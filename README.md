@@ -1,4 +1,7 @@
-# Pastelería 1000 Sabores
+
+# Pasteleria-1000-Sabores
+Trabajo semestral Fullstack II
+=======
 
 Proyecto web para la gestión y venta de productos de una pastelería ficticia, desarrollado como parte del curso Fullstack II.
 
@@ -32,11 +35,15 @@ Proyecto web para la gestión y venta de productos de una pastelería ficticia, 
 - Blog y sección de contacto.
 - Validaciones y feedback visual.
 
-## Autores
+## Contribuciones
 
-- Paz Molina
-- Jordán Villegas
+Si deseas contribuir a este proyecto, por favor abre un issue o envía un pull request.
 
 ## Licencia
 
-Proyecto educativo para el curso Fullstack II — Duoc UC.
+Este proyecto está bajo la Licencia MIT. 
+
+---
+
+Asegúrate de que el contenido del README refleje con precisión el estado actual del proyecto y que esté actualizado con cualquier cambio que realices.
+>>>>>>> master
