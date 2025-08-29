@@ -37,12 +37,6 @@ Proyecto web para la gestión y venta de productos de una pastelería ficticia, 
 
 ## Contribuciones
 
-Si deseas contribuir a este proyecto, por favor abre un issue o envía un pull request.
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT. 
-
----
+Paz Molina - Jordan Villegas
 
 Asegúrate de que el contenido del README refleje con precisión el estado actual del proyecto y que esté actualizado con cualquier cambio que realices.
