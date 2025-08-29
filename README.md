@@ -2,9 +2,6 @@
 # Pasteleria-1000-Sabores
 Trabajo semestral Fullstack II
 =======
-# README.md
-
-# Pastelería 1000 Sabores
 
 ## Descripción del Proyecto
 
