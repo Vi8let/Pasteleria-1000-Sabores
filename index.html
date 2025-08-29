@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastelería 1000 Sabores</title>
+    <meta name="description" content="Bienvenido a Pastelería 1000 Sabores, donde la repostería artesanal cobra vida.">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">
+                    <img src="assets/img/logo-gato-chef.svg" alt="Logo Pastelería 1000 Sabores" width="30" height="30" class="d-inline-block align-text-top">
+                    Pastelería 1000 Sabores
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="pages/productos.html">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="pages/nosotros.html">Nosotros</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="pages/contacto.html">Contacto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">Login</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero text-center">
+        <div class="container">
+            <h1 class="display-4">Bienvenidos a Pastelería 1000 Sabores</h1>
+            <p class="lead">Disfruta de nuestras delicias artesanales.</p>
+        </div>
+    </section>
+
+    <section class="featured-products">
+        <div class="container">
+            <h2 class="my-4">Productos Destacados</h2>
+            <div class="row">
+                <!-- Aquí se agregarán las tarjetas de productos dinámicamente con JavaScript -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="assets/img/torta_chocolate_TC001.jpg" class="card-img-top" alt="Torta de Chocolate">
+                        <div class="card-body">
+                            <h5 class="card-title">Torta Cuadrada de Chocolate</h5>
+                            <p class="card-text">$45.000 CLP</p>
+                            <a href="pages/producto-detalle.html" class="btn btn-primary">Ver Detalle</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="assets/img/torta_frutas_TC002.jpg" class="card-img-top" alt="Torta de Frutas">
+                        <div class="card-body">
+                            <h5 class="card-title">Torta Cuadrada de Frutas</h5>
+                            <p class="card-text">$50.000 CLP</p>
+                            <a href="pages/producto-detalle.html" class="btn btn-primary">Ver Detalle</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="assets/img/mousse_chocolate_PI001.jpg" class="card-img-top" alt="Mousse de Chocolate">
+                        <div class="card-body">
+                            <h5 class="card-title">Mousse de Chocolate</h5>
+                            <p class="card-text">$5.000 CLP</p>
+                            <a href="pages/producto-detalle.html" class="btn btn-primary">Ver Detalle</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center mt-4">
+        <div class="container">
+            <p>&copy; 2023 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script src="js/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+/* Estilos generales */
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #FFF5E1; /* Fondo principal */
+    color: #5D4037; /* Texto principal */
+}
+
+/* Encabezados */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Pacifico', cursive;
+}
+
+/* Botones */
+.btn {
+    background-color: #FFC0CB; /* Rosa Suave */
+    color: #5D4037; /* Texto principal */
+}
+
+.btn:hover {
+    background-color: #8B4513; /* Chocolate */
+    color: #FFF; /* Texto blanco en hover */
+}
+
+/* Estilos de tarjetas de productos */
+.product-card {
+    border: 1px solid #B0BEC5; /* Gris Claro */
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+}
+
+/* Estilos del footer */
+footer {
+    background-color: #8B4513; /* Chocolate */
+    color: #FFF; /* Texto blanco */
+    padding: 20px 0;
+    text-align: center;
+}
+
+/* Formulario de contacto */
+.form-control {
+    border: 1px solid #B0BEC5; /* Gris Claro */
+}
+
+.invalid-feedback {
+    color: #FF0000; /* Rojo para mensajes de error */
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .product-card {
+        margin-bottom: 20px;
+    }
+}

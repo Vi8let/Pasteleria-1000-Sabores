@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Producto - Pastelería 1000 Sabores</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo-gato-chef.svg" alt="Logo Pastelería 1000 Sabores" width="30" height="30">
+                    Pastelería 1000 Sabores
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="../pages/productos.html">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../pages/contacto.html">Contacto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../login.html">Login</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="../assets/img/torta_chocolate_TC001.jpg" alt="Torta Cuadrada de Chocolate" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <h1>Torta Cuadrada de Chocolate</h1>
+                <p class="lead">Precio: $45.000 CLP</p>
+                <p>Descripción: Deliciosa torta cuadrada de chocolate, perfecta para cualquier celebración.</p>
+                
+                <form id="add-to-cart-form">
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Mensaje Personalizado</label>
+                        <input type="text" class="form-control" id="message" placeholder="Escribe tu mensaje aquí">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Añadir al Carrito</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-light text-center text-lg-start mt-5">
+        <div class="text-center p-3">
+            © 2023 Pastelería 1000 Sabores
+        </div>
+    </footer>
+
+    <script src="../js/app.js" defer></script>
+    <script src="../js/productos.js" defer></script>
+</body>
+</html>
