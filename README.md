@@ -97,12 +97,4 @@ pasteleria-1000-sabores
 
 ## Contribuciones
 
-Si deseas contribuir a este proyecto, por favor abre un issue o envía un pull request.
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT. 
-
----
-
-Asegúrate de que el contenido del README refleje con precisión el estado actual del proyecto y que esté actualizado con cualquier cambio que realices.
+Solo se reciben contribuciones de los integrantes del grupo. Jordán Villegas y Paz Molina. UWU
