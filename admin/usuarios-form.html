@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Usuarios - Pastelería 1000 Sabores</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Crear/Editar Usuario</h1>
+        <form id="usuarioForm">
+            <div class="mb-3">
+                <label for="run" class="form-label">RUN (sin puntos ni guion)</label>
+                <input type="text" class="form-control" id="run" required>
+                <div class="invalid-feedback">El RUN es requerido y debe tener entre 7 y 9 caracteres.</div>
+            </div>
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" required maxlength="50">
+                <div class="invalid-feedback">El nombre es requerido y no puede exceder los 50 caracteres.</div>
+            </div>
+            <div class="mb-3">
+                <label for="apellidos" class="form-label">Apellidos</label>
+                <input type="text" class="form-control" id="apellidos" required maxlength="100">
+                <div class="invalid-feedback">Los apellidos son requeridos y no pueden exceder los 100 caracteres.</div>
+            </div>
+            <div class="mb-3">
+                <label for="correo" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="correo" required maxlength="100">
+                <div class="invalid-feedback">El correo es requerido y debe ser válido.</div>
+            </div>
+            <div class="mb-3">
+                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                <input type="date" class="form-control" id="fechaNacimiento">
+            </div>
+            <div class="mb-3">
+                <label for="tipoUsuario" class="form-label">Tipo de Usuario</label>
+                <select class="form-select" id="tipoUsuario" required>
+                    <option value="" disabled selected>Seleccione un tipo</option>
+                    <option value="administrador">Administrador</option>
+                    <option value="vendedor">Vendedor</option>
+                    <option value="cliente">Cliente</option>
+                </select>
+                <div class="invalid-feedback">El tipo de usuario es requerido.</div>
+            </div>
+            <div class="mb-3">
+                <label for="region" class="form-label">Región</label>
+                <select class="form-select" id="region" required>
+                    <option value="" disabled selected>Seleccione una región</option>
+                    <!-- Opciones de regiones se llenarán dinámicamente -->
+                </select>
+                <div class="invalid-feedback">La región es requerida.</div>
+            </div>
+            <div class="mb-3">
+                <label for="comuna" class="form-label">Comuna</label>
+                <select class="form-select" id="comuna" required>
+                    <option value="" disabled selected>Seleccione una comuna</option>
+                    <!-- Opciones de comunas se llenarán dinámicamente -->
+                </select>
+                <div class="invalid-feedback">La comuna es requerida.</div>
+            </div>
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion" required maxlength="300">
+                <div class="invalid-feedback">La dirección es requerida y no puede exceder los 300 caracteres.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+        </form>
+    </div>
+
+    <script src="../js/validaciones.js" defer></script>
+    <script src="../js/usuarios.js" defer></script>
+    <script src="../js/regiones-comunas.js" defer></script>
+</body>
+</html>
