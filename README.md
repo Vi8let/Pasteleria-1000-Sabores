@@ -46,4 +46,3 @@ Este proyecto está bajo la Licencia MIT.
 ---
 
 Asegúrate de que el contenido del README refleje con precisión el estado actual del proyecto y que esté actualizado con cualquier cambio que realices.
->>>>>>> master
