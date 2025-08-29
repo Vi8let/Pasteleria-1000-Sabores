@@ -1,3 +1,5 @@
+// regiones-comunas.js
+
 const regionesComunas = {
     "Región de Arica y Parinacota": [
         "Arica",
@@ -20,8 +22,7 @@ const regionesComunas = {
         "Tocopilla",
         "Calama",
         "San Pedro de Atacama",
-        "Sierra Gorda",
-        "Antofagasta"
+        "Sierra Gorda"
     ],
     "Región de Atacama": [
         "Copiapó",
@@ -65,8 +66,7 @@ const regionesComunas = {
         "Putaendo",
         "Santa María",
         "Catemu",
-        "Panquehue",
-        "Llaillay"
+        "Panquehue"
     ],
     "Región Metropolitana": [
         "Santiago",
@@ -102,8 +102,7 @@ const regionesComunas = {
         "Quinta de Tilcoco",
         "Rengo",
         "Requínoa",
-        "San Vicente de Tagua Tagua",
-        "Pangipulli"
+        "San Vicente de Tagua Tagua"
     ],
     "Región del Maule": [
         "Talca",
@@ -153,7 +152,6 @@ const regionesComunas = {
         "Nacimiento",
         "Negrete",
         "Quilleco",
-        "San Rosendo",
         "Santa Bárbara",
         "Yumbel"
     ],
@@ -170,7 +168,6 @@ const regionesComunas = {
         "Nueva Imperial",
         "Pitrufquén",
         "Pucón",
-        "San José de la Mariquina",
         "Teodoro Schmidt",
         "Villarrica",
         "Vilcún",
@@ -224,7 +221,6 @@ const regionesComunas = {
         "Puerto Natales",
         "Cabo de Hornos",
         "Laguna Blanca",
-        "Natales",
         "Porvenir",
         "Primavera",
         "Timaukel"

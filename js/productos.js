@@ -1,6 +1,5 @@
 // productos.js
 
-// Arreglo de productos
 const productos = [
     {
         id: 'TC001',
@@ -46,7 +45,7 @@ const productos = [
         precio: 42000,
         descripcion: 'Irresistible torta circular de manjar, un deleite para los sentidos.',
         stock: 5,
-        imagen: 'assets/img/torta_manjarl_TT002.jpg',
+        imagen: 'assets/img/torta_manjar_TT002.jpg',
         tamanos: ['Pequeña', 'Mediana', 'Grande'],
         personalizable: true
     },
@@ -82,7 +81,7 @@ const productos = [
         precio: 48000,
         descripcion: 'Deliciosa torta sin azúcar, con un toque de naranja.',
         stock: 12,
-        imagen: 'assets/img/torta_sin_azucar_naranja_PS001.jpg',
+        imagen: 'assets/img/torta_sin_azucar_naranja_PSA001.jpg',
         tamanos: ['Pequeña', 'Mediana', 'Grande'],
         personalizable: true
     },
@@ -94,7 +93,7 @@ const productos = [
         precio: 47000,
         descripcion: 'Un cheesecake cremoso sin azúcar, ideal para cuidar la línea.',
         stock: 10,
-        imagen: 'assets/img/cheesecake_sin_azucar_PS002.jpg',
+        imagen: 'assets/img/cheesecake_sin_azucar_PSA002.jpg',
         tamanos: ['Pequeña', 'Mediana'],
         personalizable: true
     },
@@ -149,7 +148,7 @@ const productos = [
     {
         id: 'PV001',
         codigo: 'PV001',
-        categoria: 'Productos Veganos',
+        categoria: 'Productos Vegana',
         nombre: 'Torta Vegana de Chocolate',
         precio: 50000,
         descripcion: 'Torta vegana de chocolate, deliciosa y saludable.',
@@ -161,7 +160,7 @@ const productos = [
     {
         id: 'PV002',
         codigo: 'PV002',
-        categoria: 'Productos Veganos',
+        categoria: 'Productos Vegana',
         nombre: 'Galletas Veganas de Avena',
         precio: 4500,
         descripcion: 'Galletas de avena veganas, perfectas para un snack.',

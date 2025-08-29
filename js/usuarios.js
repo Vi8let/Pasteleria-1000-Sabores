@@ -1,8 +1,5 @@
 // usuarios.js
 
-// Arreglo para almacenar los usuarios
-let usuarios = [];
-
 // Función para obtener usuarios del LocalStorage
 function getUsers() {
     const users = localStorage.getItem('usuarios');
@@ -11,39 +8,42 @@ function getUsers() {
 
 // Función para guardar un nuevo usuario en el LocalStorage
 function saveUser(user) {
-    usuarios = getUsers();
+    const usuarios = getUsers();
     usuarios.push(user);
     localStorage.setItem('usuarios', JSON.stringify(usuarios));
 }
 
 // Función para actualizar un usuario existente
-function updateUser(id, updatedUser) {
-    usuarios = getUsers();
-    const index = usuarios.findIndex(user => user.id === id);
+function updateUser(correo, updatedUser) {
+    const usuarios = getUsers();
+    const index = usuarios.findIndex(user => user.correo === correo);
     if (index !== -1) {
-        usuarios[index] = updatedUser;
+        usuarios[index] = { ...usuarios[index], ...updatedUser };
         localStorage.setItem('usuarios', JSON.stringify(usuarios));
     }
 }
 
 // Función para eliminar un usuario
-function deleteUser(id) {
-    usuarios = getUsers();
-    usuarios = usuarios.filter(user => user.id !== id);
-    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+function deleteUser(correo) {
+    const usuarios = getUsers();
+    const nuevosUsuarios = usuarios.filter(user => user.correo !== correo);
+    localStorage.setItem('usuarios', JSON.stringify(nuevosUsuarios));
 }
 
 // Función para validar el RUT chileno
 function validarRUT(rut) {
-    const regex = /^\d{7,8}-[0-9K]$/;
+    const regex = /^\d{7,8}-[\dkK]$/;
     if (!regex.test(rut)) return false;
-
     const [numero, dv] = rut.split('-');
-    const suma = [...numero].reverse().reduce((acc, digito, index) => {
-        return acc + (parseInt(digito) * (index % 6 + 2));
-    }, 0);
+    let suma = 0, multiplo = 2;
+    for (let i = numero.length - 1; i >= 0; i--) {
+        suma += parseInt(numero[i]) * multiplo;
+        multiplo = multiplo === 7 ? 2 : multiplo + 1;
+    }
     const dvCalculado = 11 - (suma % 11);
-    return dvCalculado === (dv === 'K' ? 10 : parseInt(dv));
+    if (dvCalculado === 11) return dv.toUpperCase() === '0';
+    if (dvCalculado === 10) return dv.toUpperCase() === 'K';
+    return dvCalculado.toString() === dv;
 }
 
 // Función para validar el registro de un nuevo usuario
@@ -60,8 +60,8 @@ function validarRegistro(user) {
     if (!apellidos || apellidos.length > 100) {
         errores.push('Apellidos requeridos y deben tener menos de 100 caracteres.');
     }
-    if (!correo || !/\S+@\S+\.\S+/.test(correo)) {
-        errores.push('Correo inválido.');
+    if (!correo || !/^[a-zA-Z0-9._%+-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/.test(correo)) {
+        errores.push('Correo inválido o no permitido.');
     }
     if (fechaNacimiento && !/^\d{4}-\d{2}-\d{2}$/.test(fechaNacimiento)) {
         errores.push('Fecha de nacimiento inválida.');
@@ -70,11 +70,11 @@ function validarRegistro(user) {
     return errores;
 }
 
-// Función para obtener un usuario por su RUT
-function getUserByRUT(rut) {
-    usuarios = getUsers();
-    return usuarios.find(user => user.rut === rut);
+// Función para obtener un usuario por su correo
+function getUserByCorreo(correo) {
+    const usuarios = getUsers();
+    return usuarios.find(user => user.correo === correo);
 }
 
 // Exportar funciones para uso en otros módulos
-export { getUsers, saveUser, updateUser, deleteUser, validarRUT, validarRegistro, getUserByRUT };
+export { getUsers, saveUser, updateUser, deleteUser, validarRUT, validarRegistro, getUserByCorreo };
