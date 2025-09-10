@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Pastelería 1000 Sabores</title>
+    <!-- Google Fonts para tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light" style="background-color: #FFF5E1;">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+                <a href="../index.html" class="btn btn-primary ms-auto">Seguir comprando</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <h1 class="text-center mb-4">Carrito de Compras</h1>
+        <div id="carritoProductos" class="row justify-content-center">
+            <!-- Aquí se cargan los productos del carrito -->
+        </div>
+        <div class="text-center mt-4">
+            <button id="vaciarCarrito" class="btn btn-danger me-2">Vaciar carrito</button>
+            <button id="finalizarCompra" class="btn btn-primary">Finalizar compra</button>
+        </div>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script type="module">
+        // Mostrar productos del carrito
+        const carritoDiv = document.getElementById('carritoProductos');
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function renderCarrito() {
+            carritoDiv.innerHTML = '';
+            if (cart.length === 0) {
+                carritoDiv.innerHTML = '<div class="col-md-8"><div class="alert alert-info">Tu carrito está vacío.</div></div>';
+                return;
+            }
+            cart.forEach((item, idx) => {
+                carritoDiv.innerHTML += `
+                    <div class="col-md-8 mb-3">
+                        <div class="card product-card">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-md-3">
+                                    <img src="../${item.imagen}" class="img-fluid rounded-start" alt="${item.nombre}">
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${item.nombre}</h5>
+                                        <p class="card-text"><strong>Precio:</strong> $${item.precio.toLocaleString('es-CL')}</p>
+                                        ${item.tamano ? `<p class="card-text"><strong>Tamaño:</strong> ${item.tamano}</p>` : ''}
+                                        <p class="card-text"><strong>Cantidad:</strong> ${item.cantidad}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <button class="btn btn-danger btn-sm eliminar-item" data-idx="${idx}">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            // Total
+            const total = cart.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+            carritoDiv.innerHTML += `
+                <div class="col-md-8 mt-3">
+                    <div class="alert alert-success text-end">
+                        <strong>Total a pagar:</strong> $${total.toLocaleString('es-CL')}
+                    </div>
+                </div>
+            `;
+        }
+
+        renderCarrito();
+
+        // Eliminar producto del carrito
+        carritoDiv.addEventListener('click', function(e) {
+            if (e.target.classList.contains('eliminar-item')) {
+                const idx = parseInt(e.target.dataset.idx);
+                cart.splice(idx, 1);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderCarrito();
+            }
+        });
+
+        // Vaciar carrito
+        document.getElementById('vaciarCarrito').addEventListener('click', function() {
+            cart = [];
+            localStorage.removeItem('cart');
+            renderCarrito();
+        });
+
+        // Finalizar compra
+        document.getElementById('finalizarCompra').addEventListener('click', function() {
+            if (cart.length === 0) {
+                alert('El carrito está vacío.');
+                return;
+            }
+            // Aquí puedes agregar la lógica para procesar la compra (ejemplo: mostrar mensaje de éxito)
+            alert('¡Compra realizada con éxito! Pronto te contactaremos.');
+            cart = [];
+            localStorage.removeItem('cart');
+            renderCarrito();
+        });
+    </script>
+</body>
+</html>
