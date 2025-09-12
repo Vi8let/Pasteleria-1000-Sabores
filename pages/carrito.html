@@ -43,69 +43,174 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script type="module">
+    <script>
         // Mostrar productos del carrito
         const carritoDiv = document.getElementById('carritoProductos');
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+        // Función para normalizar rutas de imágenes
+        function normalizarRutaImagen(rutaImagen) {
+            console.log('Normalizando ruta:', rutaImagen);
+            
+            // Si la ruta ya tiene ../, la dejamos como está
+            if (rutaImagen.startsWith('../')) {
+                console.log('Ruta ya normalizada:', rutaImagen);
+                return rutaImagen;
+            }
+            
+            // Si no tiene ../, la agregamos
+            const rutaNormalizada = '../' + rutaImagen;
+            console.log('Ruta normalizada:', rutaNormalizada);
+            return rutaNormalizada;
+        }
+
         function renderCarrito() {
+            console.log('=== RENDERIZANDO CARRITO ===');
+            console.log('Productos en carrito:', cart);
+            
             carritoDiv.innerHTML = '';
+            
             if (cart.length === 0) {
-                carritoDiv.innerHTML = '<div class="col-md-8"><div class="alert alert-info">Tu carrito está vacío.</div></div>';
+                carritoDiv.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <h4>🛒 Tu carrito está vacío</h4>
+                            <p>¡Agrega algunos productos deliciosos!</p>
+                            <a href="../index.html" class="btn btn-primary">Ir a la tienda</a>
+                        </div>
+                    </div>
+                `;
                 return;
             }
+            
             cart.forEach((item, idx) => {
+                console.log(`Renderizando item ${idx + 1}:`, item);
+                console.log(`Ruta original de imagen: ${item.imagen}`);
+                console.log(`Ruta normalizada: ${normalizarRutaImagen(item.imagen)}`);
+                
+                // Debug específico para el mousse
+                if (item.nombre.includes('Mousse')) {
+                    console.log('🔍 DEBUGGING MOUSSE:');
+                    console.log('  - ID:', item.id);
+                    console.log('  - Nombre:', item.nombre);
+                    console.log('  - Imagen original:', item.imagen);
+                    console.log('  - Imagen normalizada:', normalizarRutaImagen(item.imagen));
+                }
+                
+                const subtotal = item.precio * item.cantidad;
+                
                 carritoDiv.innerHTML += `
-                    <div class="col-md-8 mb-3">
-                        <div class="card product-card">
+                    <div class="col-12 mb-3">
+                        <div class="card product-card shadow-sm">
                             <div class="row g-0 align-items-center">
-                                <div class="col-md-3">
-                                    <img src="../${item.imagen}" class="img-fluid rounded-start" alt="${item.nombre}">
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${item.nombre}</h5>
-                                        <p class="card-text"><strong>Precio:</strong> $${item.precio.toLocaleString('es-CL')}</p>
-                                        ${item.tamano ? `<p class="card-text"><strong>Tamaño:</strong> ${item.tamano}</p>` : ''}
-                                        <p class="card-text"><strong>Cantidad:</strong> ${item.cantidad}</p>
+                                <div class="col-md-2 col-4">
+                                    <div class="p-2">
+                                        <img src="${normalizarRutaImagen(item.imagen)}" 
+                                             class="img-fluid rounded" 
+                                             alt="${item.nombre}"
+                                             style="height: 120px; width: 100%; object-fit: cover;"
+                                             onload="console.log('✅ Imagen del carrito cargada:', '${item.nombre}')"
+                                             onerror="console.error('❌ Error cargando imagen del carrito:', this.src)">
                                     </div>
                                 </div>
-                                <div class="col-md-3 text-end">
-                                    <button class="btn btn-danger btn-sm eliminar-item" data-idx="${idx}">Eliminar</button>
+                                <div class="col-md-6 col-8">
+                                    <div class="card-body p-3">
+                                        <h5 class="card-title mb-2">${item.nombre}</h5>
+                                        <p class="card-text mb-1"><strong>Precio unitario:</strong> $${item.precio.toLocaleString('es-CL')}</p>
+                                        ${item.tamano ? `<p class="card-text mb-2"><strong>Tamaño:</strong> ${item.tamano}</p>` : ''}
+                                        <div class="d-flex align-items-center mb-2">
+                                            <label class="me-2 mb-0"><strong>Cantidad:</strong></label>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${idx}, -1)">-</button>
+                                            <span class="mx-2 fw-bold">${item.cantidad}</span>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${idx}, 1)">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 text-center">
+                                    <h5 class="text-primary mb-1">$${subtotal.toLocaleString('es-CL')}</h5>
+                                    <small class="text-muted">Subtotal</small>
+                                </div>
+                                <div class="col-md-1 col-6 text-end">
+                                    <button class="btn btn-danger btn-sm eliminar-item" data-idx="${idx}" title="Eliminar producto">
+                                        🗑️
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
             });
-            // Total
-            const total = cart.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+            
+            // Calcular total
+            const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            
             carritoDiv.innerHTML += `
-                <div class="col-md-8 mt-3">
-                    <div class="alert alert-success text-end">
-                        <strong>Total a pagar:</strong> $${total.toLocaleString('es-CL')}
+                <div class="col-12 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5>Resumen del pedido</h5>
+                                    <p><strong>Total de productos:</strong> ${totalItems}</p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <h4 class="text-success">Total: $${total.toLocaleString('es-CL')}</h4>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
+            
+            console.log('=== CARRITO RENDERIZADO ===');
         }
 
-        renderCarrito();
+        // Función para cambiar cantidad de productos
+        function cambiarCantidad(idx, cambio) {
+            if (cart[idx]) {
+                cart[idx].cantidad += cambio;
+                
+                // Si la cantidad llega a 0, eliminar el producto
+                if (cart[idx].cantidad <= 0) {
+                    cart.splice(idx, 1);
+                }
+                
+                // Guardar en localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                // Re-renderizar
+                renderCarrito();
+            }
+        }
 
         // Eliminar producto del carrito
         carritoDiv.addEventListener('click', function(e) {
             if (e.target.classList.contains('eliminar-item')) {
                 const idx = parseInt(e.target.dataset.idx);
+                const productoEliminado = cart[idx].nombre;
+                
                 cart.splice(idx, 1);
                 localStorage.setItem('cart', JSON.stringify(cart));
+                
+                alert(`¡${productoEliminado} eliminado del carrito!`);
                 renderCarrito();
             }
         });
 
         // Vaciar carrito
         document.getElementById('vaciarCarrito').addEventListener('click', function() {
-            cart = [];
-            localStorage.removeItem('cart');
-            renderCarrito();
+            if (cart.length === 0) {
+                alert('El carrito ya está vacío.');
+                return;
+            }
+            
+            if (confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
+                cart = [];
+                localStorage.removeItem('cart');
+                alert('Carrito vaciado.');
+                renderCarrito();
+            }
         });
 
         // Finalizar compra
@@ -114,12 +219,173 @@
                 alert('El carrito está vacío.');
                 return;
             }
-            // Aquí puedes agregar la lógica para procesar la compra (ejemplo: mostrar mensaje de éxito)
-            alert('¡Compra realizada con éxito! Pronto te contactaremos.');
-            cart = [];
-            localStorage.removeItem('cart');
-            renderCarrito();
+            
+            const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            
+            if (confirm(`¿Confirmar compra de ${totalItems} productos por un total de $${total.toLocaleString('es-CL')}?`)) {
+                // Generar número de pedido único
+                const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                
+                // Crear boleta
+                generarBoleta(numeroPedido, total, totalItems);
+                
+                // Limpiar carrito
+                cart = [];
+                localStorage.removeItem('cart');
+                renderCarrito();
+            }
         });
+
+        // Función para generar boleta
+        function generarBoleta(numeroPedido, total, totalItems) {
+            const fecha = new Date().toLocaleDateString('es-CL');
+            const hora = new Date().toLocaleTimeString('es-CL');
+            
+            let boletaHTML = `
+                <div class="modal fade" id="boletaModal" tabindex="-1" aria-labelledby="boletaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #8B4513; color: white;">
+                                <h5 class="modal-title" id="boletaModalLabel">🎉 ¡Compra Realizada con Éxito!</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="background-color: #FFF5E1;">
+                                <div class="text-center mb-4">
+                                    <h4 style="color: #8B4513;">Pastelería 1000 Sabores</h4>
+                                    <p class="text-muted">RUT: 12.345.678-9</p>
+                                    <p class="text-muted">Dirección: Av. Principal 123, Santiago</p>
+                                    <p class="text-muted">Teléfono: +56 9 1234 5678</p>
+                                </div>
+                                
+                                <hr style="border-color: #FFC0CB;">
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Número de Pedido:</strong><br>
+                                        <span class="badge" style="background-color: #FFC0CB; color: #5D4037; font-size: 1.1rem;">${numeroPedido}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Fecha:</strong> ${fecha}<br>
+                                        <strong>Hora:</strong> ${hora}
+                                    </div>
+                                </div>
+                                
+                                <h6 style="color: #8B4513;">Productos Comprados:</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead style="background-color: #FFC0CB;">
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th>Cantidad</th>
+                                                <th>Precio Unit.</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+            `;
+            
+            cart.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                boletaHTML += `
+                    <tr>
+                        <td>${item.nombre}</td>
+                        <td>${item.cantidad}</td>
+                        <td>$${item.precio.toLocaleString('es-CL')}</td>
+                        <td>$${subtotal.toLocaleString('es-CL')}</td>
+                    </tr>
+                `;
+            });
+            
+            boletaHTML += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="text-end">
+                                    <h5 style="color: #8B4513;">Total: $${total.toLocaleString('es-CL')}</h5>
+                                </div>
+                                
+                                <hr style="border-color: #FFC0CB;">
+                                
+                                <div class="alert" style="background-color: #FFC0CB; border-color: #FFC0CB; color: #5D4037;">
+                                    <strong>📞 Próximos Pasos:</strong><br>
+                                    • Te contactaremos en las próximas 2 horas para coordinar la entrega<br>
+                                    • Puedes hacer seguimiento de tu pedido con el número: <strong>${numeroPedido}</strong><br>
+                                    • Tiempo estimado de entrega: 24-48 horas
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn" style="background-color: #8B4513; color: white;" data-bs-dismiss="modal">
+                                        Cerrar Boleta
+                                    </button>
+                                    <a href="seguimiento-pedidos.html" class="btn" style="background-color: #FFC0CB; color: #5D4037; margin-left: 10px;">
+                                        Hacer Seguimiento
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar la boleta al DOM
+            document.body.insertAdjacentHTML('beforeend', boletaHTML);
+            
+            // Mostrar la boleta
+            const boletaModal = new bootstrap.Modal(document.getElementById('boletaModal'));
+            boletaModal.show();
+            
+            // Limpiar el modal cuando se cierre
+            document.getElementById('boletaModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        // Función para probar carga de imágenes (solo las 4 que tienes)
+        function probarCargaImagenes() {
+            const imagenes = [
+                '../assets/img/TC001-Torta Cuadrada de Chocolate.png',
+                '../assets/img/TC002-Torta Cuadrada de Frutas.png', 
+                '../assets/img/TT001-Torta Circular de Vainilla.png',
+                '../assets/img/PI001-Mousse de Chocolate.png'
+            ];
+            
+            console.log('=== PROBANDO CARGA DE IMÁGENES (SOLO LAS 4 QUE TIENES) ===');
+            imagenes.forEach((ruta, index) => {
+                const img = new Image();
+                img.onload = () => console.log(`✅ Imagen ${index + 1} cargada: ${ruta}`);
+                img.onerror = () => console.error(`❌ Error cargando imagen ${index + 1}: ${ruta}`);
+                img.src = ruta;
+            });
+        }
+
+        // Función específica para probar el mousse
+        function probarMousse() {
+            console.log('=== PROBANDO ESPECÍFICAMENTE EL MOUSSE ===');
+            const rutaMousse = '../assets/img/PI001-Mousse de Chocolate.png';
+            console.log('Ruta del mousse:', rutaMousse);
+            
+            const img = new Image();
+            img.onload = () => {
+                console.log('✅ MOUSSE CARGADO CORRECTAMENTE:', rutaMousse);
+                console.log('Dimensiones:', img.width, 'x', img.height);
+            };
+            img.onerror = (e) => {
+                console.error('❌ ERROR CARGANDO MOUSSE:', rutaMousse);
+                console.error('Error details:', e);
+            };
+            img.src = rutaMousse;
+        }
+
+        // Renderizar carrito al cargar la página
+        renderCarrito();
+        
+        // Probar carga de imágenes
+        probarCargaImagenes();
+        
+        // Probar específicamente el mousse
+        probarMousse();
     </script>
 </body>
 </html>

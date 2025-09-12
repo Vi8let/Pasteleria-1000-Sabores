@@ -41,15 +41,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="region" class="form-label">Región</label>
-                            <select class="form-select" id="region" name="region" required>
-                                <option value="">Selecciona una región</option>
-                            </select>
+                            <input type="text" class="form-control" id="region" name="region" placeholder="Ej: Región Metropolitana, Valparaíso, etc." required>
                         </div>
                         <div class="mb-3">
                             <label for="comuna" class="form-label">Comuna</label>
-                            <select class="form-select" id="comuna" name="comuna" required>
-                                <option value="">Selecciona una comuna</option>
-                            </select>
+                            <input type="text" class="form-control" id="comuna" name="comuna" placeholder="Ej: Santiago, Las Condes, Viña del Mar, etc." required>
                         </div>
                         <div class="mb-3">
                             <label for="comentario" class="form-label">Comentario</label>
@@ -71,52 +67,41 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <!-- Scripts de validación y regiones -->
     <script src="../js/validaciones.js" type="module" defer></script>
-    <script src="../js/regiones-comunas.js" type="module" defer></script>
-    <script type="module">
-        // Carga dinámica de regiones y comunas
-        import regionesComunas from '../js/regiones-comunas.js';
-        const regionSelect = document.getElementById('region');
-        const comunaSelect = document.getElementById('comuna');
+    <script>
+        // Script simple para la página de contacto
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de contacto cargada');
+            
+            // Validación del formulario
+            document.getElementById('contactForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const nombre = this.name.value.trim();
+                const correo = this.email.value.trim();
+                const comentario = this.comentario.value.trim();
+                const region = this.region.value.trim();
+                const comuna = this.comuna.value.trim();
+                const errorDiv = document.getElementById('contactoError');
+                errorDiv.classList.add('d-none');
 
-        Object.keys(regionesComunas).forEach(region => {
-            const option = document.createElement('option');
-            option.value = region;
-            option.textContent = region;
-            regionSelect.appendChild(option);
-        });
+                // Validación básica
+                if (!nombre || !correo || !comentario || !region || !comuna) {
+                    errorDiv.textContent = 'Todos los campos son obligatorios.';
+                    errorDiv.classList.remove('d-none');
+                    return;
+                }
 
-        regionSelect.addEventListener('change', function() {
-            comunaSelect.innerHTML = '<option value="">Selecciona una comuna</option>';
-            const comunas = regionesComunas[this.value] || [];
-            comunas.forEach(comuna => {
-                const option = document.createElement('option');
-                option.value = comuna;
-                option.textContent = comuna;
-                comunaSelect.appendChild(option);
+                // Validación de email básica
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(correo)) {
+                    errorDiv.textContent = 'Por favor ingresa un correo electrónico válido.';
+                    errorDiv.classList.remove('d-none');
+                    return;
+                }
+
+                // Mensaje de éxito
+                alert('¡Mensaje enviado! Pronto te contactaremos.');
+                this.reset();
             });
-        });
-
-        // Validación y feedback visual
-        import { validarContacto } from '../js/validaciones.js';
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const nombre = this.name.value.trim();
-            const correo = this.email.value.trim();
-            const comentario = this.comentario.value.trim();
-            const errorDiv = document.getElementById('contactoError');
-            errorDiv.classList.add('d-none');
-            const region = this.region.value;
-            const comuna = this.comuna.value;
-
-            if (!validarContacto({ nombre, correo, comentario }, '#contactoError')) return;
-            if (!region || !comuna) {
-                errorDiv.textContent = 'Debes seleccionar región y comuna.';
-                errorDiv.classList.remove('d-none');
-                return;
-            }
-            // Aquí puedes agregar la lógica para enviar el mensaje (por ejemplo, guardar en localStorage o mostrar un mensaje de éxito)
-            alert('¡Mensaje enviado! Pronto te contactaremos.');
-            this.reset();
         });
     </script>
 </body>

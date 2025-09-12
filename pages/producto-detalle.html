@@ -21,7 +21,7 @@
                     <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
                     Pastelería 1000 Sabores
                 </a>
-                <a href="carrito.html" class="btn btn-primary ms-auto">Ver Carrito</a>
+                <a href="carrito.html" class="btn ms-auto" style="background-color: #8B4513; color: white; border-color: #8B4513;">Ver Carrito</a>
             </div>
         </nav>
     </header>
@@ -38,9 +38,242 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="../js/productos.js" type="module" defer></script>
-    <script type="module">
-        import productos from '../js/productos.js';
+    <script>
+        // Productos disponibles (todos los productos de la pastelería)
+        const productos = [
+            // Tortas Cuadradas
+            {
+                id: 'TC001',
+                codigo: 'TC001',
+                categoria: 'Tortas Cuadradas',
+                nombre: 'Torta Cuadrada de Chocolate',
+                precio: 45000,
+                descripcion: 'Deliciosa torta de chocolate con capas de ganache y un toque de avellanas. Personalizable con mensajes especiales.',
+                stock: 10,
+                imagen: '../assets/img/TC001-Torta Cuadrada de Chocolate.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true,
+                origen: 'Receta tradicional francesa adaptada con ingredientes locales chilenos. Esta torta combina la elegancia del chocolate europeo con la calidad de nuestros productos nacionales.',
+                recomendaciones: ['Torta Circular de Vainilla', 'Mousse de Chocolate', 'Torta Especial de Cumpleaños']
+            },
+            {
+                id: 'TC002',
+                codigo: 'TC002',
+                categoria: 'Tortas Cuadradas',
+                nombre: 'Torta Cuadrada de Frutas',
+                precio: 50000,
+                descripcion: 'Una mezcla de frutas frescas y crema chantilly sobre un suave bizcocho de vainilla, ideal para celebraciones.',
+                stock: 8,
+                imagen: '../assets/img/TC002-Torta Cuadrada de Frutas.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true,
+                origen: 'Inspirada en las tortas de frutas de la pastelería italiana, esta receta utiliza frutas de temporada de productores locales chilenos.',
+                recomendaciones: ['Torta Circular de Manjar', 'Tiramisú Clásico', 'Torta Especial de Boda']
+            },
+            // Tortas Circulares
+            {
+                id: 'TT001',
+                codigo: 'TT001',
+                categoria: 'Tortas Circulares',
+                nombre: 'Torta Circular de Vainilla',
+                precio: 40000,
+                descripcion: 'Bizcocho de vainilla clásico relleno con crema pastelera y cubierto con un glaseado dulce, perfecto para cualquier ocasión.',
+                stock: 15,
+                imagen: '../assets/img/TT001-Torta Circular de Vainilla.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: false,
+                origen: 'Receta clásica de la pastelería francesa, perfeccionada por nuestros estudiantes de gastronomía con técnicas tradicionales.',
+                recomendaciones: ['Torta Cuadrada de Chocolate', 'Cheesecake Sin Azúcar', 'Torta Vegana de Chocolate']
+            },
+            {
+                id: 'TT002',
+                codigo: 'TT002',
+                categoria: 'Tortas Circulares',
+                nombre: 'Torta Circular de Manjar',
+                precio: 42000,
+                descripcion: 'Torta tradicional chilena con manjar y nueces, un deleite para los amantes de los sabores dulces y clásicos.',
+                stock: 12,
+                imagen: '../assets/img/TT002-Torta Circular de Manjar.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true,
+                origen: 'Receta 100% chilena, heredada de generaciones de pasteleros locales. Utiliza manjar artesanal de productores de la zona central.',
+                recomendaciones: ['Torta Cuadrada de Frutas', 'Tarta de Santiago', 'Torta Especial de Cumpleaños']
+            },
+            // Postres Individuales
+            {
+                id: 'PI001',
+                codigo: 'PI001',
+                categoria: 'Postres Individuales',
+                nombre: 'Mousse de Chocolate',
+                precio: 5000,
+                descripcion: 'Postre individual cremoso y suave, hecho con chocolate de alta calidad, ideal para los amantes del chocolate.',
+                stock: 20,
+                imagen: '../assets/img/PI001-Mousse de Chocolate.png',
+                tamanos: [],
+                personalizable: false,
+                origen: 'Técnica francesa clásica adaptada con chocolate belga de comercio justo, promoviendo prácticas sostenibles.',
+                recomendaciones: ['Tiramisú Clásico', 'Torta Cuadrada de Chocolate', 'Brownie Sin Gluten']
+            },
+            {
+                id: 'PI002',
+                codigo: 'PI002',
+                categoria: 'Postres Individuales',
+                nombre: 'Tiramisú Clásico',
+                precio: 5500,
+                descripcion: 'Un postre italiano individual con capas de café, mascarpone y cacao, perfecto para finalizar cualquier comida.',
+                stock: 18,
+                imagen: '../assets/img/PI002-Tiramisú Clásico.png',
+                tamanos: [],
+                personalizable: false,
+                origen: 'Receta auténtica italiana, enseñada por chefs italianos a nuestros estudiantes de gastronomía internacional.',
+                recomendaciones: ['Mousse de Chocolate', 'Torta Circular de Vainilla', 'Cheesecake Sin Azúcar']
+            },
+            // Productos Sin Azúcar
+            {
+                id: 'PSA001',
+                codigo: 'PSA001',
+                categoria: 'Productos Sin Azúcar',
+                nombre: 'Torta Sin Azúcar de Naranja',
+                precio: 48000,
+                descripcion: 'Torta ligera y deliciosa, endulzada naturalmente, ideal para quienes buscan opciones más saludables.',
+                stock: 12,
+                imagen: '../assets/img/PSA001-Torta Sin Azúcar de Naranja.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true,
+                origen: 'Desarrollada por nuestros estudiantes de nutrición y gastronomía, utilizando endulzantes naturales de productores locales.',
+                recomendaciones: ['Cheesecake Sin Azúcar', 'Torta Vegana de Chocolate', 'Galletas Veganas de Avena']
+            },
+            {
+                id: 'PSA002',
+                codigo: 'PSA002',
+                categoria: 'Productos Sin Azúcar',
+                nombre: 'Cheesecake Sin Azúcar',
+                precio: 47000,
+                descripcion: 'Suave y cremoso, este cheesecake es una opción perfecta para disfrutar sin culpa.',
+                stock: 10,
+                imagen: '../assets/img/PSA002-Cheesecake Sin Azúcar.png',
+                tamanos: ['Pequeña', 'Mediana'],
+                personalizable: true,
+                origen: 'Receta neoyorquina adaptada para una alimentación consciente, desarrollada en colaboración con nutricionistas locales.',
+                recomendaciones: ['Torta Sin Azúcar de Naranja', 'Torta Circular de Vainilla', 'Mousse de Chocolate']
+            },
+            // Pastelería Tradicional
+            {
+                id: 'PT001',
+                codigo: 'PT001',
+                categoria: 'Pastelería Tradicional',
+                nombre: 'Empanada de Manzana',
+                precio: 3000,
+                descripcion: 'Pastelería tradicional rellena de manzanas especiadas, perfecta para un dulce desayuno o merienda.',
+                stock: 25,
+                imagen: '../assets/img/PT001-Empanada de Manzana.png',
+                tamanos: [],
+                personalizable: false,
+                origen: 'Receta tradicional chilena, transmitida de generación en generación, utilizando manzanas de la región del Maule.',
+                recomendaciones: ['Tarta de Santiago', 'Torta Circular de Manjar', 'Pan Sin Gluten']
+            },
+            {
+                id: 'PT002',
+                codigo: 'PT002',
+                categoria: 'Pastelería Tradicional',
+                nombre: 'Tarta de Santiago',
+                precio: 6000,
+                descripcion: 'Tradicional tarta española hecha con almendras, azúcar, y huevos, una delicia para los amantes de los postres clásicos.',
+                stock: 15,
+                imagen: '../assets/img/PT002-Tarta de Santiago.png',
+                tamanos: [],
+                personalizable: false,
+                origen: 'Receta histórica española, preservada y perfeccionada por nuestros estudiantes, utilizando almendras de productores locales.',
+                recomendaciones: ['Torta Circular de Manjar', 'Empanada de Manzana', 'Torta Especial de Boda']
+            },
+            // Productos Sin Gluten
+            {
+                id: 'PG001',
+                codigo: 'PG001',
+                categoria: 'Productos Sin Gluten',
+                nombre: 'Brownie Sin Gluten',
+                precio: 4000,
+                descripcion: 'Rico y denso, este brownie es perfecto para quienes necesitan evitar el gluten sin sacrificar el sabor.',
+                stock: 20,
+                imagen: '../assets/img/PG001-Brownie Sin Gluten.png',
+                tamanos: [],
+                personalizable: false,
+                origen: 'Desarrollado por nuestros estudiantes especializados en cocina sin gluten, utilizando harinas alternativas de productores locales.',
+                recomendaciones: ['Mousse de Chocolate', 'Torta Vegana de Chocolate', 'Pan Sin Gluten']
+            },
+            {
+                id: 'PG002',
+                codigo: 'PG002',
+                categoria: 'Productos Sin Gluten',
+                nombre: 'Pan Sin Gluten',
+                precio: 3500,
+                descripcion: 'Suave y esponjoso, ideal para sándwiches o para acompañar cualquier comida.',
+                stock: 30,
+                imagen: '../assets/img/PG002-Pan Sin Gluten.png',
+                tamanos: [],
+                personalizable: false,
+                origen: 'Receta desarrollada en colaboración con nutricionistas y panaderos locales, utilizando granos ancestrales chilenos.',
+                recomendaciones: ['Brownie Sin Gluten', 'Empanada de Manzana', 'Galletas Veganas de Avena']
+            },
+            // Productos Veganos
+            {
+                id: 'PV001',
+                codigo: 'PV001',
+                categoria: 'Productos Veganos',
+                nombre: 'Torta Vegana de Chocolate',
+                precio: 50000,
+                descripcion: 'Torta de chocolate húmeda y deliciosa, hecha sin productos de origen animal, perfecta para veganos.',
+                stock: 8,
+                imagen: '../assets/img/PV001-Torta Vegana de Chocolate.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true,
+                origen: 'Innovación culinaria desarrollada por nuestros estudiantes de gastronomía vegana, utilizando ingredientes 100% vegetales.',
+                recomendaciones: ['Torta Sin Azúcar de Naranja', 'Brownie Sin Gluten', 'Galletas Veganas de Avena']
+            },
+            {
+                id: 'PV002',
+                codigo: 'PV002',
+                categoria: 'Productos Veganos',
+                nombre: 'Galletas Veganas de Avena',
+                precio: 4500,
+                descripcion: 'Crujientes y sabrosas, estas galletas son una excelente opción para un snack saludable y vegano.',
+                stock: 40,
+                imagen: '../assets/img/PV002-Galletas Veganas de Avena.png',
+                tamanos: [],
+                personalizable: false,
+                origen: 'Receta desarrollada con avena orgánica de productores locales, promoviendo la agricultura sostenible en Chile.',
+                recomendaciones: ['Torta Vegana de Chocolate', 'Pan Sin Gluten', 'Torta Sin Azúcar de Naranja']
+            },
+            // Tortas Especiales
+            {
+                id: 'TE001',
+                codigo: 'TE001',
+                categoria: 'Tortas Especiales',
+                nombre: 'Torta Especial de Cumpleaños',
+                precio: 55000,
+                descripcion: 'Diseñada especialmente para celebraciones, personalizable con decoraciones y mensajes únicos.',
+                stock: 7,
+                imagen: '../assets/img/TE001-Torta Especial de Cumpleaños.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true,
+                origen: 'Cada torta es una obra de arte única, creada por nuestros estudiantes de repostería artística con técnicas profesionales.',
+                recomendaciones: ['Torta Cuadrada de Chocolate', 'Torta Circular de Manjar', 'Torta Especial de Boda']
+            },
+            {
+                id: 'TE002',
+                codigo: 'TE002',
+                categoria: 'Tortas Especiales',
+                nombre: 'Torta Especial de Boda',
+                precio: 60000,
+                descripcion: 'Elegante y deliciosa, esta torta está diseñada para ser el centro de atención en cualquier boda.',
+                stock: 3,
+                imagen: '../assets/img/TE002-Torta Especial de Boda.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true,
+                origen: 'Diseñada por nuestros estudiantes de pastelería de lujo, cada torta es una creación única que refleja la personalidad de la pareja.',
+                recomendaciones: ['Torta Especial de Cumpleaños', 'Torta Cuadrada de Frutas', 'Tarta de Santiago']
+            }
+        ];
 
         // Obtener el ID del producto desde la URL
         const params = new URLSearchParams(window.location.search);
@@ -53,23 +286,102 @@
         if (producto) {
             detalle.innerHTML = `
                 <div class="col-md-8">
-                    <div class="card product-card">
-                        <img src="../${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
-                        <div class="card-body">
-                            <h2 class="card-title">${producto.nombre}</h2>
-                            <p class="card-text">${producto.descripcion}</p>
-                            <p class="card-text"><strong>Categoría:</strong> ${producto.categoria}</p>
-                            <p class="card-text"><strong>Precio:</strong> $${producto.precio.toLocaleString('es-CL')}</p>
-                            <p class="card-text"><strong>Stock:</strong> ${producto.stock}</p>
-                            ${producto.tamanos && producto.tamanos.length > 0 ? `
-                                <div class="mb-3">
-                                    <label for="tamano" class="form-label">Tamaño:</label>
-                                    <select class="form-select" id="tamano">
-                                        ${producto.tamanos.map(t => `<option value="${t}">${t}</option>`).join('')}
-                                    </select>
+                    <div class="card product-card shadow-sm">
+                        <div class="row g-0">
+                            <div class="col-md-6">
+                                <img src="${producto.imagen}" class="img-fluid rounded-start" alt="${producto.nombre}" style="height: 400px; object-fit: cover; width: 100%;">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card-body h-100 d-flex flex-column">
+                                    <h2 class="card-title">${producto.nombre}</h2>
+                                    <p class="card-text text-muted"><strong>Categoría:</strong> ${producto.categoria}</p>
+                                    <p class="card-text"><strong>Código:</strong> <span class="badge" style="background-color: #FFC0CB; color: #5D4037; font-size: 1rem;">${producto.codigo}</span></p>
+                                    <p class="card-text"><strong>Precio:</strong> <span class="h4" style="color: #8B4513;">$${producto.precio.toLocaleString('es-CL')}</span></p>
+                                    <p class="card-text"><strong>Stock disponible:</strong> ${producto.stock} unidades</p>
+                                    
+                                    
+                                    <div class="mb-3">
+                                        <label for="cantidad" class="form-label"><strong>Cantidad:</strong></label>
+                                        <input type="number" class="form-control" id="cantidad" value="1" min="1" max="${producto.stock}">
+                                    </div>
+                                    
+                                    <div class="mt-auto">
+                                        <button id="agregarCarrito" class="btn btn-lg w-100 mb-2" style="background-color: #8B4513; color: white; border-color: #8B4513;">
+                                            🛒 Agregar al carrito
+                                        </button>
+                                        <a href="productos.html" class="btn btn-outline-secondary w-100">← Volver a productos</a>
+                                    </div>
                                 </div>
-                            ` : ''}
-                            <button id="agregarCarrito" class="btn btn-primary">Agregar al carrito</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Descripción detallada -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">📝 Descripción del Producto</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${producto.descripcion}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Origen de productos -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">🌱 Origen de la Receta</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${producto.origen}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Recomendaciones personalizadas -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h4 class="mb-0">💡 Recomendaciones para ti</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text mb-3">Basado en este producto, te recomendamos:</p>
+                            <div class="row">
+                                ${producto.recomendaciones.map(rec => {
+                                    const productoRec = productos.find(p => p.nombre === rec);
+                                    return productoRec ? `
+                                        <div class="col-md-4 mb-3">
+                                            <div class="card h-100">
+                                                <img src="${productoRec.imagen}" class="card-img-top" alt="${productoRec.nombre}" style="height: 150px; object-fit: cover;">
+                                                <div class="card-body">
+                                                    <h6 class="card-title">${productoRec.nombre}</h6>
+                                                    <p class="card-text fw-bold" style="color: #8B4513;">$${productoRec.precio.toLocaleString('es-CL')}</p>
+                                                    <a href="producto-detalle.html?id=${productoRec.id}" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ` : '';
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Impacto Comunitario -->
+                    <div class="card mt-4">
+                        <div class="card-header" style="background-color: #8B4513; color: white;">
+                            <h4 class="mb-0">🤝 Impacto Comunitario</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>🎓 Apoyo a Estudiantes</h5>
+                                    <p class="card-text">Cada compra apoya directamente a nuestros estudiantes de gastronomía, permitiéndoles desarrollar sus habilidades prácticas y financiar sus estudios.</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>🏘️ Comunidad Local</h5>
+                                    <p class="card-text">Trabajamos con productores locales para obtener ingredientes frescos, fortaleciendo la economía de nuestra región y promoviendo el comercio justo.</p>
+                                </div>
+                            </div>
+                            <div class="alert alert-info mt-3">
+                                <strong>💡 ¿Sabías que?</strong> El 30% de las ganancias se destina a becas para estudiantes de gastronomía y el 20% a programas de apoyo comunitario.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,27 +389,46 @@
         } else {
             detalle.innerHTML = `
                 <div class="col-md-8">
-                    <div class="alert alert-danger">Producto no encontrado.</div>
+                    <div class="alert alert-danger">
+                        <h4>Producto no encontrado</h4>
+                        <p>El producto que buscas no existe o ha sido removido.</p>
+                        <a href="productos.html" class="btn" style="background-color: #8B4513; color: white; border-color: #8B4513;">Ver todos los productos</a>
+                    </div>
                 </div>
             `;
         }
 
-        // Lógica para agregar al carrito (puedes mejorar según tu JS)
+        // Lógica para agregar al carrito
         document.addEventListener('click', function(e) {
             if (e.target && e.target.id === 'agregarCarrito') {
                 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                const tamano = document.getElementById('tamano') ? document.getElementById('tamano').value : null;
+                const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+                
                 const item = {
                     id: producto.id,
                     nombre: producto.nombre,
                     precio: producto.precio,
                     imagen: producto.imagen,
-                    tamano: tamano,
-                    cantidad: 1
+                    cantidad: cantidad
                 };
+                
                 cart.push(item);
                 localStorage.setItem('cart', JSON.stringify(cart));
-                alert('Producto agregado al carrito.');
+                
+                // Mostrar confirmación
+                const btn = e.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Agregado!';
+                btn.style.backgroundColor = '#FFC0CB';
+                btn.style.color = '#5D4037';
+                btn.style.borderColor = '#FFC0CB';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.backgroundColor = '#8B4513';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#8B4513';
+                }, 2000);
             }
         });
     </script>
