@@ -40,3 +40,15 @@ Proyecto web para la gestión y venta de productos de una pastelería ficticia, 
 Paz Molina - Jordan Villegas
 
 Asegúrate de que el contenido del README refleje con precisión el estado actual del proyecto y que esté actualizado con cualquier cambio que realices.
+
+## Jordan Villegas:
+## las funciones para una cuenta ADMIN existe, pero no está creado el usuario.
+## TO DO
+- Crear un usuario admin.
+- el usuario ADMIN permita hacer CRUD a los elementos de la página, ya sean tortas y precios y acceso a una lista de usuarios registrados en la página,
+para el ejemplo en el local storage.
+- cambiar el usuario de prueba  a uno con gmail.com.
+- acceso al localstorage en el código para ver la lista de usuarios creados.
+- mensaje de confirmacion de creacion de cuenta
+- mensaje de alerta de cuenta creada
+- crear usuario vendedor
