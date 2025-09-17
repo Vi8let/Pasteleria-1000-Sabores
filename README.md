@@ -42,6 +42,9 @@ Paz Molina - Jordan Villegas
 Asegúrate de que el contenido del README refleje con precisión el estado actual del proyecto y que esté actualizado con cualquier cambio que realices.
 
 Admin: admin@pasteleria.com / admin123
+
 Vendedor: vendedor@gmail.com / vendedor123
+
 Cliente (Gmail): cliente@gmail.com / cliente123
+
 Cliente (Duoc): cliente@duocuc.cl / cliente123
