@@ -44,11 +44,16 @@ Asegúrate de que el contenido del README refleje con precisión el estado actua
 ## Jordan Villegas:
 ## las funciones para una cuenta ADMIN existe, pero no está creado el usuario.
 ## TO DO
+- Agregar en el login la opcion de entrar como admin o vendedor además de usuario
 - Crear un usuario admin.
-- el usuario ADMIN permita hacer CRUD a los elementos de la página, ya sean tortas y precios y acceso a una lista de usuarios registrados en la página,
-para el ejemplo en el local storage.
+- el usuario ADMIN permita hacer CRUD a los elementos de la página, ya sean tortas, precios y stock y acceso a una lista de usuarios registrados en la página,
+  con el poder de eliminarlos
+- crear una pagina para que se vean esos usuarios en el admin, un boton visible solo cuando se ingrese con esa cuenta
+  en esta pagina tener 3 usuarios creados, uno de cliente @gmail.com, otro de cliente con @duocuc.cl y otro de vendedor con @gmail.com
 - cambiar el usuario de prueba  a uno con gmail.com.
+- estas deben ser creadas dentro de admin
 - acceso al localstorage en el código para ver la lista de usuarios creados.
 - mensaje de confirmacion de creacion de cuenta
 - mensaje de alerta de cuenta creada
-- crear usuario vendedor
+- crear usuario vendedor, VER lista de ordenes hechas por usuarios y stock restante de las tortas
+
