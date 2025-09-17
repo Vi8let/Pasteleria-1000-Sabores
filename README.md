@@ -45,7 +45,7 @@ Asegúrate de que el contenido del README refleje con precisión el estado actua
 ## las funciones para una cuenta ADMIN existe, pero no está creado el usuario.
 ## TO DO
 - Agregar en el login la opcion de entrar como admin o vendedor además de usuario
-- Crear un usuario admin.
+- Crear un usuario admin. con @pasteleria
 - el usuario ADMIN permita hacer CRUD a los elementos de la página, ya sean tortas, precios y stock y acceso a una lista de usuarios registrados en la página,
   con el poder de eliminarlos
 - crear una pagina para que se vean esos usuarios en el admin, un boton visible solo cuando se ingrese con esa cuenta
@@ -58,4 +58,4 @@ Asegúrate de que el contenido del README refleje con precisión el estado actua
 - crear usuario vendedor, VER lista de ordenes hechas por usuarios y stock restante de las tortas
 - que admin pueda eliminar los descuentos
 - y que esto esté comentado
-
+- eliminar usuario de prueba del login con @pastelería
