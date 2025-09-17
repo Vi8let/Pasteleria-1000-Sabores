@@ -57,4 +57,5 @@ Asegúrate de que el contenido del README refleje con precisión el estado actua
 - mensaje de alerta de cuenta creada
 - crear usuario vendedor, VER lista de ordenes hechas por usuarios y stock restante de las tortas
 - que admin pueda eliminar los descuentos
+- y que esto esté comentado
 
