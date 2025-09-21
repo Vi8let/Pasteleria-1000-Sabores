@@ -156,7 +156,7 @@
                 
                 if (d.code === 'FELICES50') {
                     // Validar que haya usado el código FELICES50 al registrarse
-                    return usuario.codigoPromocion === 'FELICES50';
+                    return usuario.codigoDescuento === 'FELICES50';
                 }
                 
                 if (d.code === 'CUMPLE_DUOC') {
@@ -270,7 +270,7 @@
                         nota = 'Esta promoción es solo para personas mayores de 50 años.';
                     }
                 } else if (d.code === 'FELICES50') {
-                    promocionValida = usuario.codigoPromocion === 'FELICES50';
+                    promocionValida = usuario.codigoDescuento === 'FELICES50';
                     if (!promocionValida) {
                         nota = 'Esta promoción solo está disponible para usuarios que la usaron al registrarse.';
                     }
