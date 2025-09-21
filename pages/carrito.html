@@ -245,11 +245,16 @@
                     // Para clientes: aplicar promociones automáticamente
                     let promocionEncontrada = null;
                     
-                    // Verificar FELICES50
+                    console.log('=== APLICANDO PROMOCIONES AUTOMÁTICAS ===');
+                    console.log('Usuario:', usuario);
+                    console.log('codigoDescuento:', usuario.codigoDescuento);
+                    
+                    // Verificar FELICES50 (prioridad más alta)
                     if (usuario.codigoDescuento === 'FELICES50') {
+                        console.log('✅ Aplicando FELICES50 (10%)');
                         promocionEncontrada = { code: 'FELICES50', percentage: 10, label: 'FELICES50 (10%)' };
                     }
-                    // Verificar ADULTO_MAYOR
+                    // Verificar ADULTO_MAYOR (solo si no tiene FELICES50)
                     else if (usuario.fechaNacimiento) {
                         const fechaNacimiento = new Date(usuario.fechaNacimiento);
                         const hoy = new Date();
@@ -264,29 +269,29 @@
                             }
                         }
                     }
-                    // Verificar CUMPLE_DUOC
-                    else if (usuario.correo && usuario.correo.includes('@duocuc.cl')) {
-                        // Verificar si es cumpleaños
-                        if (usuario.fechaNacimiento) {
-                            const fechaNacimiento = new Date(usuario.fechaNacimiento);
-                            const hoy = new Date();
-                            const esCumpleanos = fechaNacimiento.getMonth() === hoy.getMonth() && fechaNacimiento.getDate() === hoy.getDate();
-                            
-                            if (esCumpleanos) {
-                                const cart = getCart();
-                                const tortas = cart.filter(i=>/^T/.test(i.id)); // TC*, TT*, TE*
-                                const maxTorta = tortas.reduce((m,i)=> Math.max(m, i.precio), 0);
-                                descuento = Math.min(maxTorta, subtotal);
-                                nota = '¡Feliz cumpleaños! Torta gratis aplicada.';
-                                promocionAplicada = 'CUMPLE_DUOC';
-                            }
+                    // Verificar CUMPLE_DUOC (solo si no tiene otras promociones)
+                    else if (usuario.correo && usuario.correo.includes('@duocuc.cl') && usuario.fechaNacimiento) {
+                        const fechaNacimiento = new Date(usuario.fechaNacimiento);
+                        const hoy = new Date();
+                        const esCumpleanos = fechaNacimiento.getMonth() === hoy.getMonth() && fechaNacimiento.getDate() === hoy.getDate();
+                        
+                        if (esCumpleanos) {
+                            const cart = getCart();
+                            const tortas = cart.filter(i=>/^T/.test(i.id)); // TC*, TT*, TE*
+                            const maxTorta = tortas.reduce((m,i)=> Math.max(m, i.precio), 0);
+                            descuento = Math.min(maxTorta, subtotal);
+                            nota = '¡Feliz cumpleaños! Torta gratis aplicada.';
+                            promocionAplicada = 'CUMPLE_DUOC';
                         }
                     }
                     
-                    // Aplicar promoción encontrada
+                    // Aplicar promoción encontrada (solo si no se aplicó CUMPLE_DUOC)
                     if (promocionEncontrada && !promocionAplicada) {
                         descuento = Math.round(subtotal * (promocionEncontrada.percentage/100));
                         promocionAplicada = promocionEncontrada.label;
+                        console.log('✅ Descuento aplicado:', promocionAplicada, 'Monto:', descuento);
+                    } else {
+                        console.log('❌ No se aplicó descuento. promocionEncontrada:', promocionEncontrada, 'promocionAplicada:', promocionAplicada);
                     }
                 }
             }
