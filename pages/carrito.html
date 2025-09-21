@@ -124,12 +124,63 @@
             const select = document.getElementById('promoCode');
             const ds = getDiscounts();
             select.innerHTML = '';
-            ds.forEach(d=>{
-                const opt = document.createElement('option');
-                opt.value = d.code; opt.textContent = d.label || d.code;
-                select.appendChild(opt);
+            
+            // Verificar si el usuario está logueado
+            const usuario = JSON.parse(localStorage.getItem('sessionUser') || 'null');
+            if (!usuario) {
+                select.innerHTML = '<option value="">Debes iniciar sesión para ver promociones</option>';
+                select.disabled = true;
+                return;
+            }
+            
+            // Filtrar promociones según las condiciones del usuario
+            const promocionesDisponibles = ds.filter(d => {
+                if (d.code === 'ADULTO_MAYOR') {
+                    // Validar que sea mayor de 50 años
+                    if (usuario.fechaNacimiento) {
+                        const fechaNacimiento = new Date(usuario.fechaNacimiento);
+                        const hoy = new Date();
+                        const edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+                        const mesActual = hoy.getMonth();
+                        const mesNacimiento = fechaNacimiento.getMonth();
+                        
+                        // Ajustar edad si aún no ha cumplido años este año
+                        if (mesActual < mesNacimiento || (mesActual === mesNacimiento && hoy.getDate() < fechaNacimiento.getDate())) {
+                            return false;
+                        }
+                        
+                        return edad >= 50;
+                    }
+                    return false;
+                }
+                
+                if (d.code === 'FELICES50') {
+                    // Validar que haya usado el código FELICES50 al registrarse
+                    return usuario.codigoPromocion === 'FELICES50';
+                }
+                
+                if (d.code === 'CUMPLE_DUOC') {
+                    // Validar que tenga correo @duocuc.cl
+                    return usuario.correo && usuario.correo.includes('@duocuc.cl');
+                }
+                
+                return true; // Para otras promociones
             });
-            if (select.options.length>0) select.value = ds[0].code;
+            
+            if (promocionesDisponibles.length === 0) {
+                select.innerHTML = '<option value="">No hay promociones disponibles</option>';
+                select.disabled = true;
+            } else {
+                select.disabled = false;
+                promocionesDisponibles.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.code;
+                    opt.textContent = d.label || d.code;
+                    select.appendChild(opt);
+                });
+                if (select.options.length > 0) select.value = promocionesDisponibles[0].code;
+            }
+            
             toggleDuocVerification();
         }
         function toggleDuocVerification(){
@@ -192,6 +243,52 @@
             const d = ds.find(x=>x.code===code) || { type:'percentage', percentage:0 };
             let descuento = 0;
             let nota = '';
+            
+            // Verificar que el usuario esté logueado para aplicar promociones
+            const usuario = JSON.parse(localStorage.getItem('sessionUser') || 'null');
+            if (!usuario && code) {
+                nota = 'Debes iniciar sesión para aplicar promociones.';
+            } else if (usuario && code) {
+                // Validar que el usuario cumpla las condiciones para la promoción
+                let promocionValida = false;
+                
+                if (d.code === 'ADULTO_MAYOR') {
+                    if (usuario.fechaNacimiento) {
+                        const fechaNacimiento = new Date(usuario.fechaNacimiento);
+                        const hoy = new Date();
+                        const edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+                        const mesActual = hoy.getMonth();
+                        const mesNacimiento = fechaNacimiento.getMonth();
+                        
+                        if (mesActual < mesNacimiento || (mesActual === mesNacimiento && hoy.getDate() < fechaNacimiento.getDate())) {
+                            promocionValida = false;
+                        } else {
+                            promocionValida = edad >= 50;
+                        }
+                    }
+                    if (!promocionValida) {
+                        nota = 'Esta promoción es solo para personas mayores de 50 años.';
+                    }
+                } else if (d.code === 'FELICES50') {
+                    promocionValida = usuario.codigoPromocion === 'FELICES50';
+                    if (!promocionValida) {
+                        nota = 'Esta promoción solo está disponible para usuarios que la usaron al registrarse.';
+                    }
+                } else if (d.code === 'CUMPLE_DUOC') {
+                    promocionValida = usuario.correo && usuario.correo.includes('@duocuc.cl');
+                    if (!promocionValida) {
+                        nota = 'Esta promoción es solo para usuarios con correo @duocuc.cl.';
+                    }
+                } else {
+                    promocionValida = true;
+                }
+                
+                if (!promocionValida) {
+                    // No aplicar descuento si la promoción no es válida
+                    d.percentage = 0;
+                }
+            }
+            
             if (d.type === 'percentage' || (typeof d.percentage === 'number')){
                 descuento = Math.round(subtotal * (d.percentage/100));
             } else if (d.type === 'birthday_duoc'){
@@ -411,7 +508,8 @@
             
             console.log('=== CARRITO RENDERIZADO ===');
             
-            // Actualizar el resumen después de renderizar
+            // Actualizar promociones y resumen después de renderizar
+            renderPromos();
             calcular();
         }
 
