@@ -67,20 +67,32 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
-        function getDiscounts(){ return JSON.parse(localStorage.getItem('descuentos')||'[]'); }
-        function saveDiscounts(list){ localStorage.setItem('descuentos', JSON.stringify(list)); }
+        function getDiscounts(){ return JSON.parse(localStorage.getItem('discounts')||'[]'); }
+        function saveDiscounts(list){ localStorage.setItem('discounts', JSON.stringify(list)); }
 
         function render(){
             const cont = document.getElementById('listaDescuentos');
             const d = getDiscounts();
             if (d.length===0){ cont.innerHTML='<div class="alert alert-info">Sin descuentos.</div>'; return; }
             const table = document.createElement('table');
-            table.className = 'table';
+            table.className = 'table table-striped';
             table.innerHTML = '<thead><tr><th>Código</th><th>Porcentaje</th><th>Acciones</th></tr></thead>';
             const tbody = document.createElement('tbody');
             d.forEach(x=>{
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${x.codigo}</td><td>${x.porcentaje}%</td><td><button class="btn btn-sm btn-danger" data-code="${x.codigo}">Eliminar</button></td>`;
+                tr.innerHTML = `
+                    <td><strong>${x.codigo}</strong></td>
+                    <td>
+                        <div class="input-group input-group-sm" style="width: 120px;">
+                            <input type="number" class="form-control" value="${x.porcentaje}" min="1" max="90" data-code="${x.codigo}" data-field="porcentaje">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success me-1" data-action="guardar" data-code="${x.codigo}">Guardar</button>
+                        <button class="btn btn-sm btn-danger" data-action="eliminar" data-code="${x.codigo}">Eliminar</button>
+                    </td>
+                `;
                 tbody.appendChild(tr);
             });
             table.appendChild(tbody);
@@ -103,15 +115,54 @@
         });
 
         document.addEventListener('click', function(e){
-            if (e.target.matches('button.btn-danger[data-code]')){
+            if (e.target.matches('button[data-action="eliminar"]')){
                 const code = e.target.getAttribute('data-code');
-                const d = getDiscounts().filter(x=>x.codigo!==code);
-                saveDiscounts(d);
-                alert('Descuento eliminado.');
-                render();
+                if (confirm(`¿Estás seguro de que quieres eliminar el descuento ${code}?`)) {
+                    const d = getDiscounts().filter(x=>x.codigo!==code);
+                    saveDiscounts(d);
+                    alert('Descuento eliminado.');
+                    render();
+                }
+            }
+            
+            if (e.target.matches('button[data-action="guardar"]')){
+                const code = e.target.getAttribute('data-code');
+                const input = document.querySelector(`input[data-code="${code}"][data-field="porcentaje"]`);
+                const nuevoPorcentaje = parseInt(input.value, 10);
+                
+                if (nuevoPorcentaje < 1 || nuevoPorcentaje > 90) {
+                    alert('El porcentaje debe estar entre 1 y 90.');
+                    return;
+                }
+                
+                const d = getDiscounts();
+                const index = d.findIndex(x => x.codigo === code);
+                if (index !== -1) {
+                    d[index].porcentaje = nuevoPorcentaje;
+                    saveDiscounts(d);
+                    alert('Descuento actualizado.');
+                    render();
+                }
             }
         });
 
+        // Limpiar promoción DUOC del localStorage si existe
+        function limpiarPromocionDUOC() {
+            try {
+                let discounts = JSON.parse(localStorage.getItem('discounts') || '[]');
+                const originalLength = discounts.length;
+                discounts = discounts.filter(d => d.code !== 'DUOC' && d.codigo !== 'DUOC');
+                if (discounts.length !== originalLength) {
+                    localStorage.setItem('discounts', JSON.stringify(discounts));
+                    console.log('Promoción DUOC eliminada del localStorage');
+                }
+            } catch (e) {
+                console.log('Error limpiando promoción DUOC:', e);
+            }
+        }
+
+        // Limpiar DUOC al cargar la página
+        limpiarPromocionDUOC();
         render();
     </script>
 </body>

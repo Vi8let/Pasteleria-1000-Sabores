@@ -52,27 +52,47 @@
             const normalized = [];
             (list||[]).forEach(x=>{
                 let item = { ...x };
-                // Migrar DUOC antiguo -> CUMPLE_DUOC
+                
+                // Eliminar completamente la promoción DUOC (no migrar)
                 if (item.code === 'DUOC') {
-                    item = { code:'CUMPLE_DUOC', type:'birthday_duoc', label:'Cumpleaños DUOC (torta gratis)' };
+                    return; // Saltar esta promoción
                 }
+                
                 // Si no tiene type pero tiene percentage, asumir porcentaje
                 if (!item.type && typeof item.percentage === 'number') {
                     item.type = 'percentage';
                     if (!item.label) item.label = `${item.code} (${item.percentage}%)`;
                 }
-                // Forzar valores oficiales
-                if (item.code === 'FELICES50') { item.percentage = 10; item.type='percentage'; item.label='FELICES50 (10%)'; }
-                if (item.code === 'ADULTO_MAYOR') { item.percentage = 50; item.type='percentage'; item.label='Adulto Mayor (50%)'; }
-                if (item.code === 'CUMPLE_DUOC') { item.type='birthday_duoc'; item.label='Cumpleaños DUOC (torta gratis)'; delete item.percentage; }
-                // Lista blanca
-                if (['FELICES50','ADULTO_MAYOR','CUMPLE_DUOC'].includes(item.code)) normalized.push(item);
+                
+                // Forzar valores oficiales para promociones válidas
+                if (item.code === 'FELICES50') { 
+                    item.percentage = 10; 
+                    item.type='percentage'; 
+                    item.label='FELICES50 (10%)'; 
+                }
+                if (item.code === 'ADULTO_MAYOR') { 
+                    item.percentage = 50; 
+                    item.type='percentage'; 
+                    item.label='Adulto Mayor (50%)'; 
+                }
+                if (item.code === 'CUMPLE_DUOC') { 
+                    item.type='birthday_duoc'; 
+                    item.label='Cumpleaños DUOC (torta gratis)'; 
+                    delete item.percentage; 
+                }
+                
+                // Solo incluir promociones válidas
+                if (['FELICES50','ADULTO_MAYOR','CUMPLE_DUOC'].includes(item.code)) {
+                    normalized.push(item);
+                }
             });
+            
             // Si falta alguno, agregarlo por defecto
             const ensure = (code, obj) => { if (!normalized.find(d=>d.code===code)) normalized.push(obj); };
             ensure('FELICES50', { code:'FELICES50', type:'percentage', percentage:10, label:'FELICES50 (10%)' });
             ensure('ADULTO_MAYOR', { code:'ADULTO_MAYOR', type:'percentage', percentage:50, label:'Adulto Mayor (50%)' });
             ensure('CUMPLE_DUOC', { code:'CUMPLE_DUOC', type:'birthday_duoc', label:'Cumpleaños DUOC (torta gratis)' });
+            
             return normalized;
         }
         function getDiscounts(){
@@ -204,7 +224,23 @@
                     </div>
                 </div>`;
         }
+        // Limpiar promoción DUOC del localStorage si existe
+        function limpiarPromocionDUOC() {
+            try {
+                let discounts = JSON.parse(localStorage.getItem('discounts') || '[]');
+                const originalLength = discounts.length;
+                discounts = discounts.filter(d => d.code !== 'DUOC' && d.codigo !== 'DUOC');
+                if (discounts.length !== originalLength) {
+                    localStorage.setItem('discounts', JSON.stringify(discounts));
+                    console.log('Promoción DUOC eliminada del localStorage');
+                }
+            } catch (e) {
+                console.log('Error limpiando promoción DUOC:', e);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function(){
+            limpiarPromocionDUOC(); // Limpiar DUOC al cargar la página
             renderPromos();
             calcular();
             document.getElementById('promoCode').addEventListener('change', function(){ toggleDuocVerification(); calcular(); });
@@ -437,28 +473,29 @@
                 return;
             }
             
+            // Validar que el usuario esté autenticado
+            const usuario = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            if (!usuario) {
+                alert('Debes iniciar sesión para realizar una compra.');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Solo permitir compras a clientes (rol 'usuario' o sin rol definido)
+            if (usuario.rol && usuario.rol !== 'usuario') {
+                alert('Solo los clientes pueden realizar compras. Los administradores y vendedores no pueden comprar.');
+                return;
+            }
+            
             const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
             const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
-            // Modo vendedor: mostrar botón 'Pago confirmado' y luego emitir boleta
-            const usuario = JSON.parse(localStorage.getItem('sessionUser')||'null');
-            const contAcciones = document.getElementById('accionesPago');
-            if (usuario && usuario.rol==='vendedor'){
-                contAcciones.innerHTML = '<button id="btnPagoConfirmado" class="btn btn-success btn-sm">Pago confirmado</button>';
-                document.getElementById('btnPagoConfirmado').addEventListener('click', function(){
-                    const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-                    generarBoleta(numeroPedido, total, totalItems);
-                    cart = [];
-                    localStorage.removeItem('cart');
-                    renderCarrito();
-                });
-            } else {
-                if (confirm(`¿Confirmar compra de ${totalItems} productos por un total de $${total.toLocaleString('es-CL')}?`)) {
-                    const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-                    generarBoleta(numeroPedido, total, totalItems);
-                    cart = [];
-                    localStorage.removeItem('cart');
-                    renderCarrito();
-                }
+            
+            if (confirm(`¿Confirmar compra de ${totalItems} productos por un total de $${total.toLocaleString('es-CL')}?`)) {
+                const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                generarBoleta(numeroPedido, total, totalItems);
+                cart = [];
+                localStorage.removeItem('cart');
+                renderCarrito();
             }
         });
 
