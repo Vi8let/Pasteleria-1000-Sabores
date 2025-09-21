@@ -128,57 +128,30 @@
             // Verificar si el usuario está logueado
             const usuario = JSON.parse(localStorage.getItem('sessionUser') || 'null');
             if (!usuario) {
-                select.innerHTML = '<option value="">Debes iniciar sesión para ver promociones</option>';
-                select.disabled = true;
+                // Ocultar completamente la sección de promociones
+                const promoSection = document.querySelector('.card.mt-4');
+                if (promoSection) promoSection.style.display = 'none';
                 return;
             }
             
-            // Filtrar promociones según las condiciones del usuario
-            const promocionesDisponibles = ds.filter(d => {
-                if (d.code === 'ADULTO_MAYOR') {
-                    // Validar que sea mayor de 50 años
-                    if (usuario.fechaNacimiento) {
-                        const fechaNacimiento = new Date(usuario.fechaNacimiento);
-                        const hoy = new Date();
-                        const edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-                        const mesActual = hoy.getMonth();
-                        const mesNacimiento = fechaNacimiento.getMonth();
-                        
-                        // Ajustar edad si aún no ha cumplido años este año
-                        if (mesActual < mesNacimiento || (mesActual === mesNacimiento && hoy.getDate() < fechaNacimiento.getDate())) {
-                            return false;
-                        }
-                        
-                        return edad >= 50;
-                    }
-                    return false;
-                }
+            // Solo mostrar selector de promociones para vendedores
+            if (usuario.rol === 'vendedor') {
+                const promoSection = document.querySelector('.card.mt-4');
+                if (promoSection) promoSection.style.display = 'block';
                 
-                if (d.code === 'FELICES50') {
-                    // Validar que haya usado el código FELICES50 al registrarse
-                    return usuario.codigoDescuento === 'FELICES50';
-                }
-                
-                if (d.code === 'CUMPLE_DUOC') {
-                    // Validar que tenga correo @duocuc.cl
-                    return usuario.correo && usuario.correo.includes('@duocuc.cl');
-                }
-                
-                return true; // Para otras promociones
-            });
-            
-            if (promocionesDisponibles.length === 0) {
-                select.innerHTML = '<option value="">No hay promociones disponibles</option>';
-                select.disabled = true;
-            } else {
-                select.disabled = false;
-                promocionesDisponibles.forEach(d => {
+                // Mostrar todas las promociones para vendedores
+                ds.forEach(d => {
                     const opt = document.createElement('option');
                     opt.value = d.code;
                     opt.textContent = d.label || d.code;
                     select.appendChild(opt);
                 });
-                if (select.options.length > 0) select.value = promocionesDisponibles[0].code;
+                if (select.options.length > 0) select.value = ds[0].code;
+                select.disabled = false;
+            } else {
+                // Para clientes, ocultar la sección de promociones (se aplicarán automáticamente)
+                const promoSection = document.querySelector('.card.mt-4');
+                if (promoSection) promoSection.style.display = 'none';
             }
             
             toggleDuocVerification();
@@ -238,79 +211,93 @@
                 if (resumenV) resumenV.innerHTML = '';
                 return;
             }
-            const ds = getDiscounts();
-            const code = document.getElementById('promoCode').value;
-            const d = ds.find(x=>x.code===code) || { type:'percentage', percentage:0 };
+            
+            const usuario = JSON.parse(localStorage.getItem('sessionUser') || 'null');
             let descuento = 0;
             let nota = '';
+            let promocionAplicada = '';
             
-            // Verificar que el usuario esté logueado para aplicar promociones
-            const usuario = JSON.parse(localStorage.getItem('sessionUser') || 'null');
-            if (!usuario && code) {
-                nota = 'Debes iniciar sesión para aplicar promociones.';
-            } else if (usuario && code) {
-                // Validar que el usuario cumpla las condiciones para la promoción
-                let promocionValida = false;
-                
-                if (d.code === 'ADULTO_MAYOR') {
-                    if (usuario.fechaNacimiento) {
+            if (usuario) {
+                // Para vendedores: usar promoción seleccionada
+                if (usuario.rol === 'vendedor') {
+                    const ds = getDiscounts();
+                    const code = document.getElementById('promoCode').value;
+                    const d = ds.find(x=>x.code===code) || { type:'percentage', percentage:0 };
+                    
+                    if (d.type === 'percentage' || (typeof d.percentage === 'number')){
+                        descuento = Math.round(subtotal * (d.percentage/100));
+                        promocionAplicada = d.label || d.code;
+                    } else if (d.type === 'birthday_duoc'){
+                        // Validación: requiere verificación manual (correo y cumpleaños)
+                        const eligible = JSON.parse(localStorage.getItem('duocEligible')||'null');
+                        if (eligible){
+                            const cart = getCart();
+                            const tortas = cart.filter(i=>/^T/.test(i.id)); // TC*, TT*, TE*
+                            const maxTorta = tortas.reduce((m,i)=> Math.max(m, i.precio), 0);
+                            descuento = Math.min(maxTorta, subtotal);
+                            nota = `Beneficio aplicado para ${eligible.email}: una torta gratis por cumpleaños.`;
+                            promocionAplicada = 'CUMPLE_DUOC';
+                        } else {
+                            nota = 'Validación pendiente: ingresa correo @duocuc.cl y verifica cumpleaños.';
+                        }
+                    }
+                } else {
+                    // Para clientes: aplicar promociones automáticamente
+                    let promocionEncontrada = null;
+                    
+                    // Verificar FELICES50
+                    if (usuario.codigoDescuento === 'FELICES50') {
+                        promocionEncontrada = { code: 'FELICES50', percentage: 10, label: 'FELICES50 (10%)' };
+                    }
+                    // Verificar ADULTO_MAYOR
+                    else if (usuario.fechaNacimiento) {
                         const fechaNacimiento = new Date(usuario.fechaNacimiento);
                         const hoy = new Date();
                         const edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
                         const mesActual = hoy.getMonth();
                         const mesNacimiento = fechaNacimiento.getMonth();
                         
-                        if (mesActual < mesNacimiento || (mesActual === mesNacimiento && hoy.getDate() < fechaNacimiento.getDate())) {
-                            promocionValida = false;
-                        } else {
-                            promocionValida = edad >= 50;
+                        // Ajustar edad si aún no ha cumplido años este año
+                        if (mesActual >= mesNacimiento && (mesActual > mesNacimiento || hoy.getDate() >= fechaNacimiento.getDate())) {
+                            if (edad >= 50) {
+                                promocionEncontrada = { code: 'ADULTO_MAYOR', percentage: 50, label: 'Adulto Mayor (50%)' };
+                            }
                         }
                     }
-                    if (!promocionValida) {
-                        nota = 'Esta promoción es solo para personas mayores de 50 años.';
+                    // Verificar CUMPLE_DUOC
+                    else if (usuario.correo && usuario.correo.includes('@duocuc.cl')) {
+                        // Verificar si es cumpleaños
+                        if (usuario.fechaNacimiento) {
+                            const fechaNacimiento = new Date(usuario.fechaNacimiento);
+                            const hoy = new Date();
+                            const esCumpleanos = fechaNacimiento.getMonth() === hoy.getMonth() && fechaNacimiento.getDate() === hoy.getDate();
+                            
+                            if (esCumpleanos) {
+                                const cart = getCart();
+                                const tortas = cart.filter(i=>/^T/.test(i.id)); // TC*, TT*, TE*
+                                const maxTorta = tortas.reduce((m,i)=> Math.max(m, i.precio), 0);
+                                descuento = Math.min(maxTorta, subtotal);
+                                nota = '¡Feliz cumpleaños! Torta gratis aplicada.';
+                                promocionAplicada = 'CUMPLE_DUOC';
+                            }
+                        }
                     }
-                } else if (d.code === 'FELICES50') {
-                    promocionValida = usuario.codigoDescuento === 'FELICES50';
-                    if (!promocionValida) {
-                        nota = 'Esta promoción solo está disponible para usuarios que la usaron al registrarse.';
+                    
+                    // Aplicar promoción encontrada
+                    if (promocionEncontrada && !promocionAplicada) {
+                        descuento = Math.round(subtotal * (promocionEncontrada.percentage/100));
+                        promocionAplicada = promocionEncontrada.label;
                     }
-                } else if (d.code === 'CUMPLE_DUOC') {
-                    promocionValida = usuario.correo && usuario.correo.includes('@duocuc.cl');
-                    if (!promocionValida) {
-                        nota = 'Esta promoción es solo para usuarios con correo @duocuc.cl.';
-                    }
-                } else {
-                    promocionValida = true;
-                }
-                
-                if (!promocionValida) {
-                    // No aplicar descuento si la promoción no es válida
-                    d.percentage = 0;
                 }
             }
             
-            if (d.type === 'percentage' || (typeof d.percentage === 'number')){
-                descuento = Math.round(subtotal * (d.percentage/100));
-            } else if (d.type === 'birthday_duoc'){
-                // Validación: requiere verificación manual (correo y cumpleaños)
-                const eligible = JSON.parse(localStorage.getItem('duocEligible')||'null');
-                if (eligible){
-                    const cart = getCart();
-                    const tortas = cart.filter(i=>/^T/.test(i.id)); // TC*, TT*, TE*
-                    const maxTorta = tortas.reduce((m,i)=> Math.max(m, i.precio), 0);
-                    descuento = Math.min(maxTorta, subtotal);
-                    nota = `Beneficio aplicado para ${eligible.email}: una torta gratis por cumpleaños.`;
-                } else {
-                    nota = 'Validación pendiente: ingresa correo @duocuc.cl y verifica cumpleaños.';
-                }
-            }
             const total = subtotal - descuento;
             const resumen = document.getElementById('resumen');
             resumen.innerHTML = `
                 <div class="text-end">
                     <div class="mb-2"><strong>Subtotal:</strong> $${subtotal.toLocaleString('es-CL')}</div>
-                    <div class="mb-2"><strong>Descuento:</strong> -$${descuento.toLocaleString('es-CL')}</div>
-                    ${d.type==='birthday_duoc' ? `<small class="text-muted d-block mb-2">${nota}</small>` : ''}
+                    ${descuento > 0 ? `<div class="mb-2"><strong>Descuento (${promocionAplicada}):</strong> -$${descuento.toLocaleString('es-CL')}</div>` : ''}
+                    ${nota ? `<small class="text-muted d-block mb-2">${nota}</small>` : ''}
                     <div class="h5" style="color:#8B4513;"><strong>Total a pagar: $${total.toLocaleString('es-CL')}</strong></div>
                 </div>`;
         }
