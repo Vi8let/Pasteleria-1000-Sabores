@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Pastelería 1000 Sabores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <nav class="navbar navbar-light" style="background-color:#FFF5E1;">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                Pastelería 1000 Sabores
+            </a>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <h1 class="text-center mb-4">Tu Carrito</h1>
+        <div id="contenidoCarrito"></div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-6">
+                        <label class="form-label">Código de promoción</label>
+                        <select id="promoCode" class="form-select"></select>
+                        <small class="text-muted">Se aplica sobre el subtotal.</small>
+                        <div id="verifyDuocContainer" class="mt-2 d-none">
+                            <div class="input-group input-group-sm">
+                                <input type="email" id="duocEmail" class="form-control" placeholder="correo@duocuc.cl">
+                                <button class="btn btn-outline-secondary" type="button" id="btnVerificarDuoc">Verificar</button>
+                            </div>
+                            <div id="duocMsg" class="form-text"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end"></div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3" id="resumen"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        function getCart(){ try{ return JSON.parse(localStorage.getItem('cart')||'[]'); }catch(e){ return []; } }
+        function setCart(v){ localStorage.setItem('cart', JSON.stringify(v)); }
+        function normalizeDiscounts(list){
+            const normalized = [];
+            (list||[]).forEach(x=>{
+                let item = { ...x };
+                // Migrar DUOC antiguo -> CUMPLE_DUOC
+                if (item.code === 'DUOC') {
+                    item = { code:'CUMPLE_DUOC', type:'birthday_duoc', label:'Cumpleaños DUOC (torta gratis)' };
+                }
+                // Si no tiene type pero tiene percentage, asumir porcentaje
+                if (!item.type && typeof item.percentage === 'number') {
+                    item.type = 'percentage';
+                    if (!item.label) item.label = `${item.code} (${item.percentage}%)`;
+                }
+                // Forzar valores oficiales
+                if (item.code === 'FELICES50') { item.percentage = 10; item.type='percentage'; item.label='FELICES50 (10%)'; }
+                if (item.code === 'ADULTO_MAYOR') { item.percentage = 50; item.type='percentage'; item.label='Adulto Mayor (50%)'; }
+                if (item.code === 'CUMPLE_DUOC') { item.type='birthday_duoc'; item.label='Cumpleaños DUOC (torta gratis)'; delete item.percentage; }
+                // Lista blanca
+                if (['FELICES50','ADULTO_MAYOR','CUMPLE_DUOC'].includes(item.code)) normalized.push(item);
+            });
+            // Si falta alguno, agregarlo por defecto
+            const ensure = (code, obj) => { if (!normalized.find(d=>d.code===code)) normalized.push(obj); };
+            ensure('FELICES50', { code:'FELICES50', type:'percentage', percentage:10, label:'FELICES50 (10%)' });
+            ensure('ADULTO_MAYOR', { code:'ADULTO_MAYOR', type:'percentage', percentage:50, label:'Adulto Mayor (50%)' });
+            ensure('CUMPLE_DUOC', { code:'CUMPLE_DUOC', type:'birthday_duoc', label:'Cumpleaños DUOC (torta gratis)' });
+            return normalized;
+        }
+        function getDiscounts(){
+            let d = [];
+            try { d = JSON.parse(localStorage.getItem('discounts')||'[]'); } catch(e){ d = []; }
+            d = normalizeDiscounts(d);
+            localStorage.setItem('discounts', JSON.stringify(d));
+            return d;
+        }
+        function renderCart(){
+            const cont = document.getElementById('contenidoCarrito');
+            const cart = getCart();
+            if (cart.length===0){ cont.innerHTML='<div class="alert alert-info">Tu carrito está vacío.</div>'; return 0; }
+            let subtotal = 0;
+            const table = document.createElement('table');
+            table.className = 'table table-striped';
+            table.innerHTML = '<thead><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th></tr></thead>';
+            const tbody = document.createElement('tbody');
+            cart.forEach(i=>{
+                const total = i.precio * i.cantidad;
+                subtotal += total;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${i.nombre}</td><td>${i.cantidad}</td><td>$${i.precio.toLocaleString('es-CL')}</td><td>$${total.toLocaleString('es-CL')}</td>`;
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            cont.innerHTML = '';
+            cont.appendChild(table);
+            return subtotal;
+        }
+        function renderPromos(){
+            const select = document.getElementById('promoCode');
+            const ds = getDiscounts();
+            select.innerHTML = '';
+            ds.forEach(d=>{
+                const opt = document.createElement('option');
+                opt.value = d.code; opt.textContent = d.label || d.code;
+                select.appendChild(opt);
+            });
+            if (select.options.length>0) select.value = ds[0].code;
+            toggleDuocVerification();
+        }
+        function toggleDuocVerification(){
+            const code = document.getElementById('promoCode').value;
+            const box = document.getElementById('verifyDuocContainer');
+            const msg = document.getElementById('duocMsg');
+            if (code==='CUMPLE_DUOC'){
+                box.classList.remove('d-none');
+                msg.textContent = 'Ingresa el correo DUOC del cliente para validar cumpleaños.';
+                msg.style.color = '#5D4037';
+            } else {
+                box.classList.add('d-none');
+                msg.textContent='';
+                localStorage.removeItem('duocEligible');
+            }
+        }
+        function verificarDuoc(){
+            const email = (document.getElementById('duocEmail').value||'').trim();
+            const msg = document.getElementById('duocMsg');
+            msg.textContent='';
+            if (!/@duocuc\.cl$/i.test(email)){
+                msg.textContent='Debe ser correo @duocuc.cl';
+                msg.style.color = 'red';
+                localStorage.removeItem('duocEligible');
+                return false;
+            }
+            let usuarios = [];
+            try { usuarios = JSON.parse(localStorage.getItem('usuarios')||'[]'); } catch(e){ usuarios=[]; }
+            const u = usuarios.find(x=> (x.correo||x.email||'').toLowerCase()===email.toLowerCase());
+            if (!u){
+                msg.textContent='Usuario no encontrado en registros.';
+                msg.style.color = 'red';
+                localStorage.removeItem('duocEligible');
+                return false;
+            }
+            const hoy = new Date();
+            const fn = u.fechaNacimiento ? new Date(u.fechaNacimiento) : null;
+            const cumple = !!fn && fn.getMonth()===hoy.getMonth() && fn.getDate()===hoy.getDate();
+            if (!cumple){
+                msg.textContent='Hoy no es su cumpleaños.';
+                msg.style.color = 'red';
+                localStorage.removeItem('duocEligible');
+                return false;
+            }
+            localStorage.setItem('duocEligible', JSON.stringify({ email, fecha: new Date().toISOString().slice(0,10) }));
+            msg.textContent='Elegible: se aplicará una torta gratis.';
+            msg.style.color = 'green';
+            return true;
+        }
+        function calcular(){
+            const subtotal = renderCart();
+            // Si el carrito está vacío, limpiar el resumen y salir
+            if (!subtotal || subtotal <= 0){
+                const resumenV = document.getElementById('resumen');
+                if (resumenV) resumenV.innerHTML = '';
+                return;
+            }
+            const ds = getDiscounts();
+            const code = document.getElementById('promoCode').value;
+            const d = ds.find(x=>x.code===code) || { type:'percentage', percentage:0 };
+            let descuento = 0;
+            let nota = '';
+            if (d.type === 'percentage' || (typeof d.percentage === 'number')){
+                descuento = Math.round(subtotal * (d.percentage/100));
+            } else if (d.type === 'birthday_duoc'){
+                // Validación: requiere verificación manual (correo y cumpleaños)
+                const eligible = JSON.parse(localStorage.getItem('duocEligible')||'null');
+                if (eligible){
+                    const cart = getCart();
+                    const tortas = cart.filter(i=>/^T/.test(i.id)); // TC*, TT*, TE*
+                    const maxTorta = tortas.reduce((m,i)=> Math.max(m, i.precio), 0);
+                    descuento = Math.min(maxTorta, subtotal);
+                    nota = `Beneficio aplicado para ${eligible.email}: una torta gratis por cumpleaños.`;
+                } else {
+                    nota = 'Validación pendiente: ingresa correo @duocuc.cl y verifica cumpleaños.';
+                }
+            }
+            const total = subtotal - descuento;
+            const resumen = document.getElementById('resumen');
+            resumen.innerHTML = `
+                <div class="card">
+                    <div class="card-body d-flex justify-content-between">
+                        <div>
+                            <div>Subtotal: <strong>$${subtotal.toLocaleString('es-CL')}</strong></div>
+                            <div>Descuento: <strong>-$${descuento.toLocaleString('es-CL')}</strong></div>
+                            ${d.type==='birthday_duoc' ? `<small class="text-muted">${nota}</small>` : ''}
+                        </div>
+                        <div class="text-end" style="color:#8B4513;">Total a pagar: <strong>$${total.toLocaleString('es-CL')}</strong></div>
+                    </div>
+                </div>`;
+        }
+        document.addEventListener('DOMContentLoaded', function(){
+            renderPromos();
+            calcular();
+            document.getElementById('promoCode').addEventListener('change', function(){ toggleDuocVerification(); calcular(); });
+            document.getElementById('btnVerificarDuoc').addEventListener('click', function(){ if (verificarDuoc()) calcular(); });
+        });
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Pastelería 1000 Sabores</title>
+    <!-- Google Fonts para tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light" style="background-color: #FFF5E1;">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+                <a href="../index.html" class="btn btn-primary ms-auto">Seguir comprando</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <h1 class="text-center mb-4">Carrito de Compras</h1>
+        <div id="carritoProductos" class="row justify-content-center">
+            <!-- Aquí se cargan los productos del carrito -->
+        </div>
+        <div class="text-center mt-4">
+            <button id="vaciarCarrito" class="btn btn-danger me-2">Vaciar carrito</button>
+            <button id="finalizarCompra" class="btn btn-primary">Finalizar compra</button>
+        </div>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        // Mostrar productos del carrito
+        const carritoDiv = document.getElementById('carritoProductos');
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Función para normalizar rutas de imágenes
+        function normalizarRutaImagen(rutaImagen) {
+            console.log('Normalizando ruta:', rutaImagen);
+            
+            // Si la ruta ya tiene ../, la dejamos como está
+            if (rutaImagen.startsWith('../')) {
+                console.log('Ruta ya normalizada:', rutaImagen);
+                return rutaImagen;
+            }
+            
+            // Si no tiene ../, la agregamos
+            const rutaNormalizada = '../' + rutaImagen;
+            console.log('Ruta normalizada:', rutaNormalizada);
+            return rutaNormalizada;
+        }
+
+        function renderCarrito() {
+            console.log('=== RENDERIZANDO CARRITO ===');
+            console.log('Productos en carrito:', cart);
+            
+            carritoDiv.innerHTML = '';
+            
+            if (cart.length === 0) {
+                carritoDiv.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <h4>🛒 Tu carrito está vacío</h4>
+                            <p>¡Agrega algunos productos deliciosos!</p>
+                            <a href="../index.html" class="btn btn-primary">Ir a la tienda</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            cart.forEach((item, idx) => {
+                console.log(`Renderizando item ${idx + 1}:`, item);
+                console.log(`Ruta original de imagen: ${item.imagen}`);
+                console.log(`Ruta normalizada: ${normalizarRutaImagen(item.imagen)}`);
+                
+                // Debug específico para el mousse
+                if (item.nombre.includes('Mousse')) {
+                    console.log('🔍 DEBUGGING MOUSSE:');
+                    console.log('  - ID:', item.id);
+                    console.log('  - Nombre:', item.nombre);
+                    console.log('  - Imagen original:', item.imagen);
+                    console.log('  - Imagen normalizada:', normalizarRutaImagen(item.imagen));
+                }
+                
+                const subtotal = item.precio * item.cantidad;
+                
+                carritoDiv.innerHTML += `
+                    <div class="col-12 mb-3">
+                        <div class="card product-card shadow-sm">
+                            <div class="row g-0 align-items-center">
+                                <div class="col-md-2 col-4">
+                                    <div class="p-2">
+                                        <img src="${normalizarRutaImagen(item.imagen)}" 
+                                             class="img-fluid rounded" 
+                                             alt="${item.nombre}"
+                                             style="height: 120px; width: 100%; object-fit: cover;"
+                                             onload="console.log('✅ Imagen del carrito cargada:', '${item.nombre}')"
+                                             onerror="console.error('❌ Error cargando imagen del carrito:', this.src)">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-8">
+                                    <div class="card-body p-3">
+                                        <h5 class="card-title mb-2">${item.nombre}</h5>
+                                        <p class="card-text mb-1"><strong>Precio unitario:</strong> $${item.precio.toLocaleString('es-CL')}</p>
+                                        ${item.tamano ? `<p class="card-text mb-2"><strong>Tamaño:</strong> ${item.tamano}</p>` : ''}
+                                        <div class="d-flex align-items-center mb-2">
+                                            <label class="me-2 mb-0"><strong>Cantidad:</strong></label>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${idx}, -1)">-</button>
+                                            <span class="mx-2 fw-bold">${item.cantidad}</span>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${idx}, 1)">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6 text-center">
+                                    <h5 class="text-primary mb-1">$${subtotal.toLocaleString('es-CL')}</h5>
+                                    <small class="text-muted">Subtotal</small>
+                                </div>
+                                <div class="col-md-1 col-6 text-end">
+                                    <button class="btn btn-danger btn-sm eliminar-item" data-idx="${idx}" title="Eliminar producto">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Calcular total
+            const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            
+            carritoDiv.innerHTML += `
+                <div class="col-12 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5>Resumen del pedido</h5>
+                                    <p><strong>Total de productos:</strong> ${totalItems}</p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <h4 class="text-success">Total: $${total.toLocaleString('es-CL')}</h4>
+                                    <div id="accionesPago" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            console.log('=== CARRITO RENDERIZADO ===');
+        }
+
+        // Función para cambiar cantidad de productos
+        function cambiarCantidad(idx, cambio) {
+            if (cart[idx]) {
+                cart[idx].cantidad += cambio;
+                
+                // Si la cantidad llega a 0, eliminar el producto
+                if (cart[idx].cantidad <= 0) {
+                    cart.splice(idx, 1);
+                }
+                
+                // Guardar en localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                // Re-renderizar
+                renderCarrito();
+            }
+        }
+
+        // Eliminar producto del carrito
+        carritoDiv.addEventListener('click', function(e) {
+            if (e.target.classList.contains('eliminar-item')) {
+                const idx = parseInt(e.target.dataset.idx);
+                const productoEliminado = cart[idx].nombre;
+                
+                cart.splice(idx, 1);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                alert(`¡${productoEliminado} eliminado del carrito!`);
+                renderCarrito();
+            }
+        });
+
+        // Vaciar carrito
+        document.getElementById('vaciarCarrito').addEventListener('click', function() {
+            if (cart.length === 0) {
+                alert('El carrito ya está vacío.');
+                return;
+            }
+            
+            if (confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
+                cart = [];
+                localStorage.removeItem('cart');
+                alert('Carrito vaciado.');
+                renderCarrito();
+            }
+        });
+
+        // Finalizar compra
+        document.getElementById('finalizarCompra').addEventListener('click', function() {
+            if (cart.length === 0) {
+                alert('El carrito está vacío.');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            // Modo vendedor: mostrar botón 'Pago confirmado' y luego emitir boleta
+            const usuario = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            const contAcciones = document.getElementById('accionesPago');
+            if (usuario && usuario.rol==='vendedor'){
+                contAcciones.innerHTML = '<button id="btnPagoConfirmado" class="btn btn-success btn-sm">Pago confirmado</button>';
+                document.getElementById('btnPagoConfirmado').addEventListener('click', function(){
+                    const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                    generarBoleta(numeroPedido, total, totalItems);
+                    cart = [];
+                    localStorage.removeItem('cart');
+                    renderCarrito();
+                });
+            } else {
+                if (confirm(`¿Confirmar compra de ${totalItems} productos por un total de $${total.toLocaleString('es-CL')}?`)) {
+                    const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                    generarBoleta(numeroPedido, total, totalItems);
+                    cart = [];
+                    localStorage.removeItem('cart');
+                    renderCarrito();
+                }
+            }
+        });
+
+        // Función para generar boleta
+        function generarBoleta(numeroPedido, total, totalItems) {
+            const fecha = new Date().toLocaleDateString('es-CL');
+            const hora = new Date().toLocaleTimeString('es-CL');
+            
+            let boletaHTML = `
+                <div class="modal fade" id="boletaModal" tabindex="-1" aria-labelledby="boletaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #8B4513; color: white;">
+                                <h5 class="modal-title" id="boletaModalLabel">🎉 ¡Compra Realizada con Éxito!</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="background-color: #FFF5E1;">
+                                <div class="text-center mb-4">
+                                    <h4 style="color: #8B4513;">Pastelería 1000 Sabores</h4>
+                                    <p class="text-muted">RUT: 12.345.678-9</p>
+                                    <p class="text-muted">Dirección: Av. Principal 123, Santiago</p>
+                                    <p class="text-muted">Teléfono: +56 9 1234 5678</p>
+                                </div>
+                                
+                                <hr style="border-color: #FFC0CB;">
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Número de Pedido:</strong><br>
+                                        <span class="badge" style="background-color: #FFC0CB; color: #5D4037; font-size: 1.1rem;">${numeroPedido}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Fecha:</strong> ${fecha}<br>
+                                        <strong>Hora:</strong> ${hora}
+                                    </div>
+                                </div>
+                                
+                                <h6 style="color: #8B4513;">Productos Comprados:</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead style="background-color: #FFC0CB;">
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th>Cantidad</th>
+                                                <th>Precio Unit.</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+            `;
+            
+            cart.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                boletaHTML += `
+                    <tr>
+                        <td>${item.nombre}</td>
+                        <td>${item.cantidad}</td>
+                        <td>$${item.precio.toLocaleString('es-CL')}</td>
+                        <td>$${subtotal.toLocaleString('es-CL')}</td>
+                    </tr>
+                `;
+            });
+            
+            boletaHTML += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="text-end">
+                                    <h5 style="color: #8B4513;">Total: $${total.toLocaleString('es-CL')}</h5>
+                                </div>
+                                
+                                <hr style="border-color: #FFC0CB;">
+                                
+                                <div class="alert" style="background-color: #FFC0CB; border-color: #FFC0CB; color: #5D4037;">
+                                    <strong>📞 Próximos Pasos:</strong><br>
+                                    • Te contactaremos en las próximas 2 horas para coordinar la entrega<br>
+                                    • Puedes hacer seguimiento de tu pedido con el número: <strong>${numeroPedido}</strong><br>
+                                    • Tiempo estimado de entrega: 24-48 horas
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn" style="background-color: #8B4513; color: white;" data-bs-dismiss="modal">
+                                        Cerrar Boleta
+                                    </button>
+                                    <a href="seguimiento-pedidos.html" class="btn" style="background-color: #FFC0CB; color: #5D4037; margin-left: 10px;">
+                                        Hacer Seguimiento
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar la boleta al DOM
+            document.body.insertAdjacentHTML('beforeend', boletaHTML);
+            
+            // Mostrar la boleta
+            const boletaModal = new bootstrap.Modal(document.getElementById('boletaModal'));
+            boletaModal.show();
+            
+            // Limpiar el modal cuando se cierre
+            document.getElementById('boletaModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        // Función para probar carga de imágenes (solo las 4 que tienes)
+        function probarCargaImagenes() {
+            const imagenes = [
+                '../assets/img/TC001-Torta Cuadrada de Chocolate.png',
+                '../assets/img/TC002-Torta Cuadrada de Frutas.png', 
+                '../assets/img/TT001-Torta Circular de Vainilla.png',
+                '../assets/img/PI001-Mousse de Chocolate.png'
+            ];
+            
+            console.log('=== PROBANDO CARGA DE IMÁGENES (SOLO LAS 4 QUE TIENES) ===');
+            imagenes.forEach((ruta, index) => {
+                const img = new Image();
+                img.onload = () => console.log(`✅ Imagen ${index + 1} cargada: ${ruta}`);
+                img.onerror = () => console.error(`❌ Error cargando imagen ${index + 1}: ${ruta}`);
+                img.src = ruta;
+            });
+        }
+
+        // Función específica para probar el mousse
+        function probarMousse() {
+            console.log('=== PROBANDO ESPECÍFICAMENTE EL MOUSSE ===');
+            const rutaMousse = '../assets/img/PI001-Mousse de Chocolate.png';
+            console.log('Ruta del mousse:', rutaMousse);
+            
+            const img = new Image();
+            img.onload = () => {
+                console.log('✅ MOUSSE CARGADO CORRECTAMENTE:', rutaMousse);
+                console.log('Dimensiones:', img.width, 'x', img.height);
+            };
+            img.onerror = (e) => {
+                console.error('❌ ERROR CARGANDO MOUSSE:', rutaMousse);
+                console.error('Error details:', e);
+            };
+            img.src = rutaMousse;
+        }
+
+        // Renderizar carrito al cargar la página
+        renderCarrito();
+        
+        // Probar carga de imágenes
+        probarCargaImagenes();
+        
+        // Probar específicamente el mousse
+        probarMousse();
+    </script>
+</body>
+</html>

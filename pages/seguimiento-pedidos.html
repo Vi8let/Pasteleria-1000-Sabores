@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Pedidos - Pastelería 1000 Sabores</title>
+    <!-- Google Fonts para tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light" style="background-color: #FFF5E1;">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+                <div class="d-flex">
+                    <a href="carrito.html" class="btn btn-outline-primary me-2">Ver Carrito</a>
+                    <a href="productos.html" class="btn btn-primary">Productos</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">Seguimiento de Pedidos</h1>
+                
+                <!-- Formulario para buscar pedido -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Buscar tu Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="numeroPedido" placeholder="Ingresa tu número de pedido (ej: PED-2025-001)">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-primary w-100" onclick="buscarPedido()">Buscar Pedido</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del pedido -->
+                <div id="infoPedido" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Información del Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Número de Pedido:</strong> <span id="pedidoNumero"></span></p>
+                                <p><strong>Fecha de Pedido:</strong> <span id="fechaPedido"></span></p>
+                                <p><strong>Total:</strong> <span id="totalPedido"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Estado Actual:</strong> <span id="estadoActual" class="badge"></span></p>
+                                <p><strong>Fecha Estimada de Entrega:</strong> <span id="fechaEntrega"></span></p>
+                                <p><strong>Método de Entrega:</strong> <span id="metodoEntrega"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progreso del pedido -->
+                <div id="progresoPedido" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Progreso del Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item" id="estado1">
+                                <div class="timeline-marker" style="background-color: #8B4513;"></div>
+                                <div class="timeline-content">
+                                    <h6>Pedido Confirmado</h6>
+                                    <p class="text-muted">Tu pedido ha sido recibido y confirmado</p>
+                                    <small class="text-muted" id="fecha1"></small>
+                                </div>
+                            </div>
+                            <div class="timeline-item" id="estado2">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h6>En Preparación</h6>
+                                    <p class="text-muted">Nuestros chefs están preparando tu pedido</p>
+                                    <small class="text-muted" id="fecha2"></small>
+                                </div>
+                            </div>
+                            <div class="timeline-item" id="estado3">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h6>Listo para Envío</h6>
+                                    <p class="text-muted">Tu pedido está listo y será enviado pronto</p>
+                                    <small class="text-muted" id="fecha3"></small>
+                                </div>
+                            </div>
+                            <div class="timeline-item" id="estado4">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h6>En Camino</h6>
+                                    <p class="text-muted">Tu pedido está en camino hacia tu dirección</p>
+                                    <small class="text-muted" id="fecha4"></small>
+                                </div>
+                            </div>
+                            <div class="timeline-item" id="estado5">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h6>Entregado</h6>
+                                    <p class="text-muted">¡Tu pedido ha sido entregado exitosamente!</p>
+                                    <small class="text-muted" id="fecha5"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles del envío -->
+                <div id="detallesEnvio" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Detalles del Envío</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Dirección de Entrega</h6>
+                                <p id="direccionEntrega"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Información de Contacto</h6>
+                                <p id="contactoEntrega"></p>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>💡 Nota:</strong> Recibirás notificaciones por SMS y email en cada actualización del estado de tu pedido.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos del pedido -->
+                <div id="productosPedido" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Productos del Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="listaProductos"></div>
+                    </div>
+                </div>
+
+                <!-- Acciones del pedido -->
+                <div id="accionesPedido" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Acciones Disponibles</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-outline-primary w-100" onclick="generarBoleta()">
+                                    Generar Boleta
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-outline-success w-100" onclick="compartirPedido()">
+                                    Compartir Estado
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-outline-warning w-100" onclick="contactarSoporte()">
+                                    Contactar Soporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        // Datos de ejemplo de pedidos
+        const pedidos = {
+            'PED-2025-001': {
+                numero: 'PED-2025-001',
+                fecha: '2025-01-15',
+                total: 95000,
+                estado: 'En Preparación',
+                estadoNumero: 2,
+                fechaEntrega: '2025-01-17',
+                metodoEntrega: 'Delivery a domicilio',
+                direccion: 'Av. Providencia 1234, Santiago',
+                contacto: 'Juan Pérez - +56 9 1234 5678',
+                productos: [
+                    { nombre: 'Torta Cuadrada de Chocolate', cantidad: 1, precio: 45000 },
+                    { nombre: 'Mousse de Chocolate', cantidad: 2, precio: 10000 },
+                    { nombre: 'Tiramisú Clásico', cantidad: 2, precio: 11000 }
+                ],
+                fechas: {
+                    confirmado: '2025-01-15 10:30',
+                    preparacion: '2025-01-15 11:00',
+                    listo: null,
+                    camino: null,
+                    entregado: null
+                }
+            },
+            'PED-2025-002': {
+                numero: 'PED-2025-002',
+                fecha: '2025-01-14',
+                total: 120000,
+                estado: 'Entregado',
+                estadoNumero: 5,
+                fechaEntrega: '2025-01-16',
+                metodoEntrega: 'Retiro en tienda',
+                direccion: 'Tienda Pastelería 1000 Sabores',
+                contacto: 'María González - +56 9 8765 4321',
+                productos: [
+                    { nombre: 'Torta Especial de Cumpleaños', cantidad: 1, precio: 55000 },
+                    { nombre: 'Torta Circular de Manjar', cantidad: 1, precio: 42000 },
+                    { nombre: 'Galletas Veganas de Avena', cantidad: 3, precio: 13500 }
+                ],
+                fechas: {
+                    confirmado: '2025-01-14 14:20',
+                    preparacion: '2025-01-14 15:00',
+                    listo: '2025-01-15 09:00',
+                    camino: '2025-01-15 10:30',
+                    entregado: '2025-01-16 16:45'
+                }
+            }
+        };
+
+        function buscarPedido() {
+            const numeroPedido = document.getElementById('numeroPedido').value.trim();
+            
+            if (!numeroPedido) {
+                alert('Por favor ingresa un número de pedido');
+                return;
+            }
+
+            const pedido = pedidos[numeroPedido];
+            
+            if (!pedido) {
+                alert('Pedido no encontrado. Verifica el número e intenta nuevamente.');
+                return;
+            }
+
+            mostrarInformacionPedido(pedido);
+        }
+
+        function mostrarInformacionPedido(pedido) {
+            // Mostrar información básica
+            document.getElementById('pedidoNumero').textContent = pedido.numero;
+            document.getElementById('fechaPedido').textContent = new Date(pedido.fecha).toLocaleDateString('es-CL');
+            document.getElementById('totalPedido').textContent = '$' + pedido.total.toLocaleString('es-CL');
+            document.getElementById('estadoActual').textContent = pedido.estado;
+            document.getElementById('fechaEntrega').textContent = new Date(pedido.fechaEntrega).toLocaleDateString('es-CL');
+            document.getElementById('metodoEntrega').textContent = pedido.metodoEntrega;
+
+            // Aplicar color al estado
+            const estadoBadge = document.getElementById('estadoActual');
+            estadoBadge.className = 'badge';
+            switch(pedido.estadoNumero) {
+                case 1: estadoBadge.style.backgroundColor = '#8B4513'; break;
+                case 2: estadoBadge.style.backgroundColor = '#FFC0CB'; estadoBadge.style.color = '#5D4037'; break;
+                case 3: estadoBadge.style.backgroundColor = '#B0BEC5'; estadoBadge.style.color = '#5D4037'; break;
+                case 4: estadoBadge.style.backgroundColor = '#B0BEC5'; estadoBadge.style.color = '#5D4037'; break;
+                case 5: estadoBadge.style.backgroundColor = '#8B4513'; break;
+            }
+
+            // Mostrar progreso
+            mostrarProgresoPedido(pedido);
+
+            // Mostrar detalles de envío
+            document.getElementById('direccionEntrega').textContent = pedido.direccion;
+            document.getElementById('contactoEntrega').textContent = pedido.contacto;
+
+            // Mostrar productos
+            mostrarProductosPedido(pedido.productos);
+
+            // Mostrar todas las secciones
+            document.getElementById('infoPedido').style.display = 'block';
+            document.getElementById('progresoPedido').style.display = 'block';
+            document.getElementById('detallesEnvio').style.display = 'block';
+            document.getElementById('productosPedido').style.display = 'block';
+            document.getElementById('accionesPedido').style.display = 'block';
+        }
+
+        function mostrarProgresoPedido(pedido) {
+            const estados = ['estado1', 'estado2', 'estado3', 'estado4', 'estado5'];
+            const fechas = ['fecha1', 'fecha2', 'fecha3', 'fecha4', 'fecha5'];
+            
+            estados.forEach((estado, index) => {
+                const elemento = document.getElementById(estado);
+                const marcador = elemento.querySelector('.timeline-marker');
+                const fechaElemento = document.getElementById(fechas[index]);
+                
+                if (index < pedido.estadoNumero) {
+                    marcador.style.backgroundColor = '#8B4513';
+                    elemento.classList.add('completed');
+                } else if (index === pedido.estadoNumero - 1) {
+                    marcador.style.backgroundColor = '#FFC0CB';
+                    elemento.classList.add('current');
+                } else {
+                    marcador.style.backgroundColor = '#B0BEC5';
+                    elemento.classList.remove('completed', 'current');
+                }
+
+                // Mostrar fechas si están disponibles
+                const fechaKey = ['confirmado', 'preparacion', 'listo', 'camino', 'entregado'][index];
+                if (pedido.fechas[fechaKey]) {
+                    fechaElemento.textContent = pedido.fechas[fechaKey];
+                } else {
+                    fechaElemento.textContent = 'Pendiente';
+                }
+            });
+        }
+
+        function mostrarProductosPedido(productos) {
+            const lista = document.getElementById('listaProductos');
+            lista.innerHTML = '';
+
+            productos.forEach(producto => {
+                const item = document.createElement('div');
+                item.className = 'row mb-2 p-2 border-bottom';
+                item.innerHTML = `
+                    <div class="col-md-6">
+                        <strong>${producto.nombre}</strong>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        Cantidad: ${producto.cantidad}
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <strong>$${producto.precio.toLocaleString('es-CL')}</strong>
+                    </div>
+                `;
+                lista.appendChild(item);
+            });
+        }
+
+        function generarBoleta() {
+            alert('📄 Boleta generada exitosamente. Se ha enviado a tu email.');
+        }
+
+        function compartirPedido() {
+            const numeroPedido = document.getElementById('pedidoNumero').textContent;
+            const estado = document.getElementById('estadoActual').textContent;
+            
+            const texto = `¡Hola! Mi pedido ${numeroPedido} de Pastelería 1000 Sabores está ${estado.toLowerCase()}. ¡Recomiendo sus deliciosos productos! 🍰`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Mi Pedido - Pastelería 1000 Sabores',
+                    text: texto,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback para navegadores que no soportan Web Share API
+                navigator.clipboard.writeText(texto).then(() => {
+                    alert('¡Texto copiado al portapapeles! Puedes pegarlo en tus redes sociales.');
+                });
+            }
+        }
+
+        function contactarSoporte() {
+            alert('💬 Te hemos redirigido al chat de soporte. Un representante te atenderá pronto.');
+        }
+    </script>
+
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -8px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 3px #e9ecef;
+        }
+
+        .timeline-item.completed .timeline-marker {
+            background-color: #8B4513;
+            box-shadow: 0 0 0 3px #8B4513;
+        }
+
+        .timeline-item.current .timeline-marker {
+            background-color: #FFC0CB;
+            box-shadow: 0 0 0 3px #FFC0CB;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 192, 203, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 192, 203, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 192, 203, 0); }
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e9ecef;
+        }
+    </style>
+</body>
+</html>

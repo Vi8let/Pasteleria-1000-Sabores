@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos los productos - Pastelería 1000 Sabores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <nav class="navbar navbar-light" style="background-color:#FFF5E1;">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                Pastelería 1000 Sabores
+            </a>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <h1 class="text-center mb-4">Todos los productos</h1>
+        <div class="row" id="gridProductos"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        function getOverrides(){ try{ return JSON.parse(localStorage.getItem('productos')||'[]'); }catch(e){ return []; } }
+        function getBase(){
+            return [
+                { id:'TC001', codigo:'TC001', nombre:'Torta Cuadrada de Chocolate', precio:45000, stock:10, imagen:'../assets/img/TC001-Torta Cuadrada de Chocolate.png', descripcion:'Torta de chocolate.' },
+                { id:'TC002', codigo:'TC002', nombre:'Torta Cuadrada de Frutas', precio:50000, stock:8, imagen:'../assets/img/TC002-Torta Cuadrada de Frutas.png', descripcion:'Torta de frutas.' },
+                { id:'TT001', codigo:'TT001', nombre:'Torta Circular de Vainilla', precio:40000, stock:15, imagen:'../assets/img/TT001-Torta Circular de Vainilla.png', descripcion:'Torta de vainilla.' },
+                { id:'PI001', codigo:'PI001', nombre:'Mousse de Chocolate', precio:5000, stock:20, imagen:'../assets/img/PI001-Mousse de Chocolate.png', descripcion:'Mousse.' }
+            ];
+        }
+        function mezclar(){
+            const base = getBase();
+            const ov = getOverrides();
+            return base.map(p=>{ const o = ov.find(x=>x.id===p.id); return o?{...p,...o}:p; }).filter(p=>!p.eliminado);
+        }
+        function agregarAlCarrito(id){
+            const productos = mezclar();
+            const p = productos.find(x=>x.id===id);
+            if (!p) return;
+            const carrito = JSON.parse(localStorage.getItem('cart')||'[]');
+            const ex = carrito.find(i=>i.id===id);
+            if (ex) ex.cantidad += 1; else carrito.push({ id:p.id, nombre:p.nombre, precio:p.precio, imagen:p.imagen, cantidad:1, tamano:'Mediana' });
+            localStorage.setItem('cart', JSON.stringify(carrito));
+            alert('Producto agregado al carrito');
+        }
+        function render(){
+            const grid = document.getElementById('gridProductos');
+            const data = mezclar();
+            const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            const esVendedor = !!(u && u.rol==='vendedor');
+            grid.innerHTML = '';
+            data.forEach(p=>{
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-4';
+                const overlay = esVendedor ? `<span class="badge" style="position:absolute; top:8px; right:8px; background-color:#8B4513;">Stock: ${p.stock ?? '-'}</span>` : '';
+                col.innerHTML = `
+                    <div class="card h-100">
+                        <div style="position:relative;">
+                            <img src="${p.imagen}" class="card-img-top" style="height:200px;object-fit:cover;" alt="${p.nombre}">
+                            ${overlay}
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${p.nombre}</h5>
+                            <p class="card-text"><strong>Código:</strong> <span class="badge" style="background-color:#FFC0CB;color:#5D4037;">${p.codigo}</span></p>
+                            <p class="card-text">$${p.precio.toLocaleString('es-CL')}</p>
+                            <div class="mt-auto">
+                                <button class="btn btn-success btn-sm" onclick="agregarAlCarrito('${p.id}')">🛒 Agregar</button>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.appendChild(col);
+            });
+        }
+        render();
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - Pastelería 1000 Sabores</title>
+    <!-- Google Fonts para tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light" style="background-color: #FFF5E1;">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+                <div class="ms-auto d-flex gap-2">
+                    <a href="carrito.html" class="btn" style="background-color: #8B4513; color: white; border-color: #8B4513;">Ver Carrito</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <h1 class="text-center mb-4">Catálogo de Productos</h1>
+        
+        <!-- Filtros por categoría -->
+        <div class="card mb-4">
+            <div class="card-header">
+                        <h5 class="mb-0">Filtrar por Categoría</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <button class="btn w-100 categoria-btn active" style="background-color: #8B4513; color: white; border-color: #8B4513;" data-categoria="Todas">
+                            Todas las categorías
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Tortas Cuadradas">
+                            Tortas Cuadradas
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Tortas Circulares">
+                            Tortas Circulares
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Postres Individuales">
+                            Postres Individuales
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Productos Sin Azúcar">
+                            Sin Azúcar
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Pastelería Tradicional">
+                            Tradicional
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Productos Sin Gluten">
+                            Sin Gluten
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Productos Veganos">
+                            Veganos
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-primary w-100 categoria-btn" data-categoria="Tortas Especiales">
+                            Especiales
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contador de productos -->
+        <div class="mb-3">
+            <p class="text-muted">Mostrando <span id="contadorProductos">0</span> productos</p>
+        </div>
+        
+        <div class="row" id="catalogoProductos">
+            <!-- Aquí se cargarán los productos dinámicamente -->
+        </div>
+
+        <!-- Sección visible solo para ADMIN: desactivados y agregar producto -->
+        <section class="mt-5" id="adminZona" style="display:none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos desactivados</h5>
+                </div>
+                <div class="card-body" id="listaDesactivados">
+                    <!-- Render dinámico -->
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Agregar producto</h5>
+                </div>
+                <div class="card-body">
+                    <form id="formAgregarProducto" class="row g-2">
+                        <div class="col-md-2"><input required class="form-control" placeholder="ID (p.ej. TC003)" id="ap_id"></div>
+                        <div class="col-md-2"><input required class="form-control" placeholder="Código" id="ap_codigo"></div>
+                        <div class="col-md-3"><input required class="form-control" placeholder="Nombre" id="ap_nombre"></div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="ap_categoria">
+                                <option>Tortas Cuadradas</option>
+                                <option>Tortas Circulares</option>
+                                <option>Postres Individuales</option>
+                                <option>Productos Sin Azúcar</option>
+                                <option>Pastelería Tradicional</option>
+                                <option>Productos Sin Gluten</option>
+                                <option>Productos Veganos</option>
+                                <option>Tortas Especiales</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><input type="number" min="0" required class="form-control" placeholder="Precio" id="ap_precio"></div>
+                        <div class="col-12"><input class="form-control" placeholder="Descripción" id="ap_desc"></div>
+                        <div class="col-md-6"><input class="form-control" placeholder="Ruta imagen (../assets/img/...)" id="ap_imagen"></div>
+                        <div class="col-md-2"><input type="number" min="0" class="form-control" placeholder="Stock" id="ap_stock"></div>
+                        <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Agregar</button></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        // Productos disponibles (todos los productos de la pastelería)
+        const productos = [
+            // Tortas Cuadradas
+            {
+                id: 'TC001',
+                codigo: 'TC001',
+                categoria: 'Tortas Cuadradas',
+                nombre: 'Torta Cuadrada de Chocolate',
+                precio: 45000,
+                descripcion: 'Deliciosa torta de chocolate con capas de ganache y un toque de avellanas. Personalizable con mensajes especiales.',
+                stock: 10,
+                imagen: '../assets/img/TC001-Torta Cuadrada de Chocolate.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true
+            },
+            {
+                id: 'TC002',
+                codigo: 'TC002',
+                categoria: 'Tortas Cuadradas',
+                nombre: 'Torta Cuadrada de Frutas',
+                precio: 50000,
+                descripcion: 'Una mezcla de frutas frescas y crema chantilly sobre un suave bizcocho de vainilla, ideal para celebraciones.',
+                stock: 8,
+                imagen: '../assets/img/TC002-Torta Cuadrada de Frutas.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true
+            },
+            // Tortas Circulares
+            {
+                id: 'TT001',
+                codigo: 'TT001',
+                categoria: 'Tortas Circulares',
+                nombre: 'Torta Circular de Vainilla',
+                precio: 40000,
+                descripcion: 'Bizcocho de vainilla clásico relleno con crema pastelera y cubierto con un glaseado dulce, perfecto para cualquier ocasión.',
+                stock: 15,
+                imagen: '../assets/img/TT001-Torta Circular de Vainilla.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: false
+            },
+            {
+                id: 'TT002',
+                codigo: 'TT002',
+                categoria: 'Tortas Circulares',
+                nombre: 'Torta Circular de Manjar',
+                precio: 42000,
+                descripcion: 'Torta tradicional chilena con manjar y nueces, un deleite para los amantes de los sabores dulces y clásicos.',
+                stock: 12,
+                imagen: '../assets/img/TT002-Torta Circular de Manjar.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true
+            },
+            // Postres Individuales
+            {
+                id: 'PI001',
+                codigo: 'PI001',
+                categoria: 'Postres Individuales',
+                nombre: 'Mousse de Chocolate',
+                precio: 5000,
+                descripcion: 'Postre individual cremoso y suave, hecho con chocolate de alta calidad, ideal para los amantes del chocolate.',
+                stock: 20,
+                imagen: '../assets/img/PI001-Mousse de Chocolate.png',
+                tamanos: [],
+                personalizable: false
+            },
+            {
+                id: 'PI002',
+                codigo: 'PI002',
+                categoria: 'Postres Individuales',
+                nombre: 'Tiramisú Clásico',
+                precio: 5500,
+                descripcion: 'Un postre italiano individual con capas de café, mascarpone y cacao, perfecto para finalizar cualquier comida.',
+                stock: 18,
+                imagen: '../assets/img/PI002-Tiramisú Clásico.png',
+                tamanos: [],
+                personalizable: false
+            },
+            // Productos Sin Azúcar
+            {
+                id: 'PSA001',
+                codigo: 'PSA001',
+                categoria: 'Productos Sin Azúcar',
+                nombre: 'Torta Sin Azúcar de Naranja',
+                precio: 48000,
+                descripcion: 'Torta ligera y deliciosa, endulzada naturalmente, ideal para quienes buscan opciones más saludables.',
+                stock: 12,
+                imagen: '../assets/img/PSA001-Torta Sin Azúcar de Naranja.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true
+            },
+            {
+                id: 'PSA002',
+                codigo: 'PSA002',
+                categoria: 'Productos Sin Azúcar',
+                nombre: 'Cheesecake Sin Azúcar',
+                precio: 47000,
+                descripcion: 'Suave y cremoso, este cheesecake es una opción perfecta para disfrutar sin culpa.',
+                stock: 10,
+                imagen: '../assets/img/PSA002-Cheesecake Sin Azúcar.png',
+                tamanos: ['Pequeña', 'Mediana'],
+                personalizable: true
+            },
+            // Pastelería Tradicional
+            {
+                id: 'PT001',
+                codigo: 'PT001',
+                categoria: 'Pastelería Tradicional',
+                nombre: 'Empanada de Manzana',
+                precio: 3000,
+                descripcion: 'Pastelería tradicional rellena de manzanas especiadas, perfecta para un dulce desayuno o merienda.',
+                stock: 25,
+                imagen: '../assets/img/PT001-Empanada de Manzana.png',
+                tamanos: [],
+                personalizable: false
+            },
+            {
+                id: 'PT002',
+                codigo: 'PT002',
+                categoria: 'Pastelería Tradicional',
+                nombre: 'Tarta de Santiago',
+                precio: 6000,
+                descripcion: 'Tradicional tarta española hecha con almendras, azúcar, y huevos, una delicia para los amantes de los postres clásicos.',
+                stock: 15,
+                imagen: '../assets/img/PT002-Tarta de Santiago.png',
+                tamanos: [],
+                personalizable: false
+            },
+            // Productos Sin Gluten
+            {
+                id: 'PG001',
+                codigo: 'PG001',
+                categoria: 'Productos Sin Gluten',
+                nombre: 'Brownie Sin Gluten',
+                precio: 4000,
+                descripcion: 'Rico y denso, este brownie es perfecto para quienes necesitan evitar el gluten sin sacrificar el sabor.',
+                stock: 20,
+                imagen: '../assets/img/PG001-Brownie Sin Gluten.png',
+                tamanos: [],
+                personalizable: false
+            },
+            {
+                id: 'PG002',
+                codigo: 'PG002',
+                categoria: 'Productos Sin Gluten',
+                nombre: 'Pan Sin Gluten',
+                precio: 3500,
+                descripcion: 'Suave y esponjoso, ideal para sándwiches o para acompañar cualquier comida.',
+                stock: 30,
+                imagen: '../assets/img/PG002-Pan Sin Gluten.png',
+                tamanos: [],
+                personalizable: false
+            },
+            // Productos Veganos
+            {
+                id: 'PV001',
+                codigo: 'PV001',
+                categoria: 'Productos Veganos',
+                nombre: 'Torta Vegana de Chocolate',
+                precio: 50000,
+                descripcion: 'Torta de chocolate húmeda y deliciosa, hecha sin productos de origen animal, perfecta para veganos.',
+                stock: 8,
+                imagen: '../assets/img/PV001-Torta Vegana de Chocolate.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true
+            },
+            {
+                id: 'PV002',
+                codigo: 'PV002',
+                categoria: 'Productos Veganos',
+                nombre: 'Galletas Veganas de Avena',
+                precio: 4500,
+                descripcion: 'Crujientes y sabrosas, estas galletas son una excelente opción para un snack saludable y vegano.',
+                stock: 40,
+                imagen: '../assets/img/PV002-Galletas Veganas de Avena.png',
+                tamanos: [],
+                personalizable: false
+            },
+            // Tortas Especiales
+            {
+                id: 'TE001',
+                codigo: 'TE001',
+                categoria: 'Tortas Especiales',
+                nombre: 'Torta Especial de Cumpleaños',
+                precio: 55000,
+                descripcion: 'Diseñada especialmente para celebraciones, personalizable con decoraciones y mensajes únicos.',
+                stock: 7,
+                imagen: '../assets/img/TE001-Torta Especial de Cumpleaños.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true
+            },
+            {
+                id: 'TE002',
+                codigo: 'TE002',
+                categoria: 'Tortas Especiales',
+                nombre: 'Torta Especial de Boda',
+                precio: 60000,
+                descripcion: 'Elegante y deliciosa, esta torta está diseñada para ser el centro de atención en cualquier boda.',
+                stock: 3,
+                imagen: '../assets/img/TE002-Torta Especial de Boda.png',
+                tamanos: ['Pequeña', 'Mediana', 'Grande'],
+                personalizable: true
+            }
+        ];
+
+        // Variable para almacenar la categoría actual
+        let categoriaActual = 'Todas';
+
+        // Función para cargar productos con filtro
+        function cargarProductos(categoria = 'Todas') {
+            console.log('=== CARGANDO CATÁLOGO DE PRODUCTOS ===');
+            console.log('Categoría seleccionada:', categoria);
+            console.log('Cantidad total de productos:', productos.length);
+
+        const catalogo = document.getElementById('catalogoProductos');
+            const contador = document.getElementById('contadorProductos');
+            
+            if (!catalogo) {
+                console.error('❌ ERROR: No se encontró el elemento catalogoProductos');
+                return;
+            }
+            
+            // Limpiar contenido anterior
+        catalogo.innerHTML = '';
+
+            // Filtrar productos por categoría
+            // Mezclar catálogo en memoria con overrides guardados por admin en localStorage
+            let productosBase = categoria === 'Todas' ? productos : productos.filter(producto => producto.categoria === categoria);
+            let overrides = [];
+            try { overrides = JSON.parse(localStorage.getItem('productos')||'[]'); } catch(e) { overrides = []; }
+            const productosFiltrados = productosBase
+                .map(p => {
+                    const ov = overrides.find(o=>o.id===p.id);
+                    return ov ? { ...p, ...ov } : p;
+                })
+                .filter(p => !p.eliminado);
+
+            console.log(`Productos filtrados: ${productosFiltrados.length}`);
+
+            // Actualizar contador
+            if (contador) {
+                contador.textContent = productosFiltrados.length;
+            }
+
+            if (productosFiltrados.length === 0) {
+                console.warn('⚠️ No hay productos para mostrar en esta categoría');
+                catalogo.innerHTML = '<div class="col-12"><div class="alert alert-info">No hay productos disponibles en esta categoría.</div></div>';
+                return;
+            }
+            
+            productosFiltrados.forEach((producto, index) => {
+                console.log(`🔄 Creando producto ${index + 1}:`, producto.nombre);
+                console.log(`   - Imagen: ${producto.imagen}`);
+                console.log(`   - Precio: $${producto.precio}`);
+                
+            const col = document.createElement('div');
+            col.className = 'col-md-4 mb-4';
+
+            const uSess = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            const esVendedorCatalogo = !!(uSess && uSess.rol==='vendedor');
+            const overlayBadge = esVendedorCatalogo ? `<span class="badge" style="position:absolute; top:8px; right:8px; background-color:#8B4513;">Stock: ${producto.stock ?? '-'}</span>` : '';
+
+            col.innerHTML = `
+                <div class="card product-card h-100">
+                        <div style="position:relative;">
+                            <img src="${producto.imagen}" 
+                                 class="card-img-top" 
+                                 alt="${producto.nombre}" 
+                                 style="height: 250px; object-fit: cover;"
+                                 onload="console.log('✅ Imagen cargada:', '${producto.nombre}')"
+                                 onerror="console.error('❌ Error cargando imagen:', this.src)">
+                            ${overlayBadge}
+                        </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">${producto.nombre}</h5>
+                            <p class="card-text text-muted"><strong>Categoría:</strong> ${producto.categoria}</p>
+                            <p class="card-text"><strong>Código:</strong> <span class="badge" style="background-color: #FFC0CB; color: #5D4037;">${producto.codigo}</span></p>
+                        <p class="card-text">${producto.descripcion}</p>
+                            <p class="card-text"><strong>Precio:</strong> <span class="h5" style="color: #8B4513;">$${producto.precio.toLocaleString('es-CL')}</span></p>
+                            <div class="admin-controls" style="display:none;">
+                                <div class="row g-2">
+                                    <div class="col-6"><input type="number" class="form-control form-control-sm" placeholder="Precio" value="${producto.precio}" data-field="precio" data-id="${producto.id}"></div>
+                                    <div class="col-4"><input type="number" class="form-control form-control-sm" placeholder="Stock" value="${producto.stock||0}" data-field="stock" data-id="${producto.id}"></div>
+                                    <div class="col-2 d-grid gap-1">
+                                        <button class="btn btn-sm" style="background-color:#8B4513; color:#fff;" data-action="guardar" data-id="${producto.id}">Guardar</button>
+                                        <button class="btn btn-sm btn-danger" data-action="eliminar" data-id="${producto.id}">Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <button class="btn btn-sm me-2" style="background-color: #8B4513; color: white; border-color: #8B4513;" onclick="agregarAlCarrito('${producto.id}')">
+                                    🛒 Agregar al carrito
+                                </button>
+                                <a href="producto-detalle.html?id=${producto.id}" class="btn btn-sm" style="background-color: #FFC0CB; color: #5D4037; border-color: #FFC0CB;">Ver detalle</a>
+                            </div>
+                    </div>
+                </div>
+            `;
+                
+            catalogo.appendChild(col);
+            });
+
+            console.log('✅ Productos cargados exitosamente');
+        }
+
+        // Función para agregar productos al carrito
+        function agregarAlCarrito(id) {
+            console.log('=== AGREGANDO AL CARRITO ===');
+            console.log('ID del producto:', id);
+            
+            const producto = productos.find(p => p.id === id);
+            if (!producto) {
+                console.error('❌ Producto no encontrado');
+                return;
+            }
+            
+            console.log('Producto encontrado:', producto.nombre);
+            
+            // Obtener carrito del localStorage
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            console.log('Carrito actual:', cart);
+            
+            // Verificar si el producto ya está en el carrito
+            const itemExistente = cart.find(item => item.id === id);
+            
+            if (itemExistente) {
+                // Si ya existe, aumentar la cantidad
+                itemExistente.cantidad += 1;
+                console.log('Cantidad actualizada:', itemExistente.cantidad);
+            } else {
+                // Si no existe, agregarlo
+                const nuevoItem = {
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    precio: producto.precio,
+                    imagen: producto.imagen,
+                    cantidad: 1
+                };
+                cart.push(nuevoItem);
+                console.log('Nuevo item agregado:', nuevoItem);
+            }
+            
+            // Guardar en localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+            console.log('Carrito guardado:', cart);
+            
+            // Actualizar contador
+            actualizarContadorCarrito();
+            
+            // Mostrar confirmación
+            alert(`¡${producto.nombre} agregado al carrito!`);
+        }
+
+        // Función para actualizar contador del carrito
+        function actualizarContadorCarrito() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            
+            // Actualizar contador en la barra de navegación si existe
+            const contador = document.querySelector('.badge');
+            if (contador) {
+                contador.textContent = totalItems;
+            }
+        }
+
+        // Función para manejar filtros por categoría
+        function configurarFiltros() {
+            const botonesCategoria = document.querySelectorAll('.categoria-btn');
+            
+            botonesCategoria.forEach(boton => {
+                boton.addEventListener('click', function() {
+                    // Remover clase active de todos los botones
+                    botonesCategoria.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                        btn.classList.add('btn-outline-primary');
+                    });
+                    
+                    // Agregar clase active al botón clickeado
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('active');
+                    this.style.backgroundColor = '#8B4513';
+                    this.style.color = 'white';
+                    this.style.borderColor = '#8B4513';
+                    
+                    // Obtener categoría y cargar productos
+                    const categoria = this.getAttribute('data-categoria');
+                    categoriaActual = categoria;
+                    cargarProductos(categoria);
+                });
+            });
+        }
+
+        // Cargar productos cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarProductos();
+            configurarFiltros();
+            actualizarContadorCarrito();
+            // Ocultar sección duplicada superior (Todos los productos) si existe
+            try {
+                const topGrid = document.getElementById('gridProductos');
+                if (topGrid) {
+                    const topMain = topGrid.closest('main');
+                    if (topMain) {
+                        const maybeNav = topMain.previousElementSibling;
+                        if (maybeNav && maybeNav.tagName === 'NAV') { maybeNav.remove(); }
+                        topMain.remove();
+                    }
+                }
+            } catch(e) {}
+            // Mostrar controles admin si rol=admin
+            try {
+                const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
+                if (u && u.rol==='admin') {
+                    document.querySelectorAll('.admin-controls').forEach(el=> el.style.display='block');
+                    // Ocultar acceso al carrito si es admin
+                    const linkCarrito = document.querySelector('a[href="carrito.html"]');
+                    if (linkCarrito) linkCarrito.style.display='none';
+                    document.getElementById('adminZona').style.display='block';
+                    renderDesactivados();
+                }
+            } catch(e) {}
+        });
+
+        // Guardar cambios de precio/stock y eliminar producto (ADMIN)
+        document.addEventListener('click', function(e){
+            if (e.target && e.target.getAttribute('data-action')==='guardar'){
+                const id = e.target.getAttribute('data-id');
+                let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+                const precioInput = document.querySelector(`input[data-field="precio"][data-id="${id}"]`);
+                const stockInput = document.querySelector(`input[data-field="stock"][data-id="${id}"]`);
+                const nuevoPrecio = parseInt(precioInput.value,10)||0;
+                const nuevoStock = parseInt(stockInput.value,10)||0;
+                // Actualizar en localStorage si existe, si no, creamos entrada local editable
+                const idx = productosLS.findIndex(p=>p.id===id);
+                if (idx>=0){
+                    productosLS[idx].precio = nuevoPrecio;
+                    productosLS[idx].stock = nuevoStock;
+                } else {
+                    // Buscar datos base del catálogo en memoria
+                    const base = (window.productos||[]).find(p=>p.id===id) || {};
+                    productosLS.push({ ...base, id, precio: nuevoPrecio, stock: nuevoStock });
+                }
+                localStorage.setItem('productos', JSON.stringify(productosLS));
+                alert('Cambios guardados');
+                cargarProductos(categoriaActual); // mantiene controles visibles
+            }
+            if (e.target && e.target.getAttribute('data-action')==='eliminar'){
+                const id = e.target.getAttribute('data-id');
+                if (!confirm('¿Eliminar este producto del catálogo visible?')) return;
+                let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+                // Marcamos con flag eliminado para que no se muestre
+                const idx = productosLS.findIndex(p=>p.id===id);
+                if (idx>=0){
+                    productosLS[idx].eliminado = true;
+                } else {
+                    const base = (window.productos||[]).find(p=>p.id===id) || { id };
+                    productosLS.push({ ...base, eliminado: true });
+                }
+                localStorage.setItem('productos', JSON.stringify(productosLS));
+                cargarProductos(categoriaActual);
+                renderDesactivados();
+            }
+        });
+
+        function renderDesactivados(){
+            const cont = document.getElementById('listaDesactivados');
+            if (!cont) return;
+            let overrides = [];
+            try { overrides = JSON.parse(localStorage.getItem('productos')||'[]'); } catch(e) { overrides = []; }
+            const desactivados = overrides.filter(p=>p.eliminado);
+            if (desactivados.length===0){ cont.innerHTML = '<div class="text-muted">No hay productos desactivados.</div>'; return; }
+            const table = document.createElement('table');
+            table.className = 'table';
+            table.innerHTML = '<thead><tr><th>Código</th><th>Nombre</th><th>Acciones</th></tr></thead>';
+            const tbody = document.createElement('tbody');
+            desactivados.forEach(p=>{
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${p.codigo||p.id}</td><td>${p.nombre||p.id}</td><td><button class="btn btn-sm btn-primary" data-reactivar="${p.id}">Reactivar</button></td>`;
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            cont.innerHTML='';
+            cont.appendChild(table);
+        }
+
+        document.addEventListener('click', function(e){
+            if (e.target && e.target.hasAttribute('data-reactivar')){
+                const id = e.target.getAttribute('data-reactivar');
+                let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+                const idx = productosLS.findIndex(p=>p.id===id);
+                if (idx>=0){ productosLS[idx].eliminado = false; }
+                localStorage.setItem('productos', JSON.stringify(productosLS));
+                cargarProductos(categoriaActual);
+                renderDesactivados();
+            }
+        });
+
+        // Agregar producto nuevo
+        document.getElementById('formAgregarProducto').addEventListener('submit', function(e){
+            e.preventDefault();
+            const nuevo = {
+                id: document.getElementById('ap_id').value.trim(),
+                codigo: document.getElementById('ap_codigo').value.trim(),
+                nombre: document.getElementById('ap_nombre').value.trim(),
+                categoria: document.getElementById('ap_categoria').value,
+                precio: parseInt(document.getElementById('ap_precio').value,10)||0,
+                descripcion: document.getElementById('ap_desc').value.trim(),
+                imagen: document.getElementById('ap_imagen').value.trim(),
+                stock: parseInt(document.getElementById('ap_stock').value,10)||0
+            };
+            let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+            if (productosLS.some(p=>p.id===nuevo.id)) { alert('ID ya existe en overrides.'); return; }
+            productosLS.push(nuevo);
+            localStorage.setItem('productos', JSON.stringify(productosLS));
+            alert('Producto agregado (override).');
+            this.reset();
+            cargarProductos(categoriaActual);
+            renderDesactivados();
+        });
+    </script>
+</body>
+</html>

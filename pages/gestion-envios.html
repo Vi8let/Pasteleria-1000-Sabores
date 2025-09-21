@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Envíos - Pastelería 1000 Sabores</title>
+    <!-- Google Fonts para tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light" style="background-color: #FFF5E1;">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+                <div class="d-flex">
+                    <a href="carrito.html" class="btn btn-outline-primary me-2">Ver Carrito</a>
+                    <a href="productos.html" class="btn btn-primary">Productos</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">Gestión de Envíos</h1>
+                
+                <!-- Información de envío en tiempo real -->
+                <div class="card mb-4">
+                    <div class="card-header" style="background-color: #8B4513; color: white;">
+                        <h5 class="mb-0">Seguimiento en Tiempo Real</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div id="mapaEnvio" class="bg-light p-4 rounded text-center">
+                                    <i class="fas fa-map-marker-alt fa-3x text-primary mb-3"></i>
+                                    <h6>Mapa de Seguimiento</h6>
+                                    <p class="text-muted">Visualiza la ubicación actual de tu pedido</p>
+                                    <button class="btn btn-primary" onclick="iniciarSeguimiento()">Iniciar Seguimiento</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-envio">
+                                    <h6>Estado del Envío</h6>
+                                    <p><strong>Pedido:</strong> <span id="numeroPedidoEnvio">PED-2025-001</span></p>
+                                    <p><strong>Repartidor:</strong> <span id="nombreRepartidor">Carlos Mendoza</span></p>
+                                    <p><strong>Vehículo:</strong> <span id="vehiculo">Moto - ABC123</span></p>
+                                    <p><strong>Teléfono:</strong> <span id="telefonoRepartidor">+56 9 1234 5678</span></p>
+                                    <p><strong>Tiempo estimado:</strong> <span id="tiempoEstimado" class="text-success">15 minutos</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selección de fecha de entrega -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Seleccionar Fecha de Entrega</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Fecha Preferida</h6>
+                                <input type="date" class="form-control" id="fechaEntrega" min="">
+                                <small class="text-muted">Selecciona la fecha que prefieras para recibir tu pedido</small>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Horario Preferido</h6>
+                                <select class="form-select" id="horarioEntrega">
+                                    <option value="">Selecciona un horario</option>
+                                    <option value="09:00-12:00">Mañana (9:00 - 12:00)</option>
+                                    <option value="12:00-15:00">Mediodía (12:00 - 15:00)</option>
+                                    <option value="15:00-18:00">Tarde (15:00 - 18:00)</option>
+                                    <option value="18:00-21:00">Noche (18:00 - 21:00)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-success" onclick="confirmarFechaEntrega()">Confirmar Fecha de Entrega</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opciones de entrega -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Opciones de Entrega</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-truck fa-2x text-primary mb-3"></i>
+                                        <h6>Delivery Estándar</h6>
+                                        <p class="text-muted">Entrega en 24-48 horas</p>
+                                        <p class="h5 text-primary">$3.000</p>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="seleccionarEnvio('estandar')">Seleccionar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 border-success">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-bolt fa-2x text-success mb-3"></i>
+                                        <h6>Delivery Express</h6>
+                                        <p class="text-muted">Entrega en 2-4 horas</p>
+                                        <p class="h5 text-success">$5.000</p>
+                                        <button class="btn btn-success btn-sm" onclick="seleccionarEnvio('express')">Seleccionar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-store fa-2x text-warning mb-3"></i>
+                                        <h6>Retiro en Tienda</h6>
+                                        <p class="text-muted">Sin costo adicional</p>
+                                        <p class="h5 text-warning">Gratis</p>
+                                        <button class="btn btn-outline-warning btn-sm" onclick="seleccionarEnvio('tienda')">Seleccionar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de envíos -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Historial de Envíos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Pedido</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Método</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>PED-2025-001</td>
+                                        <td>15/01/2025</td>
+                                        <td><span class="badge" style="background-color: #FFC0CB; color: #5D4037;">En Camino</span></td>
+                                        <td>Delivery Express</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="verDetalleEnvio('PED-2025-001')">Ver Detalle</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PED-2025-002</td>
+                                        <td>14/01/2025</td>
+                                        <td><span class="badge" style="background-color: #8B4513; color: white;">Entregado</span></td>
+                                        <td>Retiro en Tienda</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="verDetalleEnvio('PED-2025-002')">Ver Detalle</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PED-2025-003</td>
+                                        <td>13/01/2025</td>
+                                        <td><span class="badge" style="background-color: #8B4513; color: white;">Entregado</span></td>
+                                        <td>Delivery Estándar</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="verDetalleEnvio('PED-2025-003')">Ver Detalle</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notificaciones de envío -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Notificaciones de Envío</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Configurar Notificaciones</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notifSMS" checked>
+                                    <label class="form-check-label" for="notifSMS">
+                                        Recibir notificaciones por SMS
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notifEmail" checked>
+                                    <label class="form-check-label" for="notifEmail">
+                                        Recibir notificaciones por Email
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notifPush" checked>
+                                    <label class="form-check-label" for="notifPush">
+                                        Recibir notificaciones push
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Últimas Notificaciones</h6>
+                                <div class="list-group">
+                                    <div class="list-group-item">
+                                        <small class="text-muted">Hace 5 minutos</small>
+                                        <p class="mb-1">Tu pedido PED-2025-001 está en camino</p>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <small class="text-muted">Hace 1 hora</small>
+                                        <p class="mb-1">Tu pedido PED-2025-001 está listo para envío</p>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <small class="text-muted">Ayer</small>
+                                        <p class="mb-1">Tu pedido PED-2025-002 ha sido entregado</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        // Configurar fecha mínima (hoy)
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('fechaEntrega').min = hoy;
+        });
+
+        function iniciarSeguimiento() {
+            // Simular seguimiento en tiempo real
+            const mapa = document.getElementById('mapaEnvio');
+            mapa.innerHTML = `
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <h6>Conectando con GPS...</h6>
+                <p class="text-muted">Obteniendo ubicación actual del repartidor</p>
+            `;
+
+            setTimeout(() => {
+                mapa.innerHTML = `
+                    <div class="p-3 rounded mb-3" style="background-color: #8B4513; color: white;">
+                        <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                        <h6>Ubicación Actual</h6>
+                        <p class="mb-0">Av. Providencia 1000, Santiago</p>
+                    </div>
+                    <div class="p-3 rounded" style="background-color: #B0BEC5; color: #5D4037;">
+                        <h6>Próxima Parada</h6>
+                        <p class="mb-0">Tu dirección en 15 minutos</p>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function confirmarFechaEntrega() {
+            const fecha = document.getElementById('fechaEntrega').value;
+            const horario = document.getElementById('horarioEntrega').value;
+
+            if (!fecha || !horario) {
+                alert('Por favor selecciona fecha y horario de entrega');
+                return;
+            }
+
+            alert(`✅ Fecha de entrega confirmada:\n${new Date(fecha).toLocaleDateString('es-CL')} - ${horario}`);
+        }
+
+        function seleccionarEnvio(tipo) {
+            // Remover selección anterior
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('border-success');
+            });
+
+            // Agregar selección actual
+            event.target.closest('.card').classList.add('border-success');
+
+            const tipos = {
+                'estandar': 'Delivery Estándar - $3.000',
+                'express': 'Delivery Express - $5.000',
+                'tienda': 'Retiro en Tienda - Gratis'
+            };
+
+            alert(`✅ Método de envío seleccionado:\n${tipos[tipo]}`);
+        }
+
+        function verDetalleEnvio(pedido) {
+            alert(`📋 Detalle del envío ${pedido}\n\nEstado: En proceso\nRepartidor: Carlos Mendoza\nTiempo estimado: 15 minutos\n\n¿Deseas recibir actualizaciones en tiempo real?`);
+        }
+
+        // Simular actualizaciones en tiempo real
+        setInterval(() => {
+            const tiempoElemento = document.getElementById('tiempoEstimado');
+            if (tiempoElemento) {
+                const tiempoActual = parseInt(tiempoElemento.textContent);
+                if (tiempoActual > 0) {
+                    tiempoElemento.textContent = (tiempoActual - 1) + ' minutos';
+                } else {
+                    tiempoElemento.textContent = '¡Llegando!';
+                    tiempoElemento.className = 'text-warning fw-bold';
+                }
+            }
+        }, 60000); // Actualizar cada minuto
+    </script>
+
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+</html>
