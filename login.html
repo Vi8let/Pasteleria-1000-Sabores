@@ -81,7 +81,8 @@
                     { nombre: 'Admin General', correo: 'admin@pasteleria.com', contrasena: 'admin123', rol: 'admin' },
                     { nombre: 'Vendedor Oficial', correo: 'vendedor@gmail.com', contrasena: 'vendedor123', rol: 'vendedor' },
                     { nombre: 'Cliente Gmail', correo: 'cliente@gmail.com', contrasena: 'cliente123', rol: 'usuario', codigoDescuento: 'FELICES50' },
-                    { nombre: 'Cliente Duoc', correo: 'cliente@duocuc.cl', contrasena: 'cliente123', rol: 'usuario' }
+                    { nombre: 'Cliente Duoc', correo: 'cliente@duocuc.cl', contrasena: 'cliente123', rol: 'usuario' },
+                    { nombre: 'Cliente Senior', correo: 'cliente2@gmail.com', contrasena: 'cliente123', rol: 'usuario', fechaNacimiento: '1970-01-15' }
                 ];
                 let changed = false;
                 seeds.forEach(s=>{ if(!byEmail(s.correo)){ usuarios.push(s); changed = true; } });
