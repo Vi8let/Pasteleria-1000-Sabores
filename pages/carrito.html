@@ -21,12 +21,17 @@
 
     <main class="container my-4">
         <h1 class="text-center mb-4">Tu Carrito</h1>
-        <div id="contenidoCarrito"></div>
-        <div class="card mt-3">
+        <div id="carritoProductos" class="row justify-content-center">
+            <!-- Aquí se cargan los productos del carrito -->
+        </div>
+        
+        <!-- Sección de promociones -->
+        <div class="card mt-4">
             <div class="card-body">
+                <h5 class="card-title">Código de Promoción</h5>
                 <div class="row g-2 align-items-end">
                     <div class="col-md-6">
-                        <label class="form-label">Código de promoción</label>
+                        <label class="form-label">Selecciona una promoción</label>
                         <select id="promoCode" class="form-select"></select>
                         <small class="text-muted">Se aplica sobre el subtotal.</small>
                         <div id="verifyDuocContainer" class="mt-2 d-none">
@@ -37,11 +42,18 @@
                             <div id="duocMsg" class="form-text"></div>
                         </div>
                     </div>
-                    <div class="col-md-6 text-end"></div>
+                    <div class="col-md-6 text-end">
+                        <div id="resumen"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="mt-3" id="resumen"></div>
+        
+        <!-- Botones de acción -->
+        <div class="text-center mt-4">
+            <button id="vaciarCarrito" class="btn btn-danger me-2">Vaciar carrito</button>
+            <button id="finalizarCompra" class="btn btn-primary">Finalizar compra</button>
+        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -102,26 +114,11 @@
             localStorage.setItem('discounts', JSON.stringify(d));
             return d;
         }
-        function renderCart(){
-            const cont = document.getElementById('contenidoCarrito');
+        // Función para calcular subtotal (sin renderizar tabla)
+        function calcularSubtotal(){
             const cart = getCart();
-            if (cart.length===0){ cont.innerHTML='<div class="alert alert-info">Tu carrito está vacío.</div>'; return 0; }
-            let subtotal = 0;
-            const table = document.createElement('table');
-            table.className = 'table table-striped';
-            table.innerHTML = '<thead><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Total</th></tr></thead>';
-            const tbody = document.createElement('tbody');
-            cart.forEach(i=>{
-                const total = i.precio * i.cantidad;
-                subtotal += total;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${i.nombre}</td><td>${i.cantidad}</td><td>$${i.precio.toLocaleString('es-CL')}</td><td>$${total.toLocaleString('es-CL')}</td>`;
-                tbody.appendChild(tr);
-            });
-            table.appendChild(tbody);
-            cont.innerHTML = '';
-            cont.appendChild(table);
-            return subtotal;
+            if (cart.length===0) return 0;
+            return cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
         }
         function renderPromos(){
             const select = document.getElementById('promoCode');
@@ -183,7 +180,7 @@
             return true;
         }
         function calcular(){
-            const subtotal = renderCart();
+            const subtotal = calcularSubtotal();
             // Si el carrito está vacío, limpiar el resumen y salir
             if (!subtotal || subtotal <= 0){
                 const resumenV = document.getElementById('resumen');
@@ -213,15 +210,11 @@
             const total = subtotal - descuento;
             const resumen = document.getElementById('resumen');
             resumen.innerHTML = `
-                <div class="card">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <div>Subtotal: <strong>$${subtotal.toLocaleString('es-CL')}</strong></div>
-                            <div>Descuento: <strong>-$${descuento.toLocaleString('es-CL')}</strong></div>
-                            ${d.type==='birthday_duoc' ? `<small class="text-muted">${nota}</small>` : ''}
-                        </div>
-                        <div class="text-end" style="color:#8B4513;">Total a pagar: <strong>$${total.toLocaleString('es-CL')}</strong></div>
-                    </div>
+                <div class="text-end">
+                    <div class="mb-2"><strong>Subtotal:</strong> $${subtotal.toLocaleString('es-CL')}</div>
+                    <div class="mb-2"><strong>Descuento:</strong> -$${descuento.toLocaleString('es-CL')}</div>
+                    ${d.type==='birthday_duoc' ? `<small class="text-muted d-block mb-2">${nota}</small>` : ''}
+                    <div class="h5" style="color:#8B4513;"><strong>Total a pagar: $${total.toLocaleString('es-CL')}</strong></div>
                 </div>`;
         }
         // Limpiar promoción DUOC del localStorage si existe
@@ -417,6 +410,9 @@
             `;
             
             console.log('=== CARRITO RENDERIZADO ===');
+            
+            // Actualizar el resumen después de renderizar
+            calcular();
         }
 
         // Función para cambiar cantidad de productos
