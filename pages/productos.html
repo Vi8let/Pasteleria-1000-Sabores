@@ -3,6 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
+    <title>Todos los productos - Pastelería 1000 Sabores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <nav class="navbar navbar-light" style="background-color:#FFF5E1;">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                Pastelería 1000 Sabores
+            </a>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <h1 class="text-center mb-4">Todos los productos</h1>
+        <div class="row" id="gridProductos"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        function getOverrides(){ try{ return JSON.parse(localStorage.getItem('productos')||'[]'); }catch(e){ return []; } }
+        function getBase(){
+            return [
+                { id:'TC001', codigo:'TC001', nombre:'Torta Cuadrada de Chocolate', precio:45000, stock:10, imagen:'../assets/img/TC001-Torta Cuadrada de Chocolate.png', descripcion:'Torta de chocolate.' },
+                { id:'TC002', codigo:'TC002', nombre:'Torta Cuadrada de Frutas', precio:50000, stock:8, imagen:'../assets/img/TC002-Torta Cuadrada de Frutas.png', descripcion:'Torta de frutas.' },
+                { id:'TT001', codigo:'TT001', nombre:'Torta Circular de Vainilla', precio:40000, stock:15, imagen:'../assets/img/TT001-Torta Circular de Vainilla.png', descripcion:'Torta de vainilla.' },
+                { id:'PI001', codigo:'PI001', nombre:'Mousse de Chocolate', precio:5000, stock:20, imagen:'../assets/img/PI001-Mousse de Chocolate.png', descripcion:'Mousse.' }
+            ];
+        }
+        function mezclar(){
+            const base = getBase();
+            const ov = getOverrides();
+            return base.map(p=>{ const o = ov.find(x=>x.id===p.id); return o?{...p,...o}:p; }).filter(p=>!p.eliminado);
+        }
+        function agregarAlCarrito(id){
+            const productos = mezclar();
+            const p = productos.find(x=>x.id===id);
+            if (!p) return;
+            const carrito = JSON.parse(localStorage.getItem('cart')||'[]');
+            const ex = carrito.find(i=>i.id===id);
+            if (ex) ex.cantidad += 1; else carrito.push({ id:p.id, nombre:p.nombre, precio:p.precio, imagen:p.imagen, cantidad:1, tamano:'Mediana' });
+            localStorage.setItem('cart', JSON.stringify(carrito));
+            alert('Producto agregado al carrito');
+        }
+        function render(){
+            const grid = document.getElementById('gridProductos');
+            const data = mezclar();
+            const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            const esVendedor = !!(u && u.rol==='vendedor');
+            grid.innerHTML = '';
+            data.forEach(p=>{
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-4';
+                const overlay = esVendedor ? `<span class="badge" style="position:absolute; top:8px; right:8px; background-color:#8B4513;">Stock: ${p.stock ?? '-'}</span>` : '';
+                col.innerHTML = `
+                    <div class="card h-100">
+                        <div style="position:relative;">
+                            <img src="${p.imagen}" class="card-img-top" style="height:200px;object-fit:cover;" alt="${p.nombre}">
+                            ${overlay}
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${p.nombre}</h5>
+                            <p class="card-text"><strong>Código:</strong> <span class="badge" style="background-color:#FFC0CB;color:#5D4037;">${p.codigo}</span></p>
+                            <p class="card-text">$${p.precio.toLocaleString('es-CL')}</p>
+                            <div class="mt-auto">
+                                <button class="btn btn-success btn-sm" onclick="agregarAlCarrito('${p.id}')">🛒 Agregar</button>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.appendChild(col);
+            });
+        }
+        render();
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+=======
+>>>>>>> origin/main
     <title>Productos - Pastelería 1000 Sabores</title>
     <!-- Google Fonts para tipografía -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
@@ -21,7 +109,13 @@
                     <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
                     Pastelería 1000 Sabores
                 </a>
+<<<<<<< HEAD
+                <div class="ms-auto d-flex gap-2">
+                    <a href="carrito.html" class="btn" style="background-color: #8B4513; color: white; border-color: #8B4513;">Ver Carrito</a>
+                </div>
+=======
                 <a href="carrito.html" class="btn ms-auto" style="background-color: #8B4513; color: white; border-color: #8B4513;">Ver Carrito</a>
+>>>>>>> origin/main
             </div>
         </nav>
     </header>
@@ -93,6 +187,51 @@
         <div class="row" id="catalogoProductos">
             <!-- Aquí se cargarán los productos dinámicamente -->
         </div>
+<<<<<<< HEAD
+
+        <!-- Sección visible solo para ADMIN: desactivados y agregar producto -->
+        <section class="mt-5" id="adminZona" style="display:none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos desactivados</h5>
+                </div>
+                <div class="card-body" id="listaDesactivados">
+                    <!-- Render dinámico -->
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Agregar producto</h5>
+                </div>
+                <div class="card-body">
+                    <form id="formAgregarProducto" class="row g-2">
+                        <div class="col-md-2"><input required class="form-control" placeholder="ID (p.ej. TC003)" id="ap_id"></div>
+                        <div class="col-md-2"><input required class="form-control" placeholder="Código" id="ap_codigo"></div>
+                        <div class="col-md-3"><input required class="form-control" placeholder="Nombre" id="ap_nombre"></div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="ap_categoria">
+                                <option>Tortas Cuadradas</option>
+                                <option>Tortas Circulares</option>
+                                <option>Postres Individuales</option>
+                                <option>Productos Sin Azúcar</option>
+                                <option>Pastelería Tradicional</option>
+                                <option>Productos Sin Gluten</option>
+                                <option>Productos Veganos</option>
+                                <option>Tortas Especiales</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2"><input type="number" min="0" required class="form-control" placeholder="Precio" id="ap_precio"></div>
+                        <div class="col-12"><input class="form-control" placeholder="Descripción" id="ap_desc"></div>
+                        <div class="col-md-6"><input class="form-control" placeholder="Ruta imagen (../assets/img/...)" id="ap_imagen"></div>
+                        <div class="col-md-2"><input type="number" min="0" class="form-control" placeholder="Stock" id="ap_stock"></div>
+                        <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Agregar</button></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+=======
+>>>>>>> origin/main
     </main>
 
     <footer class="text-center mt-5">
@@ -327,9 +466,22 @@
         catalogo.innerHTML = '';
 
             // Filtrar productos por categoría
+<<<<<<< HEAD
+            // Mezclar catálogo en memoria con overrides guardados por admin en localStorage
+            let productosBase = categoria === 'Todas' ? productos : productos.filter(producto => producto.categoria === categoria);
+            let overrides = [];
+            try { overrides = JSON.parse(localStorage.getItem('productos')||'[]'); } catch(e) { overrides = []; }
+            const productosFiltrados = productosBase
+                .map(p => {
+                    const ov = overrides.find(o=>o.id===p.id);
+                    return ov ? { ...p, ...ov } : p;
+                })
+                .filter(p => !p.eliminado);
+=======
             const productosFiltrados = categoria === 'Todas' 
                 ? productos 
                 : productos.filter(producto => producto.categoria === categoria);
+>>>>>>> origin/main
 
             console.log(`Productos filtrados: ${productosFiltrados.length}`);
 
@@ -352,6 +504,23 @@
             const col = document.createElement('div');
             col.className = 'col-md-4 mb-4';
 
+<<<<<<< HEAD
+            const uSess = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            const esVendedorCatalogo = !!(uSess && uSess.rol==='vendedor');
+            const overlayBadge = esVendedorCatalogo ? `<span class="badge" style="position:absolute; top:8px; right:8px; background-color:#8B4513;">Stock: ${producto.stock ?? '-'}</span>` : '';
+
+            col.innerHTML = `
+                <div class="card product-card h-100">
+                        <div style="position:relative;">
+                            <img src="${producto.imagen}" 
+                                 class="card-img-top" 
+                                 alt="${producto.nombre}" 
+                                 style="height: 250px; object-fit: cover;"
+                                 onload="console.log('✅ Imagen cargada:', '${producto.nombre}')"
+                                 onerror="console.error('❌ Error cargando imagen:', this.src)">
+                            ${overlayBadge}
+                        </div>
+=======
             col.innerHTML = `
                 <div class="card product-card h-100">
                         <img src="${producto.imagen}" 
@@ -360,12 +529,26 @@
                              style="height: 250px; object-fit: cover;"
                              onload="console.log('✅ Imagen cargada:', '${producto.nombre}')"
                              onerror="console.error('❌ Error cargando imagen:', this.src)">
+>>>>>>> origin/main
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">${producto.nombre}</h5>
                             <p class="card-text text-muted"><strong>Categoría:</strong> ${producto.categoria}</p>
                             <p class="card-text"><strong>Código:</strong> <span class="badge" style="background-color: #FFC0CB; color: #5D4037;">${producto.codigo}</span></p>
                         <p class="card-text">${producto.descripcion}</p>
                             <p class="card-text"><strong>Precio:</strong> <span class="h5" style="color: #8B4513;">$${producto.precio.toLocaleString('es-CL')}</span></p>
+<<<<<<< HEAD
+                            <div class="admin-controls" style="display:none;">
+                                <div class="row g-2">
+                                    <div class="col-6"><input type="number" class="form-control form-control-sm" placeholder="Precio" value="${producto.precio}" data-field="precio" data-id="${producto.id}"></div>
+                                    <div class="col-4"><input type="number" class="form-control form-control-sm" placeholder="Stock" value="${producto.stock||0}" data-field="stock" data-id="${producto.id}"></div>
+                                    <div class="col-2 d-grid gap-1">
+                                        <button class="btn btn-sm" style="background-color:#8B4513; color:#fff;" data-action="guardar" data-id="${producto.id}">Guardar</button>
+                                        <button class="btn btn-sm btn-danger" data-action="eliminar" data-id="${producto.id}">Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>
+=======
+>>>>>>> origin/main
                             <div class="mt-auto">
                                 <button class="btn btn-sm me-2" style="background-color: #8B4513; color: white; border-color: #8B4513;" onclick="agregarAlCarrito('${producto.id}')">
                                     🛒 Agregar al carrito
@@ -477,6 +660,130 @@
             cargarProductos();
             configurarFiltros();
             actualizarContadorCarrito();
+<<<<<<< HEAD
+            // Ocultar sección duplicada superior (Todos los productos) si existe
+            try {
+                const topGrid = document.getElementById('gridProductos');
+                if (topGrid) {
+                    const topMain = topGrid.closest('main');
+                    if (topMain) {
+                        const maybeNav = topMain.previousElementSibling;
+                        if (maybeNav && maybeNav.tagName === 'NAV') { maybeNav.remove(); }
+                        topMain.remove();
+                    }
+                }
+            } catch(e) {}
+            // Mostrar controles admin si rol=admin
+            try {
+                const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
+                if (u && u.rol==='admin') {
+                    document.querySelectorAll('.admin-controls').forEach(el=> el.style.display='block');
+                    // Ocultar acceso al carrito si es admin
+                    const linkCarrito = document.querySelector('a[href="carrito.html"]');
+                    if (linkCarrito) linkCarrito.style.display='none';
+                    document.getElementById('adminZona').style.display='block';
+                    renderDesactivados();
+                }
+            } catch(e) {}
+        });
+
+        // Guardar cambios de precio/stock y eliminar producto (ADMIN)
+        document.addEventListener('click', function(e){
+            if (e.target && e.target.getAttribute('data-action')==='guardar'){
+                const id = e.target.getAttribute('data-id');
+                let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+                const precioInput = document.querySelector(`input[data-field="precio"][data-id="${id}"]`);
+                const stockInput = document.querySelector(`input[data-field="stock"][data-id="${id}"]`);
+                const nuevoPrecio = parseInt(precioInput.value,10)||0;
+                const nuevoStock = parseInt(stockInput.value,10)||0;
+                // Actualizar en localStorage si existe, si no, creamos entrada local editable
+                const idx = productosLS.findIndex(p=>p.id===id);
+                if (idx>=0){
+                    productosLS[idx].precio = nuevoPrecio;
+                    productosLS[idx].stock = nuevoStock;
+                } else {
+                    // Buscar datos base del catálogo en memoria
+                    const base = (window.productos||[]).find(p=>p.id===id) || {};
+                    productosLS.push({ ...base, id, precio: nuevoPrecio, stock: nuevoStock });
+                }
+                localStorage.setItem('productos', JSON.stringify(productosLS));
+                alert('Cambios guardados');
+                cargarProductos(categoriaActual); // mantiene controles visibles
+            }
+            if (e.target && e.target.getAttribute('data-action')==='eliminar'){
+                const id = e.target.getAttribute('data-id');
+                if (!confirm('¿Eliminar este producto del catálogo visible?')) return;
+                let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+                // Marcamos con flag eliminado para que no se muestre
+                const idx = productosLS.findIndex(p=>p.id===id);
+                if (idx>=0){
+                    productosLS[idx].eliminado = true;
+                } else {
+                    const base = (window.productos||[]).find(p=>p.id===id) || { id };
+                    productosLS.push({ ...base, eliminado: true });
+                }
+                localStorage.setItem('productos', JSON.stringify(productosLS));
+                cargarProductos(categoriaActual);
+                renderDesactivados();
+            }
+        });
+
+        function renderDesactivados(){
+            const cont = document.getElementById('listaDesactivados');
+            if (!cont) return;
+            let overrides = [];
+            try { overrides = JSON.parse(localStorage.getItem('productos')||'[]'); } catch(e) { overrides = []; }
+            const desactivados = overrides.filter(p=>p.eliminado);
+            if (desactivados.length===0){ cont.innerHTML = '<div class="text-muted">No hay productos desactivados.</div>'; return; }
+            const table = document.createElement('table');
+            table.className = 'table';
+            table.innerHTML = '<thead><tr><th>Código</th><th>Nombre</th><th>Acciones</th></tr></thead>';
+            const tbody = document.createElement('tbody');
+            desactivados.forEach(p=>{
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${p.codigo||p.id}</td><td>${p.nombre||p.id}</td><td><button class="btn btn-sm btn-primary" data-reactivar="${p.id}">Reactivar</button></td>`;
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            cont.innerHTML='';
+            cont.appendChild(table);
+        }
+
+        document.addEventListener('click', function(e){
+            if (e.target && e.target.hasAttribute('data-reactivar')){
+                const id = e.target.getAttribute('data-reactivar');
+                let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+                const idx = productosLS.findIndex(p=>p.id===id);
+                if (idx>=0){ productosLS[idx].eliminado = false; }
+                localStorage.setItem('productos', JSON.stringify(productosLS));
+                cargarProductos(categoriaActual);
+                renderDesactivados();
+            }
+        });
+
+        // Agregar producto nuevo
+        document.getElementById('formAgregarProducto').addEventListener('submit', function(e){
+            e.preventDefault();
+            const nuevo = {
+                id: document.getElementById('ap_id').value.trim(),
+                codigo: document.getElementById('ap_codigo').value.trim(),
+                nombre: document.getElementById('ap_nombre').value.trim(),
+                categoria: document.getElementById('ap_categoria').value,
+                precio: parseInt(document.getElementById('ap_precio').value,10)||0,
+                descripcion: document.getElementById('ap_desc').value.trim(),
+                imagen: document.getElementById('ap_imagen').value.trim(),
+                stock: parseInt(document.getElementById('ap_stock').value,10)||0
+            };
+            let productosLS = JSON.parse(localStorage.getItem('productos')||'[]');
+            if (productosLS.some(p=>p.id===nuevo.id)) { alert('ID ya existe en overrides.'); return; }
+            productosLS.push(nuevo);
+            localStorage.setItem('productos', JSON.stringify(productosLS));
+            alert('Producto agregado (override).');
+            this.reset();
+            cargarProductos(categoriaActual);
+            renderDesactivados();
+=======
+>>>>>>> origin/main
         });
     </script>
 </body>

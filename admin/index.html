@@ -14,11 +14,19 @@
     <link rel="icon" type="image/png" href="../assets/img/logo-gato-chef.png">
 </head>
 <body>
+<<<<<<< HEAD
+    <!-- Redirigir este panel al inicio (no se usa panel dedicado) -->
+    <script>
+        (function(){
+            window.location.replace('../index.html');
+        })();
+=======
     <!-- Protección de acceso: Si no hay usuario en sesión, redirige a login -->
     <script>
         if (!localStorage.getItem('sessionUser')) {
             window.location.href = '../login.html';
         }
+>>>>>>> origin/main
     </script>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FFF5E1;">
@@ -32,6 +40,13 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
+<<<<<<< HEAD
+                        <li class="nav-item"><a class="nav-link" href="productos-lista.html">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="usuarios-lista.html" id="linkUsuarios">Usuarios</a></li>
+                        <li class="nav-item"><a class="nav-link" href="ordenes.html">Órdenes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="descuentos.html" id="linkDescuentos">Descuentos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../login.html" onclick="localStorage.removeItem('sessionUser')">Cerrar sesión</a></li>
+=======
                         <li class="nav-item">
                             <a class="nav-link" href="productos-lista.html">Productos</a>
                         </li>
@@ -41,6 +56,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="../login.html" onclick="localStorage.removeItem('sessionUser')">Cerrar sesión</a>
                         </li>
+>>>>>>> origin/main
                     </ul>
                 </div>
             </div>
@@ -60,7 +76,11 @@
                 </div>
             </div>
             <div class="col-md-6">
+<<<<<<< HEAD
+                <div class="card shadow-sm" id="cardUsuarios">
+=======
                 <div class="card shadow-sm">
+>>>>>>> origin/main
                     <div class="card-body">
                         <h5 class="card-title">Gestión de Usuarios</h5>
                         <p class="card-text">Administra los usuarios registrados, incluyendo la creación, edición y eliminación de usuarios.</p>
@@ -68,6 +88,27 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
+            <div class="col-md-6 mt-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Órdenes y Stock</h5>
+                        <p class="card-text">Revisar órdenes hechas por usuarios y stock restante.</p>
+                        <a href="ordenes.html" class="btn btn-primary">Ir a Órdenes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-3">
+                <div class="card shadow-sm" id="cardDescuentos">
+                    <div class="card-body">
+                        <h5 class="card-title">Descuentos</h5>
+                        <p class="card-text">Crear y eliminar códigos de descuento.</p>
+                        <a href="descuentos.html" class="btn btn-primary">Ir a Descuentos</a>
+                    </div>
+                </div>
+            </div>
+=======
+>>>>>>> origin/main
         </div>
     </main>
 
@@ -77,5 +118,25 @@
 
     <!-- Bootstrap 5 JS Bundle actualizado -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+<<<<<<< HEAD
+    <script>
+        // Ocultar enlaces/cards exclusivos para admin cuando el rol no sea admin
+        (function(){
+            const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            const isAdmin = u && u.rol === 'admin';
+            const linkUsuarios = document.getElementById('linkUsuarios');
+            const linkDescuentos = document.getElementById('linkDescuentos');
+            const cardUsuarios = document.getElementById('cardUsuarios');
+            const cardDescuentos = document.getElementById('cardDescuentos');
+            if (!isAdmin) {
+                linkUsuarios && (linkUsuarios.style.display='none');
+                linkDescuentos && (linkDescuentos.style.display='none');
+                cardUsuarios && (cardUsuarios.style.display='none');
+                cardDescuentos && (cardDescuentos.style.display='none');
+            }
+        })();
+    </script>
+=======
+>>>>>>> origin/main
 </body>
 </html>

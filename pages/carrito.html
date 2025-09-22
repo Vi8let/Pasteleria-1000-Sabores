@@ -4,6 +4,290 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito - Pastelería 1000 Sabores</title>
+<<<<<<< HEAD
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <nav class="navbar navbar-light" style="background-color:#FFF5E1;">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                Pastelería 1000 Sabores
+            </a>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <h1 class="text-center mb-4">Tu Carrito</h1>
+        <div id="carritoProductos" class="row justify-content-center">
+            <!-- Aquí se cargan los productos del carrito -->
+        </div>
+        
+        <!-- Sección de promociones -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Código de Promoción</h5>
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-6">
+                        <label class="form-label">Selecciona una promoción</label>
+                        <select id="promoCode" class="form-select"></select>
+                        <small class="text-muted">Se aplica sobre el subtotal.</small>
+                        <div id="verifyDuocContainer" class="mt-2 d-none">
+                            <div class="input-group input-group-sm">
+                                <input type="email" id="duocEmail" class="form-control" placeholder="correo@duocuc.cl">
+                                <button class="btn btn-outline-secondary" type="button" id="btnVerificarDuoc">Verificar</button>
+                            </div>
+                            <div id="duocMsg" class="form-text"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div id="resumen"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="text-center mt-4">
+            <button id="vaciarCarrito" class="btn btn-danger me-2">Vaciar carrito</button>
+            <button id="finalizarCompra" class="btn btn-primary">Finalizar compra</button>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        function getCart(){ try{ return JSON.parse(localStorage.getItem('cart')||'[]'); }catch(e){ return []; } }
+        function setCart(v){ localStorage.setItem('cart', JSON.stringify(v)); }
+        function normalizeDiscounts(list){
+            const normalized = [];
+            (list||[]).forEach(x=>{
+                let item = { ...x };
+                
+                // Eliminar completamente la promoción DUOC (no migrar)
+                if (item.code === 'DUOC') {
+                    return; // Saltar esta promoción
+                }
+                
+                // Si no tiene type pero tiene percentage, asumir porcentaje
+                if (!item.type && typeof item.percentage === 'number') {
+                    item.type = 'percentage';
+                    if (!item.label) item.label = `${item.code} (${item.percentage}%)`;
+                }
+                
+                // Forzar valores oficiales para promociones válidas
+                if (item.code === 'FELICES50') { 
+                    item.percentage = 10; 
+                    item.type='percentage'; 
+                    item.label='FELICES50 (10%)'; 
+                }
+                if (item.code === 'ADULTO_MAYOR') { 
+                    item.percentage = 50; 
+                    item.type='percentage'; 
+                    item.label='Adulto Mayor (50%)'; 
+                }
+                if (item.code === 'CUMPLE_DUOC') { 
+                    item.type='birthday_duoc'; 
+                    item.label='Cumpleaños DUOC (torta gratis)'; 
+                    delete item.percentage; 
+                }
+                
+                // Solo incluir promociones válidas
+                if (['FELICES50','ADULTO_MAYOR','CUMPLE_DUOC'].includes(item.code)) {
+                    normalized.push(item);
+                }
+            });
+            
+            // Si falta alguno, agregarlo por defecto
+            const ensure = (code, obj) => { if (!normalized.find(d=>d.code===code)) normalized.push(obj); };
+            ensure('FELICES50', { code:'FELICES50', type:'percentage', percentage:10, label:'FELICES50 (10%)' });
+            ensure('ADULTO_MAYOR', { code:'ADULTO_MAYOR', type:'percentage', percentage:50, label:'Adulto Mayor (50%)' });
+            ensure('CUMPLE_DUOC', { code:'CUMPLE_DUOC', type:'birthday_duoc', label:'Cumpleaños DUOC (torta gratis)' });
+            
+            return normalized;
+        }
+        function getDiscounts(){
+            let d = [];
+            try { d = JSON.parse(localStorage.getItem('discounts')||'[]'); } catch(e){ d = []; }
+            d = normalizeDiscounts(d);
+            localStorage.setItem('discounts', JSON.stringify(d));
+            return d;
+        }
+        // Función para calcular subtotal (sin renderizar tabla)
+        function calcularSubtotal(){
+            const cart = getCart();
+            if (cart.length===0) return 0;
+            return cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+        }
+        function renderPromos(){
+            const select = document.getElementById('promoCode');
+            const ds = getDiscounts();
+            select.innerHTML = '';
+            
+            // Verificar si el usuario está logueado
+            const usuario = JSON.parse(localStorage.getItem('sessionUser') || 'null');
+            if (!usuario) {
+                // Ocultar completamente la sección de promociones
+                const promoSection = document.querySelector('.card.mt-4');
+                if (promoSection) promoSection.style.display = 'none';
+                return;
+            }
+            
+            // Solo mostrar selector de promociones para vendedores
+            if (usuario.rol === 'vendedor') {
+                const promoSection = document.querySelector('.card.mt-4');
+                if (promoSection) promoSection.style.display = 'block';
+                
+                // Mostrar todas las promociones para vendedores
+                ds.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.code;
+                    opt.textContent = d.label || d.code;
+                    select.appendChild(opt);
+                });
+                if (select.options.length > 0) select.value = ds[0].code;
+                select.disabled = false;
+            } else {
+                // Para clientes, ocultar la sección de promociones (se aplicarán automáticamente)
+                const promoSection = document.querySelector('.card.mt-4');
+                if (promoSection) promoSection.style.display = 'none';
+            }
+            
+            toggleDuocVerification();
+        }
+        function toggleDuocVerification(){
+            const code = document.getElementById('promoCode').value;
+            const box = document.getElementById('verifyDuocContainer');
+            const msg = document.getElementById('duocMsg');
+            if (code==='CUMPLE_DUOC'){
+                box.classList.remove('d-none');
+                msg.textContent = 'Ingresa el correo DUOC del cliente para validar cumpleaños.';
+                msg.style.color = '#5D4037';
+            } else {
+                box.classList.add('d-none');
+                msg.textContent='';
+                localStorage.removeItem('duocEligible');
+            }
+        }
+        function verificarDuoc(){
+            const email = (document.getElementById('duocEmail').value||'').trim();
+            const msg = document.getElementById('duocMsg');
+            msg.textContent='';
+            if (!/@duocuc\.cl$/i.test(email)){
+                msg.textContent='Debe ser correo @duocuc.cl';
+                msg.style.color = 'red';
+                localStorage.removeItem('duocEligible');
+                return false;
+            }
+            let usuarios = [];
+            try { usuarios = JSON.parse(localStorage.getItem('usuarios')||'[]'); } catch(e){ usuarios=[]; }
+            const u = usuarios.find(x=> (x.correo||x.email||'').toLowerCase()===email.toLowerCase());
+            if (!u){
+                msg.textContent='Usuario no encontrado en registros.';
+                msg.style.color = 'red';
+                localStorage.removeItem('duocEligible');
+                return false;
+            }
+            const hoy = new Date();
+            const fn = u.fechaNacimiento ? new Date(u.fechaNacimiento) : null;
+            const cumple = !!fn && fn.getMonth()===hoy.getMonth() && fn.getDate()===hoy.getDate();
+            if (!cumple){
+                msg.textContent='Hoy no es su cumpleaños.';
+                msg.style.color = 'red';
+                localStorage.removeItem('duocEligible');
+                return false;
+            }
+            localStorage.setItem('duocEligible', JSON.stringify({ email, fecha: new Date().toISOString().slice(0,10) }));
+            msg.textContent='Elegible: se aplicará una torta gratis.';
+            msg.style.color = 'green';
+            return true;
+        }
+        function calcular(){
+    const subtotal = calcularSubtotal();
+    // Si el carrito está vacío, limpiar el resumen y salir
+    if (!subtotal || subtotal <= 0){
+        const resumenV = document.getElementById('resumen');
+        if (resumenV) resumenV.innerHTML = '';
+        return;
+    }
+    
+    const usuario = JSON.parse(localStorage.getItem('sessionUser') || 'null');
+    let descuento = 0;
+    let nota = '';
+    let promocionAplicada = '';
+    
+    if (usuario) {
+        // Para vendedores: usar promoción seleccionada
+        if (usuario.rol === 'vendedor') {
+            // ...código existente para vendedores...
+        } else {
+            // Para clientes: verificar si tiene el código FELICES50
+            if (usuario.codigoDescuento === 'FELICES50') {
+                descuento = Math.round(subtotal * 0.10); // 10% de descuento
+                promocionAplicada = 'FELICES50 (10%)';
+                console.log('✅ Aplicando descuento FELICES50 al cliente:', usuario.correo);
+            }
+            
+            // Verificar otras promociones solo si no se aplicó FELICES50
+            if (!promocionAplicada) {
+                // Verificar ADULTO_MAYOR
+                if (usuario.fechaNacimiento) {
+                    // ...código existente para adulto mayor...
+                }
+                // Verificar CUMPLE_DUOC
+                if (!promocionAplicada && usuario.correo && usuario.correo.includes('@duocuc.cl')) {
+                    // ...código existente para cumpleaños DUOC...
+                }
+            }
+        }
+    }
+    
+    const total = subtotal - descuento;
+    const resumen = document.getElementById('resumen');
+    resumen.innerHTML = `
+        <div class="text-end">
+            <div class="mb-2"><strong>Subtotal:</strong> $${subtotal.toLocaleString('es-CL')}</div>
+            ${descuento > 0 ? `<div class="mb-2"><strong>Descuento (${promocionAplicada}):</strong> -$${descuento.toLocaleString('es-CL')}</div>` : ''}
+            ${nota ? `<small class="text-muted d-block mb-2">${nota}</small>` : ''}
+            <div class="h5" style="color:#8B4513;"><strong>Total a pagar: $${total.toLocaleString('es-CL')}</strong></div>
+        </div>`;
+}
+        // Limpiar promoción DUOC del localStorage si existe
+        function limpiarPromocionDUOC() {
+            try {
+                let discounts = JSON.parse(localStorage.getItem('discounts') || '[]');
+                const originalLength = discounts.length;
+                discounts = discounts.filter(d => d.code !== 'DUOC' && d.codigo !== 'DUOC');
+                if (discounts.length !== originalLength) {
+                    localStorage.setItem('discounts', JSON.stringify(discounts));
+                    console.log('Promoción DUOC eliminada del localStorage');
+                }
+            } catch (e) {
+                console.log('Error limpiando promoción DUOC:', e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+            limpiarPromocionDUOC(); // Limpiar DUOC al cargar la página
+            renderPromos();
+            calcular();
+            document.getElementById('promoCode').addEventListener('change', function(){ toggleDuocVerification(); calcular(); });
+            document.getElementById('btnVerificarDuoc').addEventListener('click', function(){ if (verificarDuoc()) calcular(); });
+        });
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Pastelería 1000 Sabores</title>
+=======
+>>>>>>> origin/main
     <!-- Google Fonts para tipografía -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <!-- Bootstrap 5 CDN -->
@@ -26,6 +310,8 @@
         </nav>
     </header>
 
+<<<<<<< HEAD
+=======
     <main class="container mt-4">
         <h1 class="text-center mb-4">Carrito de Compras</h1>
         <div id="carritoProductos" class="row justify-content-center">
@@ -40,6 +326,7 @@
     <footer class="text-center mt-5">
         <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
     </footer>
+>>>>>>> origin/main
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -156,6 +443,10 @@
                                 </div>
                                 <div class="col-md-4 text-end">
                                     <h4 class="text-success">Total: $${total.toLocaleString('es-CL')}</h4>
+<<<<<<< HEAD
+                                    <div id="accionesPago" class="mt-2"></div>
+=======
+>>>>>>> origin/main
                                 </div>
                             </div>
                         </div>
@@ -164,6 +455,13 @@
             `;
             
             console.log('=== CARRITO RENDERIZADO ===');
+<<<<<<< HEAD
+            
+            // Actualizar promociones y resumen después de renderizar
+            renderPromos();
+            calcular();
+=======
+>>>>>>> origin/main
         }
 
         // Función para cambiar cantidad de productos
@@ -220,10 +518,31 @@
                 return;
             }
             
+<<<<<<< HEAD
+            // Validar que el usuario esté autenticado
+            const usuario = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            if (!usuario) {
+                alert('Debes iniciar sesión para realizar una compra.');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Solo permitir compras a clientes (rol 'usuario' o sin rol definido)
+            if (usuario.rol && usuario.rol !== 'usuario') {
+                alert('Solo los clientes pueden realizar compras. Los administradores y vendedores no pueden comprar.');
+                return;
+            }
+            
+=======
+>>>>>>> origin/main
             const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
             const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
             
             if (confirm(`¿Confirmar compra de ${totalItems} productos por un total de $${total.toLocaleString('es-CL')}?`)) {
+<<<<<<< HEAD
+                const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                generarBoleta(numeroPedido, total, totalItems);
+=======
                 // Generar número de pedido único
                 const numeroPedido = 'PED-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
                 
@@ -231,6 +550,7 @@
                 generarBoleta(numeroPedido, total, totalItems);
                 
                 // Limpiar carrito
+>>>>>>> origin/main
                 cart = [];
                 localStorage.removeItem('cart');
                 renderCarrito();

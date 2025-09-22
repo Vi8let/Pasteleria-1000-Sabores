@@ -41,7 +41,21 @@
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Contraseña</label>
+<<<<<<< HEAD
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required minlength="6" maxlength="20" autocomplete="new-password">
+                                <button class="btn btn-outline-secondary" type="button" id="toggleRegPassword">Mostrar</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="6" maxlength="20" autocomplete="new-password">
+                                <button class="btn btn-outline-secondary" type="button" id="toggleRegPassword2">Mostrar</button>
+                            </div>
+=======
                             <input type="password" class="form-control" id="password" name="password" required minlength="6" maxlength="20" autocomplete="new-password">
+>>>>>>> origin/main
                         </div>
                         <div class="mb-3">
                             <label for="run" class="form-label">RUN/RUT</label>
@@ -150,10 +164,17 @@
         }
 
         // Event listener para el formulario de registro
+<<<<<<< HEAD
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('name').value;
+=======
         document.getElementById('registroForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const nombre = document.getElementById('nombre').value;
+>>>>>>> origin/main
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -205,8 +226,13 @@
             const usuario = {
                 id: Date.now(),
                 nombre,
+<<<<<<< HEAD
+                correo: email,
+                contrasena: password,
+=======
                 email,
                 password,
+>>>>>>> origin/main
                 run,
                 fechaNacimiento,
                 region,
@@ -221,6 +247,10 @@
             if (resultado.success) {
                 // Guardar usuario actual
                 localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+<<<<<<< HEAD
+                localStorage.setItem('sessionUser', JSON.stringify(usuario));
+=======
+>>>>>>> origin/main
                 
                 if (codigoDescuento) {
                     localStorage.setItem('codigoDescuento', codigoDescuento);
@@ -247,6 +277,22 @@
             if (localStorage.getItem('usuarioActual')) {
                 window.location.href = '../index.html';
             }
+<<<<<<< HEAD
+            // Toggles de contraseña
+            document.getElementById('toggleRegPassword').addEventListener('click', function(){
+                const input = document.getElementById('password');
+                const es = input.type==='password';
+                input.type = es ? 'text' : 'password';
+                this.textContent = es ? 'Ocultar' : 'Mostrar';
+            });
+            document.getElementById('toggleRegPassword2').addEventListener('click', function(){
+                const input = document.getElementById('confirmPassword');
+                const es = input.type==='password';
+                input.type = es ? 'text' : 'password';
+                this.textContent = es ? 'Ocultar' : 'Mostrar';
+            });
+=======
+>>>>>>> origin/main
         });
     </script>
 </body>

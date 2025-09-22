@@ -39,6 +39,26 @@ function saveUser(user) {
     localStorage.setItem('usuarios', JSON.stringify(users));
 }
 
+<<<<<<< HEAD
+// Semilla de usuarios con roles (admin, vendedor, usuario)
+function seedInitialUsers() {
+    const existing = getUsers();
+    if (existing.length === 0) {
+        const seeded = [
+            // Usuario ADMIN con dominio válido y permisos completos
+            { nombre: 'Admin General', correo: 'admin@pasteleria.com', contrasena: 'admin123', rol: 'admin' },
+            // Usuario VENDEDOR con permisos para ver órdenes y stock
+            { nombre: 'Vendedor Oficial', correo: 'vendedor@gmail.com', contrasena: 'vendedor123', rol: 'vendedor' },
+            // Clientes de ejemplo solicitados
+            { nombre: 'Cliente Gmail', correo: 'cliente@gmail.com', contrasena: 'cliente123', rol: 'usuario' },
+            { nombre: 'Cliente Duoc', correo: 'cliente@duocuc.cl', contrasena: 'cliente123', rol: 'usuario' }
+        ];
+        localStorage.setItem('usuarios', JSON.stringify(seeded));
+    }
+}
+
+=======
+>>>>>>> origin/main
 // Sesión
 function getSessionUser() {
     return localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : null;
@@ -66,6 +86,39 @@ function clearCart() {
     localStorage.removeItem('cart');
 }
 
+<<<<<<< HEAD
+// Órdenes (para vista de vendedor/admin)
+function getOrders() {
+    const orders = localStorage.getItem('ordenes');
+    return orders ? JSON.parse(orders) : [];
+}
+
+function saveOrder(order) {
+    const orders = getOrders();
+    orders.push(order);
+    localStorage.setItem('ordenes', JSON.stringify(orders));
+}
+
+// Descuentos (admin puede eliminarlos)
+function getDiscounts() {
+    const discounts = localStorage.getItem('descuentos');
+    return discounts ? JSON.parse(discounts) : [];
+}
+
+function saveDiscount(discount) {
+    const discounts = getDiscounts();
+    discounts.push(discount);
+    localStorage.setItem('descuentos', JSON.stringify(discounts));
+}
+
+function deleteDiscount(code) {
+    let discounts = getDiscounts();
+    discounts = discounts.filter(d => d.codigo !== code);
+    localStorage.setItem('descuentos', JSON.stringify(discounts));
+}
+
+=======
+>>>>>>> origin/main
 // Semilla inicial de productos si el LocalStorage está vacío
 function seedInitialData() {
     if (getProducts().length === 0) {
@@ -79,8 +132,22 @@ function seedInitialData() {
         ];
         localStorage.setItem('productos', JSON.stringify(initialProducts));
     }
+<<<<<<< HEAD
+    // Sembrar descuentos válidos por defecto (solo FELICES50 activo)
+    if (getDiscounts().length === 0) {
+        localStorage.setItem('descuentos', JSON.stringify([
+            { codigo: 'FELICES50', porcentaje: 10, activo: true }
+        ]));
+    }
 }
 
+// Ejecutar semillas base
+seedInitialUsers();
+
+=======
+}
+
+>>>>>>> origin/main
 // Exportar funciones para uso en otros módulos
 export {
     getProducts,
@@ -95,5 +162,13 @@ export {
     getCart,
     saveCart,
     clearCart,
+<<<<<<< HEAD
+    getOrders,
+    saveOrder,
+    getDiscounts,
+    saveDiscount,
+    deleteDiscount,
+=======
+>>>>>>> origin/main
     seedInitialData
 };

@@ -37,7 +37,23 @@
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Contraseña</label>
+<<<<<<< HEAD
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">Mostrar</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rol" class="form-label">Ingresar como</label>
+                            <select id="rol" name="rol" class="form-select">
+                                <option value="auto" selected>Detección automática</option>
+                                <option value="usuario">Usuario</option>
+                                <option value="vendedor">Vendedor</option>
+                                <option value="admin">Admin</option>
+                            </select>
+=======
                             <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password">
+>>>>>>> origin/main
                         </div>
                         <div id="loginError" class="alert d-none" role="alert"></div>
                         <button type="submit" class="btn btn-primary w-100">Ingresar</button>
@@ -46,6 +62,9 @@
                         <a href="pages/registro.html" class="link-secondary">¿No tienes cuenta? Regístrate aquí</a>
                     </div>
                     
+<<<<<<< HEAD
+                    <!-- Nota: Las cuentas de ejemplo se siembran en LocalStorage (comentado en el código) -->
+=======
                     <!-- Usuario de prueba -->
                     <div class="mt-4 p-3" style="background-color: #FFF5E1; border-radius: 8px; border-left: 4px solid #8B4513;">
                         <h6 style="color: #8B4513; font-weight: bold;">🧪 Usuario de Prueba</h6>
@@ -55,6 +74,7 @@
                             <strong>Código de descuento:</strong> FELICES50 (10% de por vida)
                         </p>
                     </div>
+>>>>>>> origin/main
                 </div>
             </div>
         </div>
@@ -68,12 +88,48 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     
     <script>
+<<<<<<< HEAD
+        // Siembra local de usuarios por rol para asegurar ingreso inmediato
+        (function seedDefaultUsers(){
+            try {
+                const usuarios = JSON.parse(localStorage.getItem('usuarios')||'[]');
+                const byEmail = (e)=> usuarios.find(u=>u.correo===e);
+                const seeds = [
+                    { nombre: 'Admin General', correo: 'admin@pasteleria.com', contrasena: 'admin123', rol: 'admin' },
+                    { nombre: 'Vendedor Oficial', correo: 'vendedor@gmail.com', contrasena: 'vendedor123', rol: 'vendedor' },
+                    { nombre: 'Cliente Gmail', correo: 'cliente@gmail.com', contrasena: 'cliente123', rol: 'usuario', codigoDescuento: 'FELICES50' },
+                    { nombre: 'Cliente Duoc', correo: 'cliente@duocuc.cl', contrasena: 'cliente123', rol: 'usuario' },
+                    { nombre: 'Cliente Senior', correo: 'cliente2@gmail.com', contrasena: 'cliente123', rol: 'usuario', fechaNacimiento: '1970-01-15' }
+                ];
+                let changed = false;
+                seeds.forEach(s=>{ if(!byEmail(s.correo)){ usuarios.push(s); changed = true; } });
+                if (changed) localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            } catch(e) { /* noop */ }
+        })();
+=======
+>>>>>>> origin/main
         // Función para validar email
         function validarEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
 
+<<<<<<< HEAD
+        // Función para hacer login con roles
+        function hacerLogin(email, password, rolPreferido = 'auto') {
+            // Obtener usuarios registrados (sembrados en storage.js)
+            const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+
+            // Buscar usuario
+            const usuario = usuarios.find(u => u.correo === email && u.contrasena === password);
+
+            if (usuario) {
+                // Validar rol si se seleccionó manualmente
+                if (rolPreferido !== 'auto' && usuario.rol !== rolPreferido) {
+                    return { success: false, message: 'No tienes permisos para ese rol.' };
+                }
+                localStorage.setItem('sessionUser', JSON.stringify(usuario));
+=======
         // Función para hacer login
         function hacerLogin(email, password) {
             // Obtener usuarios registrados
@@ -107,6 +163,7 @@
             if (usuario) {
                 // Guardar usuario actual
                 localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+>>>>>>> origin/main
                 return { success: true, usuario };
             } else {
                 return { success: false, message: 'Credenciales incorrectas' };
@@ -133,17 +190,38 @@
             }
             
             // Intentar hacer login
+<<<<<<< HEAD
+            const rol = document.getElementById('rol').value;
+            const resultado = hacerLogin(email, password, rol);
+=======
             const resultado = hacerLogin(email, password);
+>>>>>>> origin/main
             
             if (resultado.success) {
                 // Login exitoso
                 alert('¡Bienvenido de vuelta!');
+<<<<<<< HEAD
+                const user = resultado.usuario;
+                // Redirección: siempre al inicio para mantener misma vista
+=======
+>>>>>>> origin/main
                 window.location.href = 'index.html';
             } else {
                 mostrarError(resultado.message);
             }
         });
 
+<<<<<<< HEAD
+        // Mostrar / ocultar contraseña
+        document.getElementById('togglePassword').addEventListener('click', function(){
+            const input = document.getElementById('password');
+            const esPassword = input.getAttribute('type') === 'password';
+            input.setAttribute('type', esPassword ? 'text' : 'password');
+            this.textContent = esPassword ? 'Ocultar' : 'Mostrar';
+        });
+
+=======
+>>>>>>> origin/main
         function mostrarError(mensaje) {
             const errorDiv = document.getElementById('loginError');
             errorDiv.textContent = mensaje;
