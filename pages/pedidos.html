@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos en curso - Pastelería 1000 Sabores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <script>
+        // Solo vendedores (y admins si quieres probar)
+        (function guard(){
+            const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
+            if (!u) { window.location.href = '../login.html'; return; }
+            if (!['vendedor','admin'].includes(u.rol)) { window.location.href = '../index.html'; }
+        })();
+    </script>
+    <header>
+        <nav class="navbar navbar-light" style="background-color: #FFF5E1;">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+                <div class="ms-auto d-flex gap-2">
+                    <a class="btn btn-outline-primary" href="../index.html">Volver</a>
+                    <a class="btn btn-primary" href="../login.html" onclick="localStorage.removeItem('sessionUser');localStorage.removeItem('usuarioActual');">Cerrar sesión</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <h1 class="text-center mb-4">Pedidos en curso</h1>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title" style="color:#8B4513;">Listado de pedidos</h5>
+                        <div id="listaPedidos"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title" style="color:#8B4513;">Stock actual</h5>
+                        <div id="listaStock"></div>
+                        <small class="text-muted">Solo lectura para vendedor.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script>
+        // Utilidades
+        function getOverrides(){ try{ return JSON.parse(localStorage.getItem('productos')||'[]'); }catch(e){ return []; } }
+        function getCatalogoBase(){
+            // Catálogo base (coincide con páginas públicas)
+            return [
+                { id:'TC001', codigo:'TC001', nombre:'Torta Cuadrada de Chocolate', precio:45000, stock:10 },
+                { id:'TC002', codigo:'TC002', nombre:'Torta Cuadrada de Frutas', precio:50000, stock:8 },
+                { id:'TT001', codigo:'TT001', nombre:'Torta Circular de Vainilla', precio:40000, stock:15 },
+                { id:'TT002', codigo:'TT002', nombre:'Torta Circular de Manjar', precio:42000, stock:12 },
+                { id:'PI001', codigo:'PI001', nombre:'Mousse de Chocolate', precio:5000, stock:20 },
+                { id:'PI002', codigo:'PI002', nombre:'Tiramisú Clásico', precio:5500, stock:18 },
+                { id:'PSA001', codigo:'PSA001', nombre:'Torta Sin Azúcar de Naranja', precio:48000, stock:12 },
+                { id:'PSA002', codigo:'PSA002', nombre:'Cheesecake Sin Azúcar', precio:47000, stock:10 },
+                { id:'PT001', codigo:'PT001', nombre:'Empanada de Manzana', precio:3000, stock:25 },
+                { id:'PT002', codigo:'PT002', nombre:'Tarta de Santiago', precio:6000, stock:15 },
+                { id:'PG001', codigo:'PG001', nombre:'Brownie Sin Gluten', precio:4000, stock:20 },
+                { id:'PG002', codigo:'PG002', nombre:'Pan Sin Gluten', precio:3500, stock:30 },
+                { id:'PV001', codigo:'PV001', nombre:'Torta Vegana de Chocolate', precio:50000, stock:8 },
+                { id:'PV002', codigo:'PV002', nombre:'Galletas Veganas de Avena', precio:4500, stock:40 },
+                { id:'TE001', codigo:'TE001', nombre:'Torta Especial de Cumpleaños', precio:55000, stock:7 },
+                { id:'TE002', codigo:'TE002', nombre:'Torta Especial de Boda', precio:60000, stock:3 }
+            ];
+        }
+
+        function getProductosMezclados(){
+            const base = getCatalogoBase();
+            const ov = getOverrides();
+            return base.map(p=>{ const o = ov.find(x=>x.id===p.id); return o ? { ...p, ...o } : p; }).filter(p=>!p.eliminado);
+        }
+
+        function seedPedidosEjemplo(){
+            let pedidos = [];
+            try{ pedidos = JSON.parse(localStorage.getItem('ordenes')||'[]'); }catch(e){ pedidos = []; }
+            if (pedidos.length>0) return;
+            const productos = getProductosMezclados();
+            function pick(id, cant){ const p = productos.find(x=>x.id===id); return { codigo:p?.codigo||id, nombre:p?.nombre||id, cantidad:cant, precio:p?.precio||0 }; }
+            const ejemplos = [
+                { id:'1001', cliente:'María López', correo:'maria@gmail.com', fecha:'2025-09-01', items:[pick('TC001',1), pick('PI001',2)] },
+                { id:'1002', cliente:'Juan Pérez', correo:'juan@gmail.com', fecha:'2025-09-01', items:[pick('TT001',1)] },
+                { id:'1003', cliente:'Ana Soto', correo:'ana@duocuc.cl', fecha:'2025-09-02', items:[pick('PSA001',1)] },
+                { id:'1004', cliente:'Pedro Díaz', correo:'pedro@gmail.com', fecha:'2025-09-02', items:[pick('PT001',6)] },
+                { id:'1005', cliente:'Camila Rojas', correo:'camila@gmail.com', fecha:'2025-09-02', items:[pick('PV001',1)] },
+                { id:'1006', cliente:'Luis Herrera', correo:'luis@gmail.com', fecha:'2025-09-03', items:[pick('PG001',3)] },
+                { id:'1007', cliente:'Valentina Silva', correo:'vale@gmail.com', fecha:'2025-09-03', items:[pick('TC002',1), pick('PI002',2)] },
+                { id:'1008', cliente:'Ignacio Toro', correo:'ignacio@gmail.com', fecha:'2025-09-03', items:[pick('TT002',1)] },
+                { id:'1009', cliente:'Paula Muñoz', correo:'paula@gmail.com', fecha:'2025-09-04', items:[pick('PSA002',1)] },
+                { id:'1010', cliente:'Rodrigo Vera', correo:'rodrigo@gmail.com', fecha:'2025-09-04', items:[pick('PV002',5)] },
+                { id:'1011', cliente:'Fernanda Jara', correo:'fer@gmail.com', fecha:'2025-09-04', items:[pick('PG002',2)] },
+                { id:'1012', cliente:'Sebastián León', correo:'seba@gmail.com', fecha:'2025-09-05', items:[pick('TE001',1)] },
+                { id:'1013', cliente:'Daniela Vega', correo:'daniela@gmail.com', fecha:'2025-09-05', items:[pick('TE002',1)] },
+                { id:'1014', cliente:'Mauricio Araya', correo:'mauro@gmail.com', fecha:'2025-09-05', items:[pick('PT002',2)] },
+                { id:'1015', cliente:'Constanza Fuentes', correo:'conny@gmail.com', fecha:'2025-09-06', items:[pick('TC001',1), pick('TT001',1)] }
+            ];
+            pedidos = ejemplos.map(x=>({ ...x, total: x.items.reduce((s,i)=>s + i.precio*i.cantidad, 0), estado:'en_curso' }));
+            localStorage.setItem('ordenes', JSON.stringify(pedidos));
+        }
+
+        function renderPedidos(){
+            const cont = document.getElementById('listaPedidos');
+            let pedidos = [];
+            try{ pedidos = JSON.parse(localStorage.getItem('ordenes')||'[]'); }catch(e){ pedidos = []; }
+            const enCurso = pedidos.filter(p=>p.estado!=='listo');
+            if (enCurso.length===0){ cont.innerHTML = '<div class="alert alert-info">No hay pedidos en curso.</div>'; return; }
+            const frag = document.createDocumentFragment();
+            enCurso.forEach(p=>{
+                const div = document.createElement('div');
+                div.className = 'border rounded p-3 mb-3';
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>Pedido #${p.id}</strong><br>
+                            <span style="color:#5D4037;">${p.cliente} — ${p.correo}</span><br>
+                            <small class="text-muted">Fecha: ${p.fecha}</small>
+                        </div>
+                        <div class="text-end">
+                            <div style="color:#8B4513; font-weight:bold;">$${(p.total||0).toLocaleString('es-CL')}</div>
+                            <button class="btn btn-sm btn-primary mt-2" data-listo="${p.id}">Marcar como lista</button>
+                        </div>
+                    </div>
+                    <div class="mt-2" style="color:#5D4037;">
+                        ${p.items.map(i=>`${i.codigo} - ${i.nombre} x${i.cantidad}`).join('<br>')}
+                    </div>
+                `;
+                frag.appendChild(div);
+            });
+            cont.innerHTML = '';
+            cont.appendChild(frag);
+        }
+
+        function renderStock(){
+            const cont = document.getElementById('listaStock');
+            const productos = getProductosMezclados();
+            if (productos.length===0){ cont.innerHTML = '<div class="alert alert-info">No hay productos.</div>'; return; }
+            const ul = document.createElement('ul');
+            ul.className = 'list-group';
+            productos.forEach(p=>{
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `<span style="color:#5D4037;">${p.codigo} - ${p.nombre}</span><span class="badge" style="background-color:#8B4513;">${p.stock ?? '-'}</span>`;
+                ul.appendChild(li);
+            });
+            cont.innerHTML = '';
+            cont.appendChild(ul);
+        }
+
+        document.addEventListener('click', function(e){
+            if (e.target && e.target.hasAttribute('data-listo')){
+                const id = e.target.getAttribute('data-listo');
+                let pedidos = [];
+                try{ pedidos = JSON.parse(localStorage.getItem('ordenes')||'[]'); }catch(e){ pedidos = []; }
+                const idx = pedidos.findIndex(p=>p.id===id);
+                if (idx>=0){ pedidos[idx].estado = 'listo'; }
+                localStorage.setItem('ordenes', JSON.stringify(pedidos));
+                renderPedidos();
+            }
+        });
+
+        // Inicio
+        seedPedidosEjemplo();
+        renderPedidos();
+        renderStock();
+    </script>
+</body>
+</html>
+
+

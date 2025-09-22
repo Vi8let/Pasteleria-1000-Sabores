@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Pastelería 1000 Sabores</title>
+    <link rel="icon" href="../assets/img/logo.png" type="image/png">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #FFF5E1;
+        }
+        .navbar-brand {
+            font-family: 'Pacifico', cursive;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #8B4513;
+            border-color: #8B4513;
+        }
+        .btn-primary:hover {
+            background-color: #5D4037;
+            border-color: #5D4037;
+        }
+        .btn-outline-primary {
+            color: #8B4513;
+            border-color: #8B4513;
+        }
+        .btn-outline-primary:hover {
+            background-color: #8B4513;
+            border-color: #8B4513;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FFF5E1; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <a href="carrito.html" class="btn me-2" style="background-color: #8B4513; color: white; border-color: #8B4513;">Ver Carrito</a>
+                    <a href="../index.html" class="btn" style="color: #8B4513; border-color: #8B4513;">Volver al Inicio</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header" style="background-color: #8B4513; color: white;">
+                        <h5 class="mb-0">Mi Cuenta</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action active" id="datosPersonalesTab">
+                            Datos Personales
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="pedidosTab">
+                            Mis Pedidos
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="direccionesTab">
+                            Mis Direcciones
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" id="descuentosTab">
+                            Mis Descuentos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <!-- Datos Personales -->
+                <div id="datosPersonales" class="tab-content">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #FFC0CB; color: #5D4037;">
+                            <h5 class="mb-0">Mis Datos Personales</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="formDatosPersonales">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="nombre" class="form-label">Nombre Completo</label>
+                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="telefono" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                                        <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="region" class="form-label">Región</label>
+                                        <input type="text" class="form-control" id="region" name="region" placeholder="Ej: Región Metropolitana, Valparaíso, etc." required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="comuna" class="form-label">Comuna</label>
+                                        <input type="text" class="form-control" id="comuna" name="comuna" placeholder="Ej: Santiago, Las Condes, Viña del Mar, etc." required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="direccion" class="form-label">Dirección</label>
+                                    <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Calle, número, departamento" required>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn" style="background-color: #8B4513; color: white; border-color: #8B4513;">Guardar Cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mis Pedidos -->
+                <div id="pedidos" class="tab-content d-none">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #FFC0CB; color: #5D4037;">
+                            <h5 class="mb-0">Historial de Pedidos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="listaPedidos">
+                                <p class="text-muted">No tienes pedidos registrados aún.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mis Direcciones -->
+                <div id="direcciones" class="tab-content d-none">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #FFC0CB; color: #5D4037;">
+                            <h5 class="mb-0">Mis Direcciones de Entrega</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="listaDirecciones">
+                                <p class="text-muted">No tienes direcciones guardadas.</p>
+                            </div>
+                            <button class="btn mt-3" style="background-color: #8B4513; color: white; border-color: #8B4513;" data-bs-toggle="modal" data-bs-target="#nuevaDireccionModal">
+                                Agregar Nueva Dirección
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mis Descuentos -->
+                <div id="descuentos" class="tab-content d-none">
+                    <div class="card">
+                        <div class="card-header" style="background-color: #FFC0CB; color: #5D4037;">
+                            <h5 class="mb-0">Mis Descuentos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="listaDescuentos">
+                                <div class="alert" style="background-color: #FFC0CB; border-color: #FFC0CB; color: #5D4037;">
+                                    <h6>Descuento de Por Vida - 10%</h6>
+                                    <p class="mb-0">¡Felicidades! Tienes un descuento del 10% de por vida en todos nuestros productos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Nueva Dirección -->
+    <div class="modal fade" id="nuevaDireccionModal" tabindex="-1" aria-labelledby="nuevaDireccionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #8B4513; color: white;">
+                    <h5 class="modal-title" id="nuevaDireccionModalLabel">Nueva Dirección</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formNuevaDireccion">
+                        <div class="mb-3">
+                            <label for="nombreDireccion" class="form-label">Nombre de la Dirección</label>
+                            <input type="text" class="form-control" id="nombreDireccion" placeholder="Ej: Casa, Trabajo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccionCompleta" class="form-label">Dirección Completa</label>
+                            <input type="text" class="form-control" id="direccionCompleta" placeholder="Calle, número, departamento" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="regionDireccion" class="form-label">Región</label>
+                                <select class="form-select" id="regionDireccion" required>
+                                    <option value="">Selecciona una región</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="comunaDireccion" class="form-label">Comuna</label>
+                                <select class="form-select" id="comunaDireccion" required>
+                                    <option value="">Selecciona una comuna</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="instrucciones" class="form-label">Instrucciones de Entrega (Opcional)</label>
+                            <textarea class="form-control" id="instrucciones" rows="3" placeholder="Ej: Llamar antes de llegar, dejar en portería, etc."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn" style="background-color: #8B4513; color: white; border-color: #8B4513;" onclick="guardarNuevaDireccion()">Guardar Dirección</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Cargar datos del usuario desde localStorage
+        function cargarDatosUsuario() {
+            const usuario = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
+            if (usuario.nombre) {
+                document.getElementById('nombre').value = usuario.nombre || '';
+                document.getElementById('email').value = usuario.email || '';
+                document.getElementById('telefono').value = usuario.telefono || '';
+                document.getElementById('fechaNacimiento').value = usuario.fechaNacimiento || '';
+                document.getElementById('region').value = usuario.region || '';
+                document.getElementById('comuna').value = usuario.comuna || '';
+                document.getElementById('direccion').value = usuario.direccion || '';
+            }
+        }
+
+        // Guardar datos del usuario
+        function guardarDatosUsuario() {
+            const usuario = {
+                nombre: document.getElementById('nombre').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                region: document.getElementById('region').value,
+                comuna: document.getElementById('comuna').value,
+                direccion: document.getElementById('direccion').value,
+                codigoDescuento: localStorage.getItem('codigoDescuento') || null
+            };
+            localStorage.setItem('usuarioActual', JSON.stringify(usuario));
+            alert('Datos guardados correctamente.');
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarDatosUsuario();
+            
+            // Event listeners para tabs
+            document.getElementById('datosPersonalesTab').addEventListener('click', function(e) {
+                e.preventDefault();
+                mostrarTab('datosPersonales');
+            });
+            
+            document.getElementById('pedidosTab').addEventListener('click', function(e) {
+                e.preventDefault();
+                mostrarTab('pedidos');
+            });
+            
+            document.getElementById('direccionesTab').addEventListener('click', function(e) {
+                e.preventDefault();
+                mostrarTab('direcciones');
+            });
+            
+            document.getElementById('descuentosTab').addEventListener('click', function(e) {
+                e.preventDefault();
+                mostrarTab('descuentos');
+            });
+            
+            // Event listener para formulario de datos personales
+            document.getElementById('formDatosPersonales').addEventListener('submit', function(e) {
+                e.preventDefault();
+                guardarDatosUsuario();
+            });
+        });
+
+        function mostrarTab(tabId) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('d-none');
+            });
+            
+            // Remover clase active de todos los enlaces
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar tab seleccionado
+            document.getElementById(tabId).classList.remove('d-none');
+            
+            // Activar enlace correspondiente
+            document.getElementById(tabId + 'Tab').classList.add('active');
+        }
+
+        function guardarNuevaDireccion() {
+            const nombre = document.getElementById('nombreDireccion').value;
+            const direccion = document.getElementById('direccionCompleta').value;
+            const region = document.getElementById('regionDireccion').value;
+            const comuna = document.getElementById('comunaDireccion').value;
+            const instrucciones = document.getElementById('instrucciones').value;
+            
+            if (!nombre || !direccion || !region || !comuna) {
+                alert('Por favor completa todos los campos obligatorios.');
+                return;
+            }
+            
+            // Guardar dirección en localStorage
+            const direcciones = JSON.parse(localStorage.getItem('direcciones') || '[]');
+            direcciones.push({
+                id: Date.now(),
+                nombre,
+                direccion,
+                region,
+                comuna,
+                instrucciones
+            });
+            localStorage.setItem('direcciones', JSON.stringify(direcciones));
+            
+            // Cerrar modal y limpiar formulario
+            const modal = bootstrap.Modal.getInstance(document.getElementById('nuevaDireccionModal'));
+            modal.hide();
+            document.getElementById('formNuevaDireccion').reset();
+            
+            alert('Dirección guardada correctamente.');
+        }
+    </script>
+</body>
+</html>

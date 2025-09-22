@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Producto | Pastelería 1000 Sabores</title>
+    <!-- Google Fonts para tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+</head>
+<body>
+    <!-- Protección de acceso: Si no hay usuario en sesión, redirige a login -->
+    <script>
+        if (!localStorage.getItem('sessionUser')) {
+            window.location.href = '../login.html';
+        }
+    </script>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FFF5E1;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">
+                    <img src="../assets/img/logo.png" alt="Logo Pastelería 1000 Sabores" width="32" height="32" class="d-inline-block align-text-top logo-svg">
+                    Pastelería 1000 Sabores
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm p-4">
+                    <h1 class="text-center mb-4" id="formTitle">Agregar Producto</h1>
+                    <form id="productoForm" novalidate>
+                        <div class="mb-3">
+                            <label for="codigo" class="form-label">Código</label>
+                            <input type="text" class="form-control" id="codigo" name="codigo" required maxlength="20">
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <input type="text" class="form-control" id="categoria" name="categoria" required maxlength="50">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required maxlength="300"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="precio" name="precio" required min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="stock" class="form-label">Stock</label>
+                            <input type="number" class="form-control" id="stock" name="stock" required min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="imagen" class="form-label">Imagen (ruta relativa)</label>
+                            <input type="text" class="form-control" id="imagen" name="imagen" required placeholder="assets/img/torta_chocolate_TC001.jpg">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tamanos" class="form-label">Tamaños disponibles (separados por coma)</label>
+                            <input type="text" class="form-control" id="tamanos" name="tamanos" placeholder="Pequeña,Mediana,Grande">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="personalizable" name="personalizable">
+                            <label class="form-check-label" for="personalizable">¿Personalizable?</label>
+                        </div>
+                        <div id="productoError" class="alert d-none" role="alert"></div>
+                        <button type="submit" class="btn btn-primary w-100">Guardar producto</button>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <a href="productos-lista.html" class="link-secondary">Volver al listado</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>&copy; 2025 Pastelería 1000 Sabores. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="../js/productos.js" type="module" defer></script>
+    <script type="module">
+        import productos from '../js/productos.js';
+
+        // Si hay un id en la URL, es edición
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        const form = document.getElementById('productoForm');
+        const errorDiv = document.getElementById('productoError');
+        const formTitle = document.getElementById('formTitle');
+
+        if (id) {
+            formTitle.textContent = 'Editar Producto';
+            const producto = productos.find(p => p.id === id);
+            if (producto) {
+                form.codigo.value = producto.codigo;
+                form.nombre.value = producto.nombre;
+                form.categoria.value = producto.categoria;
+                form.descripcion.value = producto.descripcion;
+                form.precio.value = producto.precio;
+                form.stock.value = producto.stock;
+                form.imagen.value = producto.imagen;
+                form.tamanos.value = producto.tamanos ? producto.tamanos.join(',') : '';
+                form.personalizable.checked = producto.personalizable || false;
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            errorDiv.classList.add('d-none');
+
+            // Validaciones básicas
+            if (!form.codigo.value.trim() || !form.nombre.value.trim() || !form.categoria.value.trim() ||
+                !form.descripcion.value.trim() || !form.precio.value || !form.stock.value || !form.imagen.value.trim()) {
+                errorDiv.textContent = 'Todos los campos obligatorios deben estar completos.';
+                errorDiv.classList.remove('d-none');
+                return;
+            }
+
+            // Construir objeto producto
+            const nuevoProducto = {
+                id: id || form.codigo.value.trim(),
+                codigo: form.codigo.value.trim(),
+                nombre: form.nombre.value.trim(),
+                categoria: form.categoria.value.trim(),
+                descripcion: form.descripcion.value.trim(),
+                precio: parseInt(form.precio.value),
+                stock: parseInt(form.stock.value),
+                imagen: form.imagen.value.trim(),
+                tamanos: form.tamanos.value ? form.tamanos.value.split(',').map(t => t.trim()) : [],
+                personalizable: form.personalizable.checked
+            };
+
+            // Guardar en localStorage
+            let productosLS = JSON.parse(localStorage.getItem('productos')) || [];
+            if (id) {
+                // Editar
+                productosLS = productosLS.map(p => p.id === id ? nuevoProducto : p);
+            } else {
+                // Agregar
+                if (productosLS.some(p => p.id === nuevoProducto.id || p.codigo === nuevoProducto.codigo)) {
+                    errorDiv.textContent = 'Ya existe un producto con ese código o ID.';
+                    errorDiv.classList.remove('d-none');
+                    return;
+                }
+                productosLS.push(nuevoProducto);
+            }
+            localStorage.setItem('productos', JSON.stringify(productosLS));
+            alert('Producto guardado correctamente.');
+            window.location.href = 'productos-lista.html';
+        });
+    </script>
+</body>
+</html>
