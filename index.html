@@ -35,18 +35,28 @@
                         <li class="nav-item">
                             <a class="nav-link" href="pages/blogs.html">Blog</a>
                         </li>
+<<<<<<< HEAD
                         <li class="nav-item" id="contactNav">
                             <a class="nav-link" id="contactLink" href="pages/contacto.html">Contacto</a>
                         </li>
                         <li class="nav-item" id="seguimientoNav">
+=======
+                        <li class="nav-item">
+                            <a class="nav-link" href="pages/contacto.html">Contacto</a>
+                        </li>
+                        <li class="nav-item">
+>>>>>>> origin/main
                             <a class="nav-link" href="pages/seguimiento-pedidos.html">Seguimiento</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="pages/promociones-sociales.html">Promociones</a>
                         </li>
+<<<<<<< HEAD
                         <li class="nav-item" id="adminUsuariosNav" style="display:none;">
                             <a class="nav-link" href="admin/usuarios-lista.html">Usuarios</a>
                         </li>
+=======
+>>>>>>> origin/main
                         <li class="nav-item">
                             <a class="nav-link" href="pages/carrito.html">🛒 Carrito</a>
                         </li>
@@ -74,7 +84,11 @@
                     <p class="lead mb-4" style="color: #8B4513;">Dulces momentos, sabores únicos. Descubre nuestra exquisita selección de tortas y postres artesanales.</p>
                     <div class="d-flex gap-3 justify-content-center">
                         <a href="pages/productos.html" class="btn btn-primary btn-lg">Ver Productos</a>
+<<<<<<< HEAD
                         <a href="pages/registro.html" id="registerBtn" class="btn btn-outline-primary btn-lg">Registrarse</a>
+=======
+                        <a href="pages/registro.html" class="btn btn-outline-primary btn-lg">Registrarse</a>
+>>>>>>> origin/main
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -228,6 +242,7 @@
             // Limpiar contenido anterior
             productosDestacados.innerHTML = '';
             
+<<<<<<< HEAD
             // Mezclar con overrides guardados por admin y filtrar eliminados
             let overrides = [];
             try { overrides = JSON.parse(localStorage.getItem('productos')||'[]'); } catch(e) { overrides = []; }
@@ -237,6 +252,10 @@
 
             // Mostrar solo los primeros 3 productos como destacados
             const destacados = mezclados.slice(0, 3);
+=======
+            // Mostrar solo los primeros 3 productos como destacados
+            const destacados = productos.slice(0, 3);
+>>>>>>> origin/main
             console.log('Productos destacados seleccionados:', destacados);
             
             if (destacados.length === 0) {
@@ -253,8 +272,11 @@
                 const col = document.createElement('div');
                 col.className = 'col-md-4 mb-4';
                 
+<<<<<<< HEAD
                 const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
                 const esVendedor = !!(u && u.rol==='vendedor');
+=======
+>>>>>>> origin/main
                 col.innerHTML = `
                     <div class="card product-card h-100">
                         <img src="${producto.imagen}" 
@@ -268,7 +290,10 @@
                             <p class="card-text"><strong>Código:</strong> <span class="badge" style="background-color: #FFC0CB; color: #5D4037;">${producto.codigo}</span></p>
                             <p class="card-text">${producto.descripcion}</p>
                             <p class="card-text"><strong>Precio:</strong> $${producto.precio.toLocaleString('es-CL')}</p>
+<<<<<<< HEAD
                             ${esVendedor ? `<p class=\"card-text\" style=\"color:#5D4037;\"><strong>Stock:</strong> ${producto.stock ?? '-'}</p>` : ''}
+=======
+>>>>>>> origin/main
                             <div class="mt-auto">
                                 <button class="btn btn-success btn-sm me-2" onclick="agregarAlCarrito('${producto.id}')">
                                     🛒 Agregar al carrito
@@ -338,8 +363,12 @@
             
             // Buscar el botón del carrito en la navegación
             const botonCarrito = document.querySelector('a[href="pages/carrito.html"]');
+<<<<<<< HEAD
             const u = JSON.parse(localStorage.getItem('sessionUser')||'null');
             if (botonCarrito && !(u && u.rol==='admin')) {
+=======
+            if (botonCarrito) {
+>>>>>>> origin/main
                 if (totalItems > 0) {
                     botonCarrito.innerHTML = `🛒 Carrito (${totalItems})`;
                 } else {
@@ -352,13 +381,18 @@
         function cerrarSesion() {
             if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
                 localStorage.removeItem('usuarioActual');
+<<<<<<< HEAD
                 localStorage.removeItem('sessionUser');
                 location.href = 'login.html';
+=======
+                location.reload();
+>>>>>>> origin/main
             }
         }
 
         // Función para actualizar la navegación según el estado de sesión
         function actualizarNavegacion() {
+<<<<<<< HEAD
             const usuarioActual = localStorage.getItem('sessionUser') || localStorage.getItem('usuarioActual');
             const perfilNav = document.getElementById('perfilNav');
             const loginNav = document.getElementById('loginNav');
@@ -368,12 +402,19 @@
                     const contactLink = document.getElementById('contactLink');
             const seguimientoNav = document.getElementById('seguimientoNav');
             const registerBtn = document.getElementById('registerBtn');
+=======
+            const usuarioActual = localStorage.getItem('usuarioActual');
+            const perfilNav = document.getElementById('perfilNav');
+            const loginNav = document.getElementById('loginNav');
+            const logoutNav = document.getElementById('logoutNav');
+>>>>>>> origin/main
             
             if (usuarioActual) {
                 // Usuario logueado
                 perfilNav.style.display = 'block';
                 loginNav.style.display = 'none';
                 logoutNav.style.display = 'block';
+<<<<<<< HEAD
                 try {
                     const u = JSON.parse(usuarioActual);
                     adminUsuariosNav.style.display = (u.rol === 'admin') ? 'block' : 'none';
@@ -394,17 +435,22 @@
                     // Ocultar Registrarse para cualquier usuario logueado
                     if (registerBtn) registerBtn.style.display = 'none';
                 } catch(e){ adminUsuariosNav.style.display='none'; }
+=======
+>>>>>>> origin/main
             } else {
                 // Usuario no logueado
                 perfilNav.style.display = 'none';
                 loginNav.style.display = 'block';
                 logoutNav.style.display = 'none';
+<<<<<<< HEAD
                 adminUsuariosNav.style.display = 'none';
                 const botonCarrito = document.querySelector('a[href="pages/carrito.html"]');
                 if (botonCarrito) botonCarrito.style.display = '';
                 if (contactNav) contactNav.style.display = '';
                 if (seguimientoNav) seguimientoNav.style.display = '';
                 if (registerBtn) registerBtn.style.display = '';
+=======
+>>>>>>> origin/main
             }
         }
 

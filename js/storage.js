@@ -39,6 +39,7 @@ function saveUser(user) {
     localStorage.setItem('usuarios', JSON.stringify(users));
 }
 
+<<<<<<< HEAD
 // Semilla de usuarios con roles (admin, vendedor, usuario)
 function seedInitialUsers() {
     const existing = getUsers();
@@ -56,6 +57,8 @@ function seedInitialUsers() {
     }
 }
 
+=======
+>>>>>>> origin/main
 // Sesión
 function getSessionUser() {
     return localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : null;
@@ -83,6 +86,7 @@ function clearCart() {
     localStorage.removeItem('cart');
 }
 
+<<<<<<< HEAD
 // Órdenes (para vista de vendedor/admin)
 function getOrders() {
     const orders = localStorage.getItem('ordenes');
@@ -113,6 +117,8 @@ function deleteDiscount(code) {
     localStorage.setItem('descuentos', JSON.stringify(discounts));
 }
 
+=======
+>>>>>>> origin/main
 // Semilla inicial de productos si el LocalStorage está vacío
 function seedInitialData() {
     if (getProducts().length === 0) {
@@ -126,6 +132,7 @@ function seedInitialData() {
         ];
         localStorage.setItem('productos', JSON.stringify(initialProducts));
     }
+<<<<<<< HEAD
     // Sembrar descuentos válidos por defecto (solo FELICES50 activo)
     if (getDiscounts().length === 0) {
         localStorage.setItem('descuentos', JSON.stringify([
@@ -137,6 +144,10 @@ function seedInitialData() {
 // Ejecutar semillas base
 seedInitialUsers();
 
+=======
+}
+
+>>>>>>> origin/main
 // Exportar funciones para uso en otros módulos
 export {
     getProducts,
@@ -151,10 +162,13 @@ export {
     getCart,
     saveCart,
     clearCart,
+<<<<<<< HEAD
     getOrders,
     saveOrder,
     getDiscounts,
     saveDiscount,
     deleteDiscount,
+=======
+>>>>>>> origin/main
     seedInitialData
 };
