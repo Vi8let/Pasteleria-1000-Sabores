@@ -48,3 +48,5 @@ Vendedor: vendedor@gmail.com / vendedor123
 Cliente (Gmail): cliente@gmail.com / cliente123
 
 Cliente (Duoc): cliente@duocuc.cl / cliente123
+
+Cliente viejo: cliente2@gmail.com / cliente123
