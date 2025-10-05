@@ -203,5 +203,4 @@ const productos = [
     }
 ];
 
-// Exportar el arreglo de productos para su uso en otras partes de la aplicación
-export default productos;
+// Los productos están disponibles globalmente

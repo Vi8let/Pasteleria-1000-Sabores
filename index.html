@@ -26,13 +26,13 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
+                        <li class="nav-item" id="productosNav">
                             <a class="nav-link" href="pages/productos.html">Productos</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" id="nosotrosNav">
                             <a class="nav-link" href="pages/nosotros.html">Nosotros</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" id="blogNav">
                             <a class="nav-link" href="pages/blogs.html">Blog</a>
                         </li>
                         <li class="nav-item" id="contactNav">
@@ -41,13 +41,10 @@
                         <li class="nav-item" id="seguimientoNav">
                             <a class="nav-link" href="pages/seguimiento-pedidos.html">Seguimiento</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="pages/promociones-sociales.html">Promociones</a>
-                        </li>
                         <li class="nav-item" id="adminUsuariosNav" style="display:none;">
                             <a class="nav-link" href="admin/usuarios-lista.html">Usuarios</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" id="carritoNav">
                             <a class="nav-link" href="pages/carrito.html">🛒 Carrito</a>
                         </li>
                         <li class="nav-item" id="perfilNav" style="display: none;">
@@ -158,59 +155,11 @@
 
     <!-- Bootstrap 5 JS Bundle actualizado -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <!-- Script para cargar productos destacados -->
+    <!-- Scripts -->
+    <script src="js/productos.js"></script>
+    <script src="js/storage.js"></script>
     <script>
-        // Productos disponibles (solo las 4 imágenes que tienes)
-        const productos = [
-            {
-                id: 'TC001',
-                codigo: 'TC001',
-                categoria: 'Tortas Cuadradas',
-                nombre: 'Torta Cuadrada de Chocolate',
-                precio: 45000,
-                descripcion: 'Deliciosa torta de chocolate con capas de ganache y un toque de avellanas. Personalizable con mensajes especiales.',
-                stock: 10,
-                imagen: './assets/img/TC001-Torta Cuadrada de Chocolate.png',
-                tamanos: ['Pequeña', 'Mediana', 'Grande'],
-                personalizable: true
-            },
-            {
-                id: 'TC002',
-                codigo: 'TC002',
-                categoria: 'Tortas Cuadradas',
-                nombre: 'Torta Cuadrada de Frutas',
-                precio: 50000,
-                descripcion: 'Una mezcla de frutas frescas y crema chantilly sobre un suave bizcocho de vainilla, ideal para celebraciones.',
-                stock: 8,
-                imagen: './assets/img/TC002-Torta Cuadrada de Frutas.png',
-                tamanos: ['Pequeña', 'Mediana', 'Grande'],
-                personalizable: true
-            },
-            {
-                id: 'TT001',
-                codigo: 'TT001',
-                categoria: 'Tortas Circulares',
-                nombre: 'Torta Circular de Vainilla',
-                precio: 40000,
-                descripcion: 'Bizcocho de vainilla clásico relleno con crema pastelera y cubierto con un glaseado dulce, perfecto para cualquier ocasión.',
-                stock: 15,
-                imagen: './assets/img/TT001-Torta Circular de Vainilla.png',
-                tamanos: ['Pequeña', 'Mediana', 'Grande'],
-                personalizable: false
-            },
-            {
-                id: 'PI001',
-                codigo: 'PI001',
-                categoria: 'Postres Individuales',
-                nombre: 'Mousse de Chocolate',
-                precio: 5000,
-                descripcion: 'Postre individual cremoso y suave, hecho con chocolate de alta calidad, ideal para los amantes del chocolate.',
-                stock: 20,
-                imagen: './assets/img/PI001-Mousse de Chocolate.png',
-                tamanos: [],
-                personalizable: false
-            }
-        ];
+        // Los productos se cargan desde productos.js
 
         // Función para cargar productos destacados
         function cargarProductosDestacados() {
@@ -364,10 +313,20 @@
             const loginNav = document.getElementById('loginNav');
             const logoutNav = document.getElementById('logoutNav');
             const adminUsuariosNav = document.getElementById('adminUsuariosNav');
-                    const contactNav = document.getElementById('contactNav');
-                    const contactLink = document.getElementById('contactLink');
+            const contactNav = document.getElementById('contactNav');
+            const contactLink = document.getElementById('contactLink');
             const seguimientoNav = document.getElementById('seguimientoNav');
             const registerBtn = document.getElementById('registerBtn');
+            const navbar = document.querySelector('.navbar');
+            const productosNav = document.getElementById('productosNav');
+            const nosotrosNav = document.getElementById('nosotrosNav');
+            const blogNav = document.getElementById('blogNav');
+            const carritoNav = document.getElementById('carritoNav');
+            
+            // Resetear clases de la navegación
+            if (navbar) {
+                navbar.classList.remove('admin-role', 'vendedor-role');
+            }
             
             if (usuarioActual) {
                 // Usuario logueado
@@ -377,34 +336,94 @@
                 try {
                     const u = JSON.parse(usuarioActual);
                     adminUsuariosNav.style.display = (u.rol === 'admin') ? 'block' : 'none';
-                    // Para vendedor: cambiar Contacto -> Pedidos (sin ocultar Perfil/Carrito)
-                    if (u.rol === 'vendedor') {
-                        if (contactNav) { contactNav.style.display = 'block'; }
-                        if (contactLink) { contactLink.textContent = 'Pedidos'; contactLink.setAttribute('href','pages/pedidos.html'); }
-                    }
-                    // Para admin: ocultar Perfil/Carrito y mostrar Pedidos
+                    
+                    // Aplicar clases CSS según el rol
                     if (u.rol === 'admin') {
+                        // Admin: color azul oscuro con borde rojo
+                        if (navbar) {
+                            navbar.classList.add('admin-role');
+                        }
+                        // Agregar indicador de rol
+                        const navbarBrand = document.querySelector('.navbar-brand');
+                        if (navbarBrand && !navbarBrand.querySelector('.role-indicator')) {
+                            const roleIndicator = document.createElement('span');
+                            roleIndicator.className = 'role-indicator';
+                            roleIndicator.textContent = ' [ADMIN]';
+                            roleIndicator.style.fontSize = '0.8em';
+                            roleIndicator.style.opacity = '0.8';
+                            navbarBrand.appendChild(roleIndicator);
+                        }
                         perfilNav.style.display = 'none';
                         const botonCarrito = document.querySelector('a[href="pages/carrito.html"]');
                         if (botonCarrito) botonCarrito.style.display = 'none';
                         if (contactNav) { contactNav.style.display = 'block'; }
                         if (contactLink) { contactLink.textContent = 'Pedidos'; contactLink.setAttribute('href','pages/pedidos.html'); }
                         if (seguimientoNav) seguimientoNav.style.display = 'none';
+                    } else if (u.rol === 'vendedor') {
+                        // Vendedor: color verde oscuro
+                        if (navbar) {
+                            navbar.classList.add('vendedor-role');
+                        }
+                        // Agregar indicador de rol
+                        const navbarBrand = document.querySelector('.navbar-brand');
+                        if (navbarBrand && !navbarBrand.querySelector('.role-indicator')) {
+                            const roleIndicator = document.createElement('span');
+                            roleIndicator.className = 'role-indicator';
+                            roleIndicator.textContent = ' [VENDEDOR]';
+                            roleIndicator.style.fontSize = '0.8em';
+                            roleIndicator.style.opacity = '0.8';
+                            navbarBrand.appendChild(roleIndicator);
+                        }
+                        
+                        // Ocultar elementos no deseados para vendedor
+                        if (productosNav) productosNav.style.display = 'none';
+                        if (nosotrosNav) nosotrosNav.style.display = 'none';
+                        if (blogNav) blogNav.style.display = 'none';
+                        if (perfilNav) perfilNav.style.display = 'none';
+                        // Carrito SÍ debe estar visible para simular compras presenciales
+                        if (carritoNav) carritoNav.style.display = 'block';
+                        
+                        // Mostrar solo elementos necesarios
+                        if (contactNav) { 
+                            contactNav.style.display = 'block';
+                            contactLink.textContent = 'Pedidos';
+                            contactLink.setAttribute('href','pages/pedidos.html');
+                        }
+                        if (seguimientoNav) seguimientoNav.style.display = 'block';
+                    } else {
+                        // Usuario normal - mostrar todos los elementos excepto admin
+                        if (productosNav) productosNav.style.display = 'block';
+                        if (nosotrosNav) nosotrosNav.style.display = 'block';
+                        if (blogNav) blogNav.style.display = 'block';
+                        if (carritoNav) carritoNav.style.display = 'block';
+                        if (contactNav) contactNav.style.display = 'block';
+                        if (seguimientoNav) seguimientoNav.style.display = 'block';
+                        if (perfilNav) perfilNav.style.display = 'block';
+                        // Usuario normal mantiene el color original (#FFF5E1)
                     }
+                    
                     // Ocultar Registrarse para cualquier usuario logueado
                     if (registerBtn) registerBtn.style.display = 'none';
                 } catch(e){ adminUsuariosNav.style.display='none'; }
             } else {
-                // Usuario no logueado
+                // Usuario no logueado - mostrar todos los elementos
                 perfilNav.style.display = 'none';
                 loginNav.style.display = 'block';
                 logoutNav.style.display = 'none';
                 adminUsuariosNav.style.display = 'none';
-                const botonCarrito = document.querySelector('a[href="pages/carrito.html"]');
-                if (botonCarrito) botonCarrito.style.display = '';
-                if (contactNav) contactNav.style.display = '';
-                if (seguimientoNav) seguimientoNav.style.display = '';
-                if (registerBtn) registerBtn.style.display = '';
+                if (productosNav) productosNav.style.display = 'block';
+                if (nosotrosNav) nosotrosNav.style.display = 'block';
+                if (blogNav) blogNav.style.display = 'block';
+                if (carritoNav) carritoNav.style.display = 'block';
+                if (contactNav) contactNav.style.display = 'block';
+                if (seguimientoNav) seguimientoNav.style.display = 'block';
+                if (registerBtn) registerBtn.style.display = 'block';
+
+                // Limpiar indicadores de rol
+                const roleIndicator = document.querySelector('.role-indicator');
+                if (roleIndicator) {
+                    roleIndicator.remove();
+                }
             }
         }
 

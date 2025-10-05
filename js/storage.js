@@ -1,6 +1,9 @@
-// storage.js
+// ===== GESTIÓN DE DATOS EN LOCALSTORAGE =====
+// Archivo: js/storage.js
+// Contiene todas las funciones para manejar productos, usuarios, sesiones y órdenes
 
-// Productos
+// ===== PRODUCTOS =====
+// Los productos se guardan en localStorage con la clave 'productos'
 function getProducts() {
     const products = localStorage.getItem('productos');
     return products ? JSON.parse(products) : [];
@@ -27,7 +30,8 @@ function deleteProduct(id) {
     localStorage.setItem('productos', JSON.stringify(filteredProducts));
 }
 
-// Usuarios
+// ===== USUARIOS =====
+// Los usuarios se guardan en localStorage con la clave 'usuarios'
 function getUsers() {
     const users = localStorage.getItem('usuarios');
     return users ? JSON.parse(users) : [];
@@ -39,24 +43,22 @@ function saveUser(user) {
     localStorage.setItem('usuarios', JSON.stringify(users));
 }
 
-// Semilla de usuarios con roles (admin, vendedor, usuario)
+// ===== USUARIOS INICIALES =====
+// Crea usuarios de ejemplo si no existen (solo la primera vez)
 function seedInitialUsers() {
     const existing = getUsers();
     if (existing.length === 0) {
         const seeded = [
-            // Usuario ADMIN con dominio válido y permisos completos
             { nombre: 'Admin General', correo: 'admin@pasteleria.com', contrasena: 'admin123', rol: 'admin' },
-            // Usuario VENDEDOR con permisos para ver órdenes y stock
             { nombre: 'Vendedor Oficial', correo: 'vendedor@gmail.com', contrasena: 'vendedor123', rol: 'vendedor' },
-            // Clientes de ejemplo solicitados
-            { nombre: 'Cliente Gmail', correo: 'cliente@gmail.com', contrasena: 'cliente123', rol: 'usuario' },
-            { nombre: 'Cliente Duoc', correo: 'cliente@duocuc.cl', contrasena: 'cliente123', rol: 'usuario' }
+            { nombre: 'Cliente Gmail', correo: 'cliente@gmail.com', contrasena: 'cliente123', rol: 'usuario' }
         ];
         localStorage.setItem('usuarios', JSON.stringify(seeded));
     }
 }
 
-// Sesión
+// ===== SESIÓN DE USUARIO =====
+// La sesión activa se guarda en localStorage con la clave 'sessionUser'
 function getSessionUser() {
     return localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : null;
 }
@@ -69,7 +71,8 @@ function clearSession() {
     localStorage.removeItem('sessionUser');
 }
 
-// Carrito
+// ===== CARRITO =====
+// El carrito se guarda en localStorage con la clave 'cart'
 function getCart() {
     const cart = localStorage.getItem('cart');
     return cart ? JSON.parse(cart) : [];
@@ -83,7 +86,8 @@ function clearCart() {
     localStorage.removeItem('cart');
 }
 
-// Órdenes (para vista de vendedor/admin)
+// ===== ÓRDENES =====
+// Las órdenes se guardan en localStorage con la clave 'ordenes'
 function getOrders() {
     const orders = localStorage.getItem('ordenes');
     return orders ? JSON.parse(orders) : [];
@@ -95,7 +99,8 @@ function saveOrder(order) {
     localStorage.setItem('ordenes', JSON.stringify(orders));
 }
 
-// Descuentos (admin puede eliminarlos)
+// ===== DESCUENTOS =====
+// Los descuentos se guardan en localStorage con la clave 'descuentos'
 function getDiscounts() {
     const discounts = localStorage.getItem('descuentos');
     return discounts ? JSON.parse(discounts) : [];
@@ -113,7 +118,8 @@ function deleteDiscount(code) {
     localStorage.setItem('descuentos', JSON.stringify(discounts));
 }
 
-// Semilla inicial de productos si el LocalStorage está vacío
+// ===== DATOS INICIALES =====
+// Crea productos y descuentos de ejemplo si no existen (solo la primera vez)
 function seedInitialData() {
     if (getProducts().length === 0) {
         const initialProducts = [
@@ -126,7 +132,8 @@ function seedInitialData() {
         ];
         localStorage.setItem('productos', JSON.stringify(initialProducts));
     }
-    // Sembrar descuentos válidos por defecto (solo FELICES50 activo)
+    
+    // Crear descuento FELICES50 por defecto
     if (getDiscounts().length === 0) {
         localStorage.setItem('descuentos', JSON.stringify([
             { codigo: 'FELICES50', porcentaje: 10, activo: true }
@@ -134,27 +141,6 @@ function seedInitialData() {
     }
 }
 
-// Ejecutar semillas base
+// ===== INICIALIZACIÓN =====
+// Ejecutar semillas de datos al cargar el archivo
 seedInitialUsers();
-
-// Exportar funciones para uso en otros módulos
-export {
-    getProducts,
-    saveProduct,
-    updateProduct,
-    deleteProduct,
-    getUsers,
-    saveUser,
-    getSessionUser,
-    setSessionUser,
-    clearSession,
-    getCart,
-    saveCart,
-    clearCart,
-    getOrders,
-    saveOrder,
-    getDiscounts,
-    saveDiscount,
-    deleteDiscount,
-    seedInitialData
-};

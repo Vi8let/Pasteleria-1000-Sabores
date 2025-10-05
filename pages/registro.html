@@ -63,11 +63,19 @@
                         </div>
                         <div class="mb-3">
                             <label for="region" class="form-label">Región</label>
-                            <input type="text" class="form-control" id="region" name="region" placeholder="Ej: Región Metropolitana, Valparaíso, etc." required>
+                            <select class="form-select" id="region" name="region" required>
+                                <option value="">Selecciona una región</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="comuna" class="form-label">Comuna</label>
-                            <input type="text" class="form-control" id="comuna" name="comuna" placeholder="Ej: Santiago, Las Condes, Viña del Mar, etc." required>
+                            <select class="form-select" id="comuna" name="comuna" required disabled>
+                                <option value="">Primero selecciona una región</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección de Domicilio</label>
+                            <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Calle, número, departamento" required>
                         </div>
                         <div class="mb-3">
                             <label for="codigoDescuento" class="form-label">Código de Descuento (Opcional)</label>
@@ -91,12 +99,14 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script de regiones y comunas -->
+    <script src="../js/regiones-comunas.js"></script>
     
     <script>
 
-        // Función para validar email
+        // Función para validar email (solo dominios permitidos)
         function validarEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const re = /^[a-zA-Z0-9._%+-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/;
             return re.test(email);
         }
 
@@ -142,7 +152,7 @@
             const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
             
             // Verificar si el email ya existe
-            if (usuarios.find(u => u.email === datosUsuario.email)) {
+            if (usuarios.find(u => u.correo === datosUsuario.correo)) {
                 return { success: false, message: 'Este email ya está registrado.' };
             }
             
@@ -171,16 +181,17 @@
             const fechaNacimiento = document.getElementById('fechaNacimiento').value;
             const region = document.getElementById('region').value;
             const comuna = document.getElementById('comuna').value;
+            const direccion = document.getElementById('direccion').value;
             const codigoDescuento = document.getElementById('codigoDescuento').value;
             
             // Validaciones
-            if (!nombre || !email || !password || !confirmPassword || !run || !fechaNacimiento || !region || !comuna) {
+            if (!nombre || !email || !password || !confirmPassword || !run || !fechaNacimiento || !region || !comuna || !direccion) {
                 mostrarError('Por favor completa todos los campos obligatorios.');
                 return;
             }
             
             if (!validarEmail(email)) {
-                mostrarError('Por favor ingresa un email válido.');
+                mostrarError('Por favor ingresa un email válido. Solo se permiten @gmail.com, @duoc.cl o @profesor.duoc.cl');
                 return;
             }
             
@@ -205,6 +216,12 @@
                 return;
             }
             
+            // Validar región y comuna
+            if (!isValidComuna(region, comuna)) {
+                mostrarError('La comuna seleccionada no pertenece a la región elegida.');
+                return;
+            }
+            
             // Validar código de descuento si se proporciona
             if (codigoDescuento && !validarCodigoDescuento(codigoDescuento)) {
                 mostrarError('El código de descuento no es válido.');
@@ -213,14 +230,15 @@
             
             // Crear objeto de usuario
             const usuario = {
-                id: Date.now(),
                 nombre,
                 correo: email,
                 contrasena: password,
+                rol: 'usuario', // Rol por defecto
                 run,
                 fechaNacimiento,
                 region,
                 comuna,
+                direccion,
                 codigoDescuento: codigoDescuento || null,
                 fechaRegistro: new Date().toISOString()
             };
@@ -253,11 +271,51 @@
             errorDiv.classList.add('alert-danger');
         }
 
+        // Cargar regiones y comunas
+        function cargarRegiones() {
+            const selectRegion = document.getElementById('region');
+            const regiones = getAllRegiones();
+            
+            regiones.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                selectRegion.appendChild(option);
+            });
+        }
+
+        function cargarComunas(region) {
+            const selectComuna = document.getElementById('comuna');
+            selectComuna.innerHTML = '<option value="">Selecciona una comuna</option>';
+            
+            if (region) {
+                const comunas = getComunasByRegion(region);
+                comunas.forEach(comuna => {
+                    const option = document.createElement('option');
+                    option.value = comuna;
+                    option.textContent = comuna;
+                    selectComuna.appendChild(option);
+                });
+                selectComuna.disabled = false;
+            } else {
+                selectComuna.disabled = true;
+            }
+        }
+
         // Verificar usuario logueado al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             if (localStorage.getItem('usuarioActual')) {
                 window.location.href = '../index.html';
             }
+            
+            // Cargar regiones
+            cargarRegiones();
+            
+            // Event listener para cambio de región
+            document.getElementById('region').addEventListener('change', function() {
+                cargarComunas(this.value);
+            });
+            
             // Toggles de contraseña
             document.getElementById('toggleRegPassword').addEventListener('click', function(){
                 const input = document.getElementById('password');

@@ -76,5 +76,4 @@ function getUserByCorreo(correo) {
     return usuarios.find(user => user.correo === correo);
 }
 
-// Exportar funciones para uso en otros módulos
-export { getUsers, saveUser, updateUser, deleteUser, validarRUT, validarRegistro, getUserByCorreo };
+// Las funciones están disponibles globalmente

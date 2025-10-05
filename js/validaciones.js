@@ -130,16 +130,4 @@ function validarContacto({ nombre, correo, comentario }, errorSelector = null) {
     return true;
 }
 
-// Exportar funciones para uso en otros scripts
-export {
-    validarCorreo,
-    validarContrasena,
-    validarNombre,
-    validarComentario,
-    validarRUN,
-    validarFechaNacimiento,
-    validarRegistro,
-    validarLogin,
-    validarContacto,
-    mostrarError
-};
+// Las funciones están disponibles globalmente

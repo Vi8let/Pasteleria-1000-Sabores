@@ -26,6 +26,35 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     color: #8B4513 !important;
 }
 
+/* Estilos para roles específicos */
+.navbar.admin-role {
+    background-color: #2C3E50 !important;
+    border-bottom: 2px solid #E74C3C !important;
+}
+.navbar.admin-role .nav-link {
+    color: #ECF0F1 !important;
+}
+.navbar.admin-role .nav-link:hover {
+    color: #E74C3C !important;
+}
+.navbar.admin-role .navbar-brand {
+    color: #ECF0F1 !important;
+}
+
+.navbar.vendedor-role {
+    background-color: #2C5530 !important;
+    border-bottom: 2px solid #4A7C59 !important;
+}
+.navbar.vendedor-role .nav-link {
+    color: #FFFFFF !important;
+}
+.navbar.vendedor-role .nav-link:hover {
+    color: #4A7C59 !important;
+}
+.navbar.vendedor-role .navbar-brand {
+    color: #FFFFFF !important;
+}
+
 /* Botones */
 .btn, .btn-primary {
     background-color: #FFC0CB !important; /* Rosa Suave */

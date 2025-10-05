@@ -146,23 +146,6 @@
             }
         });
 
-        // Limpiar promoción DUOC del localStorage si existe
-        function limpiarPromocionDUOC() {
-            try {
-                let discounts = JSON.parse(localStorage.getItem('discounts') || '[]');
-                const originalLength = discounts.length;
-                discounts = discounts.filter(d => d.code !== 'DUOC' && d.codigo !== 'DUOC');
-                if (discounts.length !== originalLength) {
-                    localStorage.setItem('discounts', JSON.stringify(discounts));
-                    console.log('Promoción DUOC eliminada del localStorage');
-                }
-            } catch (e) {
-                console.log('Error limpiando promoción DUOC:', e);
-            }
-        }
-
-        // Limpiar DUOC al cargar la página
-        limpiarPromocionDUOC();
         render();
     </script>
 </body>

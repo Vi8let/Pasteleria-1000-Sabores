@@ -191,55 +191,8 @@
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
-        // Datos de ejemplo de pedidos
-        const pedidos = {
-            'PED-2025-001': {
-                numero: 'PED-2025-001',
-                fecha: '2025-01-15',
-                total: 95000,
-                estado: 'En Preparación',
-                estadoNumero: 2,
-                fechaEntrega: '2025-01-17',
-                metodoEntrega: 'Delivery a domicilio',
-                direccion: 'Av. Providencia 1234, Santiago',
-                contacto: 'Juan Pérez - +56 9 1234 5678',
-                productos: [
-                    { nombre: 'Torta Cuadrada de Chocolate', cantidad: 1, precio: 45000 },
-                    { nombre: 'Mousse de Chocolate', cantidad: 2, precio: 10000 },
-                    { nombre: 'Tiramisú Clásico', cantidad: 2, precio: 11000 }
-                ],
-                fechas: {
-                    confirmado: '2025-01-15 10:30',
-                    preparacion: '2025-01-15 11:00',
-                    listo: null,
-                    camino: null,
-                    entregado: null
-                }
-            },
-            'PED-2025-002': {
-                numero: 'PED-2025-002',
-                fecha: '2025-01-14',
-                total: 120000,
-                estado: 'Entregado',
-                estadoNumero: 5,
-                fechaEntrega: '2025-01-16',
-                metodoEntrega: 'Retiro en tienda',
-                direccion: 'Tienda Pastelería 1000 Sabores',
-                contacto: 'María González - +56 9 8765 4321',
-                productos: [
-                    { nombre: 'Torta Especial de Cumpleaños', cantidad: 1, precio: 55000 },
-                    { nombre: 'Torta Circular de Manjar', cantidad: 1, precio: 42000 },
-                    { nombre: 'Galletas Veganas de Avena', cantidad: 3, precio: 13500 }
-                ],
-                fechas: {
-                    confirmado: '2025-01-14 14:20',
-                    preparacion: '2025-01-14 15:00',
-                    listo: '2025-01-15 09:00',
-                    camino: '2025-01-15 10:30',
-                    entregado: '2025-01-16 16:45'
-                }
-            }
-        };
+        // ===== SEGUIMIENTO DE PEDIDOS =====
+        // Funcionalidad para buscar y mostrar pedidos reales desde localStorage
 
         function buscarPedido() {
             const numeroPedido = document.getElementById('numeroPedido').value.trim();
@@ -249,45 +202,67 @@
                 return;
             }
 
-            const pedido = pedidos[numeroPedido];
+            // Buscar en las órdenes guardadas
+            const ordenes = JSON.parse(localStorage.getItem('ordenes') || '[]');
+            const orden = ordenes.find(o => o.numeroPedido === numeroPedido);
             
-            if (!pedido) {
+            if (!orden) {
                 alert('Pedido no encontrado. Verifica el número e intenta nuevamente.');
                 return;
             }
 
-            mostrarInformacionPedido(pedido);
+            mostrarInformacionPedido(orden);
         }
 
-        function mostrarInformacionPedido(pedido) {
+        function mostrarInformacionPedido(orden) {
             // Mostrar información básica
-            document.getElementById('pedidoNumero').textContent = pedido.numero;
-            document.getElementById('fechaPedido').textContent = new Date(pedido.fecha).toLocaleDateString('es-CL');
-            document.getElementById('totalPedido').textContent = '$' + pedido.total.toLocaleString('es-CL');
-            document.getElementById('estadoActual').textContent = pedido.estado;
-            document.getElementById('fechaEntrega').textContent = new Date(pedido.fechaEntrega).toLocaleDateString('es-CL');
-            document.getElementById('metodoEntrega').textContent = pedido.metodoEntrega;
+            document.getElementById('pedidoNumero').textContent = orden.numeroPedido;
+            document.getElementById('fechaPedido').textContent = new Date(orden.fecha).toLocaleDateString('es-CL');
+            document.getElementById('totalPedido').textContent = '$' + orden.total.toLocaleString('es-CL');
+            document.getElementById('estadoActual').textContent = orden.estado;
+            
+            // Calcular fecha estimada de entrega (2 horas después)
+            const fechaEntrega = new Date(new Date(orden.fecha).getTime() + 2*60*60*1000);
+            document.getElementById('fechaEntrega').textContent = fechaEntrega.toLocaleDateString('es-CL');
+            document.getElementById('metodoEntrega').textContent = 'Delivery a domicilio';
 
             // Aplicar color al estado
             const estadoBadge = document.getElementById('estadoActual');
             estadoBadge.className = 'badge';
-            switch(pedido.estadoNumero) {
-                case 1: estadoBadge.style.backgroundColor = '#8B4513'; break;
-                case 2: estadoBadge.style.backgroundColor = '#FFC0CB'; estadoBadge.style.color = '#5D4037'; break;
-                case 3: estadoBadge.style.backgroundColor = '#B0BEC5'; estadoBadge.style.color = '#5D4037'; break;
-                case 4: estadoBadge.style.backgroundColor = '#B0BEC5'; estadoBadge.style.color = '#5D4037'; break;
-                case 5: estadoBadge.style.backgroundColor = '#8B4513'; break;
+            switch(orden.estado) {
+                case 'En preparación': 
+                    estadoBadge.style.backgroundColor = '#FFC0CB'; 
+                    estadoBadge.style.color = '#5D4037'; 
+                    break;
+                case 'En horneado': 
+                    estadoBadge.style.backgroundColor = '#B0BEC5'; 
+                    estadoBadge.style.color = '#5D4037'; 
+                    break;
+                case 'Empaquetado': 
+                    estadoBadge.style.backgroundColor = '#B0BEC5'; 
+                    estadoBadge.style.color = '#5D4037'; 
+                    break;
+                case 'En despacho': 
+                    estadoBadge.style.backgroundColor = '#B0BEC5'; 
+                    estadoBadge.style.color = '#5D4037'; 
+                    break;
+                case 'Entregado': 
+                    estadoBadge.style.backgroundColor = '#8B4513'; 
+                    estadoBadge.style.color = 'white'; 
+                    break;
             }
 
             // Mostrar progreso
-            mostrarProgresoPedido(pedido);
+            mostrarProgresoPedido(orden);
 
             // Mostrar detalles de envío
-            document.getElementById('direccionEntrega').textContent = pedido.direccion;
-            document.getElementById('contactoEntrega').textContent = pedido.contacto;
+            document.getElementById('direccionEntrega').textContent = 
+                `${orden.usuario.direccion}, ${orden.usuario.comuna}, ${orden.usuario.region}`;
+            document.getElementById('contactoEntrega').textContent = 
+                `${orden.usuario.nombre} - ${orden.usuario.correo}`;
 
             // Mostrar productos
-            mostrarProductosPedido(pedido.productos);
+            mostrarProductosPedido(orden.productos);
 
             // Mostrar todas las secciones
             document.getElementById('infoPedido').style.display = 'block';
@@ -297,19 +272,34 @@
             document.getElementById('accionesPedido').style.display = 'block';
         }
 
-        function mostrarProgresoPedido(pedido) {
+        function mostrarProgresoPedido(orden) {
             const estados = ['estado1', 'estado2', 'estado3', 'estado4', 'estado5'];
             const fechas = ['fecha1', 'fecha2', 'fecha3', 'fecha4', 'fecha5'];
+            const nombresEstados = ['Pedido Confirmado', 'En Preparación', 'En Horneado', 'En Despacho', 'Entregado'];
+            
+            // Determinar el estado actual
+            let estadoActual = 0;
+            const ahora = new Date();
+            
+            if (ahora >= new Date(orden.seguimiento.preparacion)) estadoActual = 1;
+            if (ahora >= new Date(orden.seguimiento.horneado)) estadoActual = 2;
+            if (ahora >= new Date(orden.seguimiento.empaquetado)) estadoActual = 3;
+            if (ahora >= new Date(orden.seguimiento.despacho)) estadoActual = 4;
+            if (orden.seguimiento.entregado) estadoActual = 5;
             
             estados.forEach((estado, index) => {
                 const elemento = document.getElementById(estado);
                 const marcador = elemento.querySelector('.timeline-marker');
                 const fechaElemento = document.getElementById(fechas[index]);
+                const titulo = elemento.querySelector('h6');
                 
-                if (index < pedido.estadoNumero) {
+                // Actualizar título del estado
+                titulo.textContent = nombresEstados[index];
+                
+                if (index < estadoActual) {
                     marcador.style.backgroundColor = '#8B4513';
                     elemento.classList.add('completed');
-                } else if (index === pedido.estadoNumero - 1) {
+                } else if (index === estadoActual) {
                     marcador.style.backgroundColor = '#FFC0CB';
                     elemento.classList.add('current');
                 } else {
@@ -318,9 +308,17 @@
                 }
 
                 // Mostrar fechas si están disponibles
-                const fechaKey = ['confirmado', 'preparacion', 'listo', 'camino', 'entregado'][index];
-                if (pedido.fechas[fechaKey]) {
-                    fechaElemento.textContent = pedido.fechas[fechaKey];
+                const fechasOrden = [
+                    orden.fecha,
+                    orden.seguimiento.preparacion,
+                    orden.seguimiento.horneado,
+                    orden.seguimiento.empaquetado,
+                    orden.seguimiento.despacho,
+                    orden.seguimiento.entregado
+                ];
+                
+                if (fechasOrden[index]) {
+                    fechaElemento.textContent = new Date(fechasOrden[index]).toLocaleString('es-CL');
                 } else {
                     fechaElemento.textContent = 'Pendiente';
                 }
@@ -342,7 +340,7 @@
                         Cantidad: ${producto.cantidad}
                     </div>
                     <div class="col-md-3 text-end">
-                        <strong>$${producto.precio.toLocaleString('es-CL')}</strong>
+                        <strong>$${(producto.precio * producto.cantidad).toLocaleString('es-CL')}</strong>
                     </div>
                 `;
                 lista.appendChild(item);

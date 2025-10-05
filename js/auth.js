@@ -1,13 +1,17 @@
 // auth.js
 
-import {
-    validarCorreo,
-    validarContrasena,
-    validarNombre,
-    validarRUN,
-    validarFechaNacimiento,
-    mostrarError
-} from './validaciones.js';
+// Función para mostrar errores
+function mostrarError(mensaje, selector = null) {
+    if (selector) {
+        const errorDiv = document.querySelector(selector);
+        if (errorDiv) {
+            errorDiv.textContent = mensaje;
+            errorDiv.classList.remove('d-none');
+        }
+    } else {
+        alert(mensaje);
+    }
+}
 
 // Función para registrar un nuevo usuario
 function registerUser() {
@@ -21,25 +25,25 @@ function registerUser() {
         const run = form.run.value.trim();
         const fechaNacimiento = form.fechaNacimiento.value;
 
-        // Validaciones según la rúbrica
-        if (!validarNombre(nombre)) {
+        // Validaciones básicas
+        if (!nombre || nombre.trim().length === 0) {
             mostrarError('Nombre inválido.', '#registroError');
             return;
         }
-        if (!validarCorreo(correo)) {
+        if (!correo || !/^[a-zA-Z0-9._%+-]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/.test(correo)) {
             mostrarError('Correo no permitido.', '#registroError');
             return;
         }
-        if (!validarContrasena(contrasena)) {
+        if (contrasena.length < 6 || contrasena.length > 20) {
             mostrarError('Contraseña debe tener entre 6 y 20 caracteres.', '#registroError');
             return;
         }
-        if (!validarRUN(run)) {
+        if (!run || !/^\d{7,8}-[\dkK]$/.test(run)) {
             mostrarError('RUN/RUT inválido.', '#registroError');
             return;
         }
-        if (!validarFechaNacimiento(fechaNacimiento)) {
-            mostrarError('Debes ser mayor de 18 años.', '#registroError');
+        if (!fechaNacimiento) {
+            mostrarError('Fecha de nacimiento requerida.', '#registroError');
             return;
         }
 
