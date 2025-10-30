@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getCart, updateQuantity, removeItem, clearCart } from '../services/cartService.js'
+import { getSessionUser } from '../services/authService.js'
+import { calcularDescuentos } from '../services/discountService.js'
 
 export default function Carrito(){
   const [cart, setCart] = useState([])
@@ -22,6 +24,9 @@ export default function Carrito(){
   }
 
   const subtotal = cart.reduce((s,i)=> s + i.precio * i.cantidad, 0)
+  const usuario = getSessionUser()
+  const { mejor } = calcularDescuentos(usuario, subtotal)
+  const total = subtotal - (mejor?.monto || 0)
 
   if (cart.length === 0){
     return (
@@ -68,11 +73,18 @@ export default function Carrito(){
       <div className="card">
         <div className="card-body d-flex justify-content-between align-items-center">
           <div>
-            <strong>Subtotal:</strong> ${subtotal.toLocaleString('es-CL')}
+            <div><strong>Subtotal:</strong> ${subtotal.toLocaleString('es-CL')}</div>
+            {mejor?.monto>0 && (
+              <div className="text-success">
+                <strong>Descuento ({mejor.porcentaje}%):</strong> -${mejor.monto.toLocaleString('es-CL')}<br/>
+                <small>{mejor.descripcion}</small>
+              </div>
+            )}
+            <div className="h5" style={{color:'#8B4513'}}><strong>Total:</strong> ${total.toLocaleString('es-CL')}</div>
           </div>
           <div className="d-flex gap-2">
             <button className="btn btn-danger" onClick={vaciar}>Vaciar carrito</button>
-            <button className="btn btn-primary" onClick={()=>alert('Compra simulada (descuentos se agregan en el siguiente hito).')}>Finalizar compra</button>
+            <button className="btn btn-primary" onClick={()=>alert(`Compra confirmada por $${total.toLocaleString('es-CL')}`)}>Finalizar compra</button>
           </div>
         </div>
       </div>

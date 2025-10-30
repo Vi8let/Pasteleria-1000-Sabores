@@ -6,6 +6,8 @@ export function getCart(){
 
 export function saveCart(cart){
   localStorage.setItem(CART_KEY, JSON.stringify(cart))
+  const total = cart.reduce((s,i)=> s + i.cantidad, 0)
+  window.dispatchEvent(new CustomEvent('cart:updated', { detail: { total } }))
 }
 
 export function addToCart(product, cantidad = 1){
