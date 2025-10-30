@@ -3,6 +3,7 @@ import { getCart, updateQuantity, removeItem, clearCart } from '../services/cart
 import { getSessionUser } from '../services/authService.js'
 import { calcularDescuentos } from '../services/discountService.js'
 import { saveOrder, generateOrderNumber } from '../services/orderService.js'
+import Modal from 'bootstrap/js/dist/modal'
 
 export default function Carrito(){
   const [cart, setCart] = useState([])
@@ -102,7 +103,7 @@ export default function Carrito(){
     holder.innerHTML = modalHtml
     document.body.appendChild(holder)
     const modalEl = document.getElementById('boletaModal')
-    const modal = new window.bootstrap.Modal(modalEl)
+    const modal = new Modal(modalEl)
     modal.show()
     modalEl.addEventListener('hidden.bs.modal', ()=> holder.remove())
   }

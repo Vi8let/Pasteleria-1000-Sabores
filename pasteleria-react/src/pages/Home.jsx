@@ -5,7 +5,9 @@ import { getSessionUser } from '../services/authService.js'
 
 export default function Home(){
   const productos = getProducts().slice(0,3)
-  const isAdmin = (getSessionUser()?.rol === 'admin')
+  const session = getSessionUser()
+  const isAdmin = (session?.rol === 'admin')
+  const isLogged = !!session
 
   function onAgregar(p){
     addToCart(p, 1)
@@ -23,7 +25,7 @@ export default function Home(){
               <p className="lead mb-4" style={{color:'#8B4513'}}>Dulces momentos, sabores únicos. Descubre nuestra exquisita selección de tortas y postres artesanales.</p>
               <div className="d-flex gap-3 justify-content-center">
                 <Link to="/productos" className="btn btn-primary btn-lg">Ver Productos</Link>
-                <Link to="/login" className="btn btn-outline-primary btn-lg">Registrarse</Link>
+                {!isLogged && <Link to="/login" className="btn btn-outline-primary btn-lg">Registrarse</Link>}
               </div>
             </div>
             <div className="col-lg-6">
