@@ -1,0 +1,11 @@
+/* Copiaremos estilos reales más adelante; por ahora, base mínima */
+body {
+    background-color: #FFF5E1;
+    color: #5D4037;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.navbar .nav-link { font-weight: 700; color: #5D4037; }
+.navbar .nav-link:hover { color: #8B4513; }
+
+
