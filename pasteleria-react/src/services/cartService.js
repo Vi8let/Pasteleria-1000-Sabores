@@ -20,4 +20,26 @@ export function addToCart(product, cantidad = 1){
   return cart
 }
 
+export function updateQuantity(id, delta){
+  const cart = getCart()
+  const idx = cart.findIndex(i => i.id === id)
+  if (idx >= 0){
+    cart[idx].cantidad += delta
+    if (cart[idx].cantidad <= 0) cart.splice(idx, 1)
+    saveCart(cart)
+  }
+  return cart
+}
+
+export function removeItem(id){
+  const cart = getCart().filter(i => i.id !== id)
+  saveCart(cart)
+  return cart
+}
+
+export function clearCart(){
+  saveCart([])
+  return []
+}
+
 
