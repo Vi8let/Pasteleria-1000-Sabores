@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getCart, updateQuantity, removeItem, clearCart } from '../services/cartService.js'
 import { getSessionUser } from '../services/authService.js'
 import { calcularDescuentos } from '../services/discountService.js'
+import { saveOrder, generateOrderNumber } from '../services/orderService.js'
 
 export default function Carrito(){
   const [cart, setCart] = useState([])
@@ -35,6 +36,75 @@ export default function Carrito(){
         <div className="alert alert-info">Tu carrito está vacío.</div>
       </div>
     )
+  }
+
+  function finalizarCompra(){
+    if (!cart.length){ alert('El carrito está vacío.'); return }
+    const usuario = getSessionUser()
+    if (!usuario){ alert('Debes iniciar sesión para comprar.'); return }
+    const numeroPedido = generateOrderNumber()
+    const fecha = new Date().toISOString()
+    const orden = {
+      numeroPedido,
+      fecha,
+      usuario: { nombre: usuario?.nombre, correo: usuario?.correo, direccion: usuario?.direccion, comuna: usuario?.comuna, region: usuario?.region },
+      productos: cart,
+      subtotal,
+      descuento: mejor?.monto || 0,
+      descuentoInfo: mejor,
+      total
+    }
+    saveOrder(orden)
+    mostrarBoleta(orden)
+    setCart([])
+    clearCart()
+  }
+
+  function mostrarBoleta({ numeroPedido, subtotal, total, descuento, descuentoInfo }){
+    const fechaLocal = new Date().toLocaleDateString('es-CL')
+    const horaLocal = new Date().toLocaleTimeString('es-CL')
+    const modalHtml = `
+      <div class="modal fade" id="boletaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header" style="background-color:#8B4513;color:#fff;">
+              <h5 class="modal-title">🎉 ¡Compra realizada con éxito!</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color:#FFF5E1;">
+              <div class="row mb-3">
+                <div class="col-6"><strong>Número de Pedido:</strong><br><span class="badge" style="background-color:#FFC0CB;color:#5D4037;">${numeroPedido}</span></div>
+                <div class="col-6 text-end"><strong>Fecha:</strong> ${fechaLocal}<br><strong>Hora:</strong> ${horaLocal}</div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead style="background-color:#FFC0CB;">
+                    <tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr>
+                  </thead>
+                  <tbody>
+                    ${cart.map(i=>`<tr><td>${i.nombre}</td><td>${i.cantidad}</td><td>$${i.precio.toLocaleString('es-CL')}</td><td>$${(i.precio*i.cantidad).toLocaleString('es-CL')}</td></tr>`).join('')}
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-end">
+                <div class="mb-2"><strong>Subtotal:</strong> $${subtotal.toLocaleString('es-CL')}</div>
+                ${descuento>0 ? `<div class="mb-2 text-success"><strong>Descuento (${descuentoInfo.porcentaje}%):</strong> -$${descuento.toLocaleString('es-CL')}<br><small>${descuentoInfo.descripcion}</small></div>` : ''}
+                <h5 style="color:#8B4513;">Total: $${total.toLocaleString('es-CL')}</h5>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn" style="background-color:#8B4513;color:#fff;" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>`
+    const holder = document.createElement('div')
+    holder.innerHTML = modalHtml
+    document.body.appendChild(holder)
+    const modalEl = document.getElementById('boletaModal')
+    const modal = new window.bootstrap.Modal(modalEl)
+    modal.show()
+    modalEl.addEventListener('hidden.bs.modal', ()=> holder.remove())
   }
 
   return (
@@ -84,7 +154,7 @@ export default function Carrito(){
           </div>
           <div className="d-flex gap-2">
             <button className="btn btn-danger" onClick={vaciar}>Vaciar carrito</button>
-            <button className="btn btn-primary" onClick={()=>alert(`Compra confirmada por $${total.toLocaleString('es-CL')}`)}>Finalizar compra</button>
+            <button className="btn btn-primary" onClick={finalizarCompra}>Finalizar compra</button>
           </div>
         </div>
       </div>
