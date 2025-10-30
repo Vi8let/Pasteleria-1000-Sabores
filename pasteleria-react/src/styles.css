@@ -15,4 +15,25 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 
 .logo-svg { width: 32px; height: 32px; vertical-align: middle; }
 
+/* Botones acordes a la paleta */
+.btn, .btn-primary {
+    background-color: #FFC0CB !important;
+    color: #5D4037 !important;
+    border-color: #8B4513 !important;
+    font-weight: 700;
+}
+.btn:hover, .btn-primary:hover {
+    background-color: #8B4513 !important;
+    color: #FFF5E1 !important;
+}
+.btn-outline-primary {
+    color: #8B4513 !important;
+    border-color: #8B4513 !important;
+}
+.btn-outline-primary:hover {
+    background-color: #8B4513 !important;
+    color: #FFF5E1 !important;
+    border-color: #8B4513 !important;
+}
+
 
