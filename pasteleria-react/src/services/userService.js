@@ -22,6 +22,17 @@ export function addUser(user){
   return user
 }
 
+export function deleteUserByEmail(correo){
+  const filtered = getUsers().filter(u => u.correo !== correo)
+  saveUsers(filtered)
+}
+
+export function updateUserByEmail(correo, changes){
+  const users = getUsers()
+  const idx = users.findIndex(u=>u.correo===correo)
+  if (idx>=0){ users[idx] = { ...users[idx], ...changes } ; saveUsers(users) }
+}
+
 export function seedUsers(){
   const existing = getUsers()
   if (existing.length>0) return
