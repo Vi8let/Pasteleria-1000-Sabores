@@ -1,0 +1,33 @@
+// karma.conf.js
+module.exports = function (config) {
+  config.set({
+    frameworks: ['jasmine'],
+    files: [
+      { pattern: 'src/**/*.spec.js', watched: false },
+      { pattern: 'src/**/*.spec.jsx', watched: false }
+    ],
+    preprocessors: {
+      'src/**/*.spec.js': ['esbuild'],
+      'src/**/*.spec.jsx': ['esbuild']
+    },
+    esbuild: {
+      target: 'es2020',
+      jsx: 'automatic',
+      sourcemap: 'inline',
+      define: { 'process.env.NODE_ENV': '"test"' }
+    },
+    reporters: ['progress', 'coverage'],
+    coverageReporter: {
+      dir: 'coverage',
+      reporters: [{ type: 'html', subdir: 'html' }, { type: 'text-summary' }]
+    },
+    browsers: ['ChromeHeadless'],
+    singleRun: true,
+    plugins: [
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-coverage'),
+      require('karma-esbuild')
+    ]
+  });
+};

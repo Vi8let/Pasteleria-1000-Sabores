@@ -1,0 +1,39 @@
+/* Copiaremos estilos reales más adelante; por ahora, base mínima */
+body {
+    background-color: #FFF5E1;
+    color: #5D4037;
+    font-family: 'Lato', Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: 'Pacifico', cursive;
+}
+
+.navbar { background-color: #FFF5E1 !important; border-bottom: 1px solid #B0BEC5; }
+.navbar .nav-link { font-weight: 700; color: #5D4037 !important; }
+.navbar .nav-link:hover { color: #8B4513 !important; }
+
+.logo-svg { width: 32px; height: 32px; vertical-align: middle; }
+
+/* Botones acordes a la paleta */
+.btn, .btn-primary {
+    background-color: #FFC0CB !important;
+    color: #5D4037 !important;
+    border-color: #8B4513 !important;
+    font-weight: 700;
+}
+.btn:hover, .btn-primary:hover {
+    background-color: #8B4513 !important;
+    color: #FFF5E1 !important;
+}
+.btn-outline-primary {
+    color: #8B4513 !important;
+    border-color: #8B4513 !important;
+}
+.btn-outline-primary:hover {
+    background-color: #8B4513 !important;
+    color: #FFF5E1 !important;
+    border-color: #8B4513 !important;
+}
+
+
