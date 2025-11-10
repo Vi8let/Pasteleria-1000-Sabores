@@ -1,20 +1,16 @@
 // Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
 module.exports = function(config){
   config.set({
-    // Frameworks
     frameworks: ['jasmine', 'webpack'],
 
-    // Archivos de prueba
-files: [
-  { pattern: 'src/**/*.spec.js', watched: true }
-],
+    files: [
+      { pattern: 'test/all.spec.js', watched: true }
+    ],
 
-preprocessors: {
-  'src/**/*.spec.js': ['webpack']
-},
+    preprocessors: {
+      'test/all.spec.js': ['webpack']
+    },
 
-
-    // Build de test con webpack + babel
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',
@@ -50,11 +46,11 @@ preprocessors: {
         ]
       },
       resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: ['.js', '.jsx'],
+        fallback: { "path": false } // Necesario para import.meta.glob
       }
     },
 
-    // Reportes
     reporters: ['progress', 'kjhtml', 'coverage'],
 
     coverageReporter: {
@@ -66,20 +62,18 @@ preprocessors: {
       ]
     },
 
-    // Para visualizar en navegador desde otra máquina
     hostname: '0.0.0.0',
     listenAddress: '0.0.0.0',
     port: 9876,
     client: {
       jasmine: { random: false },
-      clearContext: false   // deja visible la UI de tests
+      clearContext: false
     },
 
-    // Navegador headless vía Puppeteer
+    // 🚀 Presentación en directo: el navegador se conecta desde tu PC
     browsers: [],
     customLaunchers: {},
 
-    // Modo presentación en vivo
     autoWatch: true,
     singleRun: false
   })
