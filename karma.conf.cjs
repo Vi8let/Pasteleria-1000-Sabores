@@ -1,31 +1,25 @@
-// Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
+// Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura y UI en /debug.html
 module.exports = function (config) {
   config.set({
-    // Frameworks
     frameworks: ['jasmine', 'webpack'],
 
-    // Archivos de prueba y assets estáticos
+    //  A) Cargamos un único entry que importa TODOS los *.spec.js
     files: [
-      // Todos los tests
-      { pattern: 'src/**/*.spec.js', watched: true },
-      { pattern: 'test/**/*.spec.js', watched: true },
+      { pattern: 'test/all.spec.js', watched: true },
 
-      // Servir assets (favicon/logo que tu index.html intenta leer)
+      //  B) Servir assets estáticos (para evitar 404 del logo y las imágenes)
       { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true, nocache: true }
     ],
 
-    // Mapear /assets/img/... a lo que sirve Karma
+    //  Mapea /assets/img/ (como está en tu index.html) -> carpeta que sirve Karma
     proxies: {
       '/assets/img/': '/base/public/assets/img/'
     },
 
-    // Preprocesar tests con webpack
     preprocessors: {
-      'src/**/*.spec.js': ['webpack'],
-      'test/**/*.spec.js': ['webpack']
+      'test/all.spec.js': ['webpack']
     },
 
-    // Build de test con webpack + babel
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',
@@ -62,13 +56,13 @@ module.exports = function (config) {
       },
       resolve: {
         extensions: ['.js', '.jsx'],
-        // Evita polyfills innecesarios en webpack 5
+        // evita polyfills de Node en webpack 5
         fallback: { path: false }
       }
     },
 
-    // Reportes
     reporters: ['progress', 'kjhtml', 'coverage'],
+
     coverageReporter: {
       dir: 'coverage',
       reporters: [
@@ -78,31 +72,34 @@ module.exports = function (config) {
       ]
     },
 
-    // No exponemos el puerto (no necesario en headless)
+    // Acceso desde tu notebook al runner
     hostname: '0.0.0.0',
     listenAddress: '0.0.0.0',
     port: 9876,
 
     client: {
       jasmine: { random: false },
-      clearContext: false
+      clearContext: false   // deja visible la UI de Jasmine
     },
 
-    // Watch en EC2
-    autoWatch: true,
-    singleRun: false,
-
-    browserDisconnectTolerance: 3,
+    // Resiliencia si hay microcortes de red en la sala
+    browserDisconnectTolerance: 5,
     browserNoActivityTimeout: 120000,
     captureTimeout: 120000,
+    transports: ['websocket', 'polling'],
 
-    // Lanzamos Chrome Headless DENTRO de la EC2
-    browsers: ['ChromeHeadlessNoSandbox'],
+    // OPCIÓN A: te conectas desde tu Chrome en el notebook (recomendado para “ver” las pruebas)
+    browsers: [],
+
+    // OPCIÓN B: ejecutar headless en la EC2 (solo si decides usar CHROME_BIN)
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
       }
-    }
+    },
+
+    autoWatch: true,
+    singleRun: false
   });
 };

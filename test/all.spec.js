@@ -1,2 +1,9 @@
-// Cargar automáticamente todos los .spec.js de src
-const tests = import.meta.glob('../src/**/*.spec.js', { eager: true });
+// test/all.spec.js
+
+// src/**/*.spec.js
+const srcReq = require.context('../src', true, /\.spec\.js$/);
+srcReq.keys().forEach(srcReq);
+
+// test/**/*.spec.js (por si tienes tests adicionales)
+const testReq = require.context('.', true, /\.spec\.js$/);
+testReq.keys().forEach(testReq);
