@@ -1,9 +1,5 @@
-// test/all.spec.js
-
-// src/**/*.spec.js
-const srcReq = require.context('../src', true, /\.spec\.js$/);
-srcReq.keys().forEach(srcReq);
-
-// test/**/*.spec.js (por si tienes tests adicionales)
-const testReq = require.context('.', true, /\.spec\.js$/);
-testReq.keys().forEach(testReq);
+import '../src/services/authService.spec.js';
+import '../src/services/cartService.spec.js';
+import '../src/services/discountService.spec.js';
+import '../src/services/productService.spec.js';
+import '../src/components/Navbar.spec.js';
