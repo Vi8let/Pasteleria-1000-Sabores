@@ -1,23 +1,27 @@
-// Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura y UI en /debug.html
+// Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
 module.exports = function (config) {
   config.set({
+    basePath: '',
+
     frameworks: ['jasmine', 'webpack'],
 
-    //  A) Cargamos un único entry que importa TODOS los *.spec.js
+    // Tests y assets estáticos
     files: [
-      { pattern: 'test/all.spec.js', watched: true },
+      { pattern: 'src/**/*.spec.js', watched: true },
+      { pattern: 'test/**/*.spec.js', watched: true },
 
-      //  B) Servir assets estáticos (para evitar 404 del logo y las imágenes)
-      { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true, nocache: true }
+      // Sirve TODO public/assets/** (no se inyecta en el runner)
+      { pattern: 'public/assets/**/*', watched: false, included: false, served: true, nocache: true }
     ],
 
-    //  Mapea /assets/img/ (como está en tu index.html) -> carpeta que sirve Karma
+    // /assets/... (lo que pide index.html) -> /base/public/assets/...
     proxies: {
-      '/assets/img/': '/base/public/assets/img/'
+      '/assets/': '/base/public/assets/'
     },
 
     preprocessors: {
-      'test/all.spec.js': ['webpack']
+      'src/**/*.spec.js': ['webpack'],
+      'test/**/*.spec.js': ['webpack']
     },
 
     webpack: {
@@ -56,7 +60,6 @@ module.exports = function (config) {
       },
       resolve: {
         extensions: ['.js', '.jsx'],
-        // evita polyfills de Node en webpack 5
         fallback: { path: false }
       }
     },
@@ -72,34 +75,33 @@ module.exports = function (config) {
       ]
     },
 
-    // Acceso desde tu notebook al runner
+    // Exponer Karma fuera de la EC2
     hostname: '0.0.0.0',
     listenAddress: '0.0.0.0',
     port: 9876,
 
     client: {
       jasmine: { random: false },
-      clearContext: false   // deja visible la UI de Jasmine
+      clearContext: false
     },
 
-    // Resiliencia si hay microcortes de red en la sala
-    browserDisconnectTolerance: 5,
+    autoWatch: true,
+    singleRun: false,
+
+    // Tolerancia a desconexiones desde tu navegador
+    browserDisconnectTolerance: 3,
     browserNoActivityTimeout: 120000,
     captureTimeout: 120000,
-    transports: ['websocket', 'polling'],
 
-    // OPCIÓN A: te conectas desde tu Chrome en el notebook (recomendado para “ver” las pruebas)
+    // Opción A: conectar tu navegador manualmente (deja vacío)
     browsers: [],
 
-    // OPCIÓN B: ejecutar headless en la EC2 (solo si decides usar CHROME_BIN)
+    // Opción B: lanzar Chrome Headless en EC2 si usas CHROME_BIN
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
       }
-    },
-
-    autoWatch: true,
-    singleRun: false
+    }
   });
 };
