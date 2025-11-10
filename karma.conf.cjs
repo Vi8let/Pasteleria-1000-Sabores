@@ -1,13 +1,19 @@
 // Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
 module.exports = function(config){
   config.set({
+    // Frameworks
     frameworks: ['jasmine', 'webpack'],
+
+    // Archivos de prueba
     files: [
       { pattern: 'test/index.spec.js', watched: false }
     ],
+
     preprocessors: {
       'test/index.spec.js': ['webpack']
     },
+
+    // Build de test con webpack + babel
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',
@@ -46,7 +52,10 @@ module.exports = function(config){
         extensions: ['.js', '.jsx']
       }
     },
-    reporters: ['progress', 'coverage'],
+
+    // Reportes
+    reporters: ['progress', 'kjhtml', 'coverage'],
+
     coverageReporter: {
       dir: 'coverage',
       reporters: [
@@ -55,21 +64,31 @@ module.exports = function(config){
         { type: 'lcov', subdir: '.' }
       ]
     },
+
+    // Para visualizar en navegador desde otra máquina
+    hostname: '0.0.0.0',
+    listenAddress: '0.0.0.0',
+    port: 9876,
+    client: {
+      jasmine: { random: false },
+      clearContext: false   // deja visible la UI de tests
+    },
+
+    // Navegador headless vía Puppeteer
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
+        flags: [
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage'
+        ]
       }
     },
-    singleRun: false,
+
+    // Modo presentación en vivo
     autoWatch: true,
-    client: {
-      jasmine: {
-        random: false
-      },
-      clearContext: false
-    }
+    singleRun: false
   })
 }
-

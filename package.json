@@ -7,10 +7,14 @@
   "dev": "vite",
   "build": "vite build",
   "preview": "vite preview",
-  "test": "karma start karma.conf.cjs",
+
+  "test": "cross-env CHROME_BIN=$(node -e \"console.log(require('puppeteer').executablePath())\") karma start karma.conf.cjs --no-single-run",
+
   "test:ci": "cross-env CHROME_BIN=$(node -e \"console.log(require('puppeteer').executablePath())\") karma start karma.conf.cjs --single-run",
-  "test:watch": "karma start karma.conf.cjs",
-  "test:ui": "karma start karma.conf.cjs --no-single-run"
+
+  "test:watch": "cross-env CHROME_BIN=$(node -e \"console.log(require('puppeteer').executablePath())\") karma start karma.conf.cjs --auto-watch --no-single-run",
+
+  "test:ui": "cross-env CHROME_BIN=$(node -e \"console.log(require('puppeteer').executablePath())\") karma start karma.conf.cjs --no-single-run"
 }
 ,
   "dependencies": {
