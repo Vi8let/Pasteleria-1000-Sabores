@@ -6,7 +6,7 @@ module.exports = function (config) {
 
     // Archivos de prueba y assets estáticos
     files: [
-      // Todos tus tests
+      // Tests
       { pattern: 'src/**/*.spec.js', watched: true },
       { pattern: 'test/**/*.spec.js', watched: true },
 
@@ -69,7 +69,6 @@ module.exports = function (config) {
 
     // Reportes
     reporters: ['progress', 'kjhtml', 'coverage'],
-
     coverageReporter: {
       dir: 'coverage',
       reporters: [
@@ -89,10 +88,6 @@ module.exports = function (config) {
       clearContext: false // mantiene visible la UI después de correr
     },
 
-    // Modo presentación en vivo
-    autoWatch: true,
-    singleRun: false,
-
     // Más tolerante a latencias y recargas
     browserDisconnectTolerance: 3,
     browserNoActivityTimeout: 120000,
@@ -101,7 +96,7 @@ module.exports = function (config) {
     // OPCIÓN A) Conexión manual desde tu navegador (deja vacío)
     browsers: [],
 
-    // OPCIÓN B) Lanzar Chrome Headless en la EC2 (actívalo si usas el script con CHROME_BIN)
+    // OPCIÓN B) Lanzar Chrome Headless en la EC2 (útil con CHROME_BIN)
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
