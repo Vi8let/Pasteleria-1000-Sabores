@@ -1,7 +1,6 @@
 // Karma + Jasmine + esbuild para proyectos Vite/ESM
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
-const istanbul = require('esbuild-istanbul')
 
 export default function(config){
   config.set({
@@ -10,24 +9,21 @@ export default function(config){
       { pattern: 'src/**/*.spec.js', watched: false }
     ],
     preprocessors: {
-      'src/**/*.spec.js': ['esbuild']
+      'src/**/*.spec.js': ['babel'],
+      'src/**/*.js': ['babel'],
+      'src/**/*.jsx': ['babel']
     },
-    esbuild: {
-      format: 'esm',
-      target: 'es2020',
-      sourcemap: true,
-      jsx: 'automatic',
-      jsxImportSource: 'react',
-      loader: {
-        '.js': 'jsx',
-        '.jsx': 'jsx'
-      },
-      plugins: [
-        istanbul({
-          include: ['src/**/*.js', 'src/**/*.jsx'],
-          exclude: ['src/**/*.spec.js'],
-        })
-      ]
+    babelPreprocessor: {
+      options: {
+        sourceMaps: 'inline',
+        presets: [
+          ['@babel/preset-env', { targets: { chrome: '100' } }],
+          ['@babel/preset-react', { runtime: 'automatic' }]
+        ],
+        plugins: [
+          ['babel-plugin-istanbul', { exclude: ['**/*.spec.js'] }]
+        ]
+      }
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {
