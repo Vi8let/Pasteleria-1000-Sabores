@@ -3,13 +3,13 @@ module.exports = function(config){
   config.set({
     frameworks: ['jasmine'],
     files: [
-      // Especificaciones (webpack resolverá imports de fuentes)
+     
       { pattern: 'src/**/*.spec.js', watched: false },
       { pattern: 'src/**/*.spec.jsx', watched: false }
     ],
     preprocessors: {
-      'src/**/*.spec.js': ['webpack', 'sourcemap'],
-      'src/**/*.spec.jsx': ['webpack', 'sourcemap']
+      'src//.spec.js': ['webpack'],
+      'src//.spec.jsx': ['webpack']
     },
     webpack: {
       mode: 'development',
