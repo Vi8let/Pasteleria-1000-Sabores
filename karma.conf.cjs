@@ -1,22 +1,20 @@
-// Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
+// Karma + Jasmine + webpack + cobertura + sirve logo correctamente
 module.exports = function (config) {
   config.set({
-    basePath: '',
-
     frameworks: ['jasmine', 'webpack'],
 
-    // Tests y assets estáticos
     files: [
+      // Test files
       { pattern: 'src/**/*.spec.js', watched: true },
       { pattern: 'test/**/*.spec.js', watched: true },
 
-      // Sirve TODO public/assets/** (no se inyecta en el runner)
-      { pattern: 'public/assets/**/*', watched: false, included: false, served: true, nocache: true }
+      // Servir logo e imágenes (pero sin inyectarlas en el runner)
+      { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true }
     ],
 
-    // /assets/... (lo que pide index.html) -> /base/public/assets/...
+    // Esto es lo que elimina el 404 del logo
     proxies: {
-      '/assets/': '/base/public/assets/'
+      '/assets/img/': '/base/public/assets/img/'
     },
 
     preprocessors: {
@@ -32,20 +30,6 @@ module.exports = function (config) {
           {
             test: /\.[jt]sx?$/,
             exclude: /node_modules|\.spec\.[jt]sx?$/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                presets: [
-                  ['@babel/preset-env', { targets: { chrome: '100' }, modules: false }],
-                  ['@babel/preset-react', { runtime: 'automatic' }]
-                ],
-                plugins: ['babel-plugin-istanbul']
-              }
-            }
-          },
-          {
-            test: /\.spec\.[jt]sx?$/,
-            exclude: /node_modules/,
             use: {
               loader: 'babel-loader',
               options: {
@@ -70,12 +54,10 @@ module.exports = function (config) {
       dir: 'coverage',
       reporters: [
         { type: 'html', subdir: 'html' },
-        { type: 'text-summary' },
-        { type: 'lcov', subdir: '.' }
+        { type: 'text-summary' }
       ]
     },
 
-    // Exponer Karma fuera de la EC2
     hostname: '0.0.0.0',
     listenAddress: '0.0.0.0',
     port: 9876,
@@ -88,15 +70,9 @@ module.exports = function (config) {
     autoWatch: true,
     singleRun: false,
 
-    // Tolerancia a desconexiones desde tu navegador
-    browserDisconnectTolerance: 3,
-    browserNoActivityTimeout: 120000,
-    captureTimeout: 120000,
-
-    // Opción A: conectar tu navegador manualmente (deja vacío)
+    // Nos conectamos desde tu navegador → por eso vacío
     browsers: [],
 
-    // Opción B: lanzar Chrome Headless en EC2 si usas CHROME_BIN
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
