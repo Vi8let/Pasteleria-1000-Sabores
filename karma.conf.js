@@ -1,18 +1,17 @@
-// Karma + Jasmine + esbuild para proyectos Vite/ESM
-import { createRequire } from 'module'
-const require = createRequire(import.meta.url)
-
-export default function(config){
+// Karma + Jasmine + esbuild (CommonJS) para máxima compatibilidad
+module.exports = function(config){
   config.set({
     frameworks: ['jasmine'],
     files: [
-      { pattern: 'src/**/*.spec.{js,jsx}', watched: false }
+      { pattern: 'src/**/*.spec.js', watched: false },
+      { pattern: 'src/**/*.spec.jsx', watched: false }
     ],
     preprocessors: {
-      'src/**/*.spec.{js,jsx}': ['esbuild']
+      'src/**/*.spec.js': ['esbuild'],
+      'src/**/*.spec.jsx': ['esbuild']
     },
     esbuild: {
-      format: 'esm',
+      format: 'iife',
       target: 'es2020',
       sourcemap: true,
       jsx: 'automatic',
@@ -20,6 +19,9 @@ export default function(config){
       loader: {
         '.js': 'jsx',
         '.jsx': 'jsx'
+      },
+      define: {
+        'process.env.NODE_ENV': '"test"'
       }
     },
     reporters: ['progress'],
