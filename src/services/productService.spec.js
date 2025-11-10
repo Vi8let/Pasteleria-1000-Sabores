@@ -14,6 +14,11 @@ describe('productService', () => {
     expect(byId).toBeDefined()
     expect(byId.id).toBe(uno.id)
   })
+
+  it('getProductById retorna undefined con id inexistente', () => {
+    const resultado = getProductById('ID_INEXISTENTE_XYZ')
+    expect(resultado).toBeUndefined()
+  })
 })
 
 

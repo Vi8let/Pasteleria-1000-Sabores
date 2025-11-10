@@ -6,10 +6,10 @@ export default function(config){
   config.set({
     frameworks: ['jasmine'],
     files: [
-      { pattern: 'src/**/*.spec.js', watched: false }
+      { pattern: 'src/**/*.spec.{js,jsx}', watched: false }
     ],
     preprocessors: {
-      'src/**/*.spec.js': ['esbuild']
+      'src/**/*.spec.{js,jsx}': ['esbuild']
     },
     esbuild: {
       format: 'esm',
