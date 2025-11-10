@@ -19,9 +19,11 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
     "cross-env": "^7.0.3",
+    "esbuild-plugin-istanbul": "^1.2.2",
     "jasmine-core": "^5.2.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^3.2.0",
+    "karma-coverage": "^2.2.1",
     "karma-esbuild": "^2.2.0",
     "karma-jasmine": "^5.1.0",
     "puppeteer": "^23.8.0",

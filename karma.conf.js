@@ -1,6 +1,7 @@
 // Karma + Jasmine + esbuild para proyectos Vite/ESM
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
+const istanbul = require('esbuild-plugin-istanbul')
 
 export default function(config){
   config.set({
@@ -20,9 +21,21 @@ export default function(config){
       loader: {
         '.js': 'jsx',
         '.jsx': 'jsx'
-      }
+      },
+      plugins: [
+        istanbul({
+          include: ['src/**/*.js', 'src/**/*.jsx'],
+          exclude: ['src/**/*.spec.js'],
+        })
+      ]
     },
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
+    coverageReporter: {
+      reporters: [
+        { type: 'html', dir: 'coverage/', subdir: '.' },
+        { type: 'text-summary' }
+      ]
+    },
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
