@@ -1,0 +1,47 @@
+const USERS_KEY = 'usuarios'
+
+export function getUsers(){
+  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]') } catch { return [] }
+}
+
+export function saveUsers(list){
+  localStorage.setItem(USERS_KEY, JSON.stringify(list))
+}
+
+export function findByEmail(correo){
+  return getUsers().find(u => u.correo === correo)
+}
+
+export function addUser(user){
+  const users = getUsers()
+  if (users.some(u => u.correo === user.correo)){
+    throw new Error('El correo ya está registrado')
+  }
+  users.push(user)
+  saveUsers(users)
+  return user
+}
+
+export function deleteUserByEmail(correo){
+  const filtered = getUsers().filter(u => u.correo !== correo)
+  saveUsers(filtered)
+}
+
+export function updateUserByEmail(correo, changes){
+  const users = getUsers()
+  const idx = users.findIndex(u=>u.correo===correo)
+  if (idx>=0){ users[idx] = { ...users[idx], ...changes } ; saveUsers(users) }
+}
+
+export function seedUsers(){
+  const existing = getUsers()
+  if (existing.length>0) return
+  const seeds = [
+    { nombre:'Admin General', correo:'admin@pasteleria.com', contrasena:'admin123', rol:'admin' },
+    { nombre:'Cliente Oficial', correo:'cliente.oficial@gmail.com', contrasena:'cliente123', rol:'usuario' },
+    { nombre:'Cliente Gmail', correo:'cliente@gmail.com', contrasena:'cliente123', rol:'usuario', fechaNacimiento:'1970-01-15' }
+  ]
+  saveUsers(seeds)
+}
+
+
