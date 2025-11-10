@@ -5,13 +5,14 @@ module.exports = function(config){
     frameworks: ['jasmine', 'webpack'],
 
     // Archivos de prueba
-    files: [
-      { pattern: 'test/index.spec.js', watched: false }
-    ],
+files: [
+  { pattern: 'src/**/*.spec.js', watched: true }
+],
 
-    preprocessors: {
-      'test/index.spec.js': ['webpack']
-    },
+preprocessors: {
+  'src/**/*.spec.js': ['webpack']
+},
+
 
     // Build de test con webpack + babel
     webpack: {
