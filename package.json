@@ -16,6 +16,7 @@
 
   "test:ui": "cross-env CHROME_BIN=$(node -e \"console.log(require('puppeteer').executablePath())\") karma start karma.conf.cjs --no-single-run"
 }
+
 ,
   "dependencies": {
     "bootstrap": "^5.3.3",
