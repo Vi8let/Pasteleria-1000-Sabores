@@ -1,7 +1,7 @@
 // Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
 module.exports = function(config){
   config.set({
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'webpack'],
     files: [
      
       { pattern: 'src/**/*.spec.js', watched: false },
@@ -23,7 +23,7 @@ module.exports = function(config){
               loader: 'babel-loader',
               options: {
                 presets: [
-                  ['@babel/preset-env', { targets: { chrome: '100' } }],
+                  ['@babel/preset-env', { targets: { chrome: '100' }, modules: 'commonjs' }],
                   ['@babel/preset-react', { runtime: 'automatic' }]
                 ],
                 plugins: ['babel-plugin-istanbul']
@@ -37,7 +37,7 @@ module.exports = function(config){
               loader: 'babel-loader',
               options: {
                 presets: [
-                  ['@babel/preset-env', { targets: { chrome: '100' } }],
+                  ['@babel/preset-env', { targets: { chrome: '100' }, modules: 'commonjs' }],
                   ['@babel/preset-react', { runtime: 'automatic' }]
                 ]
               }
