@@ -3,14 +3,14 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "scripts": {
+ "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "karma start karma.conf.cjs",
     "test:ci": "cross-env CHROME_BIN=$(node -e \"console.log(require('puppeteer').executablePath())\") karma start karma.conf.cjs --single-run",
     "test:watch": "cross-env CHROME_BIN=$(node -e \"console.log(require('puppeteer').executablePath())\") karma start karma.conf.cjs"
-  },
+},
   "dependencies": {
     "bootstrap": "^5.3.3",
     "react": "^18.3.1",

@@ -6,15 +6,15 @@ module.exports = function (config) {
 
     // Archivos de prueba y assets estáticos
     files: [
-      // Todos los tests (src/ y test/)
+      // Todos los tests
       { pattern: 'src/**/*.spec.js', watched: true },
       { pattern: 'test/**/*.spec.js', watched: true },
 
-      // Servir assets (no inyectar en el runner)
+      // Servir assets (favicon/logo que tu index.html intenta leer)
       { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true, nocache: true }
     ],
 
-    // Mapear /assets/img/... a lo que sirve Karma (evita 404 de favicon/logo)
+    // Mapear /assets/img/... a lo que sirve Karma
     proxies: {
       '/assets/img/': '/base/public/assets/img/'
     },
@@ -67,9 +67,8 @@ module.exports = function (config) {
       }
     },
 
-    // Reportes (UI en navegador + cobertura + progreso)
-    reporters: ['kjhtml', 'progress', 'coverage'],
-
+    // Reportes
+    reporters: ['progress', 'kjhtml', 'coverage'],
     coverageReporter: {
       dir: 'coverage',
       reporters: [
@@ -79,30 +78,26 @@ module.exports = function (config) {
       ]
     },
 
-    // Acceso externo desde tu PC
+    // No exponemos el puerto (no necesario en headless)
     hostname: '0.0.0.0',
     listenAddress: '0.0.0.0',
     port: 9876,
 
     client: {
       jasmine: { random: false },
-      clearContext: false // mantiene visible la UI después de correr
+      clearContext: false
     },
 
-    // Modo presentación en vivo
+    // Watch en EC2
     autoWatch: true,
     singleRun: false,
 
-    // Más tolerante a latencias y recargas
     browserDisconnectTolerance: 3,
     browserNoActivityTimeout: 120000,
     captureTimeout: 120000,
-    transports: ['websocket', 'polling'],
 
-    // 👇 IMPORTANTE: no lanzar browsers en la EC2; te conectarás desde tu Chrome
-    browsers: [],
-
-    // Si en algún momento quieres headless en la EC2, habilita este launcher
+    // Lanzamos Chrome Headless DENTRO de la EC2
+    browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
