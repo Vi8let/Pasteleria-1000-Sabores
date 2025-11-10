@@ -1,45 +1,52 @@
-// Karma + Jasmine + esbuild + babel-istanbul (CommonJS) con cobertura
+// Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
 module.exports = function(config){
   config.set({
     frameworks: ['jasmine'],
     files: [
-      // Código fuente (no se inyecta en la página, solo para instrumentación)
-      { pattern: 'src/**/*.js', included: false, watched: false },
-      { pattern: 'src/**/*.jsx', included: false, watched: false },
-      // Especificaciones
+      // Especificaciones (webpack resolverá imports de fuentes)
       { pattern: 'src/**/*.spec.js', watched: false },
       { pattern: 'src/**/*.spec.jsx', watched: false }
     ],
     preprocessors: {
-      // Instrumentar el código fuente con Babel + Istanbul (excluye *.spec.*)
-      'src/**/!(*.spec).js': ['babel', 'coverage'],
-      'src/**/!(*.spec).jsx': ['babel', 'coverage'],
-      // Compilar ESM/JSX de los specs con esbuild
-      'src/**/*.spec.js': ['esbuild'],
-      'src/**/*.spec.jsx': ['esbuild']
+      'src/**/*.spec.js': ['webpack', 'sourcemap'],
+      'src/**/*.spec.jsx': ['webpack', 'sourcemap']
     },
-    babelPreprocessor: {
-      options: {
-        presets: [
-          ['@babel/preset-env', { modules: 'commonjs' }],
-          ['@babel/preset-react', { runtime: 'automatic' }]
-        ],
-        plugins: ['babel-plugin-istanbul'],
-        sourceMap: 'inline'
-      }
-    },
-    esbuild: {
-      format: 'iife',
-      target: 'es2020',
-      sourcemap: true,
-      jsx: 'automatic',
-      jsxImportSource: 'react',
-      loader: {
-        '.js': 'jsx',
-        '.jsx': 'jsx'
+    webpack: {
+      mode: 'development',
+      devtool: 'inline-source-map',
+      module: {
+        rules: [
+          {
+            test: /\.[jt]sx?$/,
+            exclude: /node_modules|\.spec\.[jt]sx?$/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  ['@babel/preset-env', { targets: { chrome: '100' } }],
+                  ['@babel/preset-react', { runtime: 'automatic' }]
+                ],
+                plugins: ['babel-plugin-istanbul']
+              }
+            }
+          },
+          {
+            test: /\.spec\.[jt]sx?$/,
+            exclude: /node_modules/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  ['@babel/preset-env', { targets: { chrome: '100' } }],
+                  ['@babel/preset-react', { runtime: 'automatic' }]
+                ]
+              }
+            }
+          }
+        ]
       },
-      define: {
-        'process.env.NODE_ENV': '"test"'
+      resolve: {
+        extensions: ['.js', '.jsx']
       }
     },
     reporters: ['progress', 'coverage'],
