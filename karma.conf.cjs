@@ -1,21 +1,21 @@
-// Karma + Jasmine + webpack + cobertura + sirve logo correctamente
+// Karma + Jasmine + Webpack + Babel + cobertura
 module.exports = function (config) {
+  const useHeadless = !!process.env.CHROME_BIN; // si viene de Puppeteer (CI)
+
   config.set({
     frameworks: ['jasmine', 'webpack'],
 
+    // Tests + assets estáticos
     files: [
-      // Test files
       { pattern: 'src/**/*.spec.js', watched: true },
       { pattern: 'test/**/*.spec.js', watched: true },
 
-      // Servir logo e imágenes (pero sin inyectarlas en el runner)
-      { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true }
+      // Sirve /assets/img/* desde public/ (para evitar 404 en logo.png)
+      { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true, nocache: true }
     ],
 
-    // Esto es lo que elimina el 404 del logo
-    proxies: {
-      '/assets/img/': '/base/public/assets/img/'
-    },
+    // Mapea /assets/img/... => /base/public/assets/img/ que sirve Karma
+    proxies: { '/assets/img/': '/base/public/assets/img/' },
 
     preprocessors: {
       'src/**/*.spec.js': ['webpack'],
@@ -30,6 +30,20 @@ module.exports = function (config) {
           {
             test: /\.[jt]sx?$/,
             exclude: /node_modules|\.spec\.[jt]sx?$/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  ['@babel/preset-env', { targets: { chrome: '100' }, modules: false }],
+                  ['@babel/preset-react', { runtime: 'automatic' }]
+                ],
+                plugins: ['babel-plugin-istanbul']
+              }
+            }
+          },
+          {
+            test: /\.spec\.[jt]sx?$/,
+            exclude: /node_modules/,
             use: {
               loader: 'babel-loader',
               options: {
@@ -54,7 +68,8 @@ module.exports = function (config) {
       dir: 'coverage',
       reporters: [
         { type: 'html', subdir: 'html' },
-        { type: 'text-summary' }
+        { type: 'text-summary' },
+        { type: 'lcov', subdir: '.' }
       ]
     },
 
@@ -70,9 +85,12 @@ module.exports = function (config) {
     autoWatch: true,
     singleRun: false,
 
-    // Nos conectamos desde tu navegador → por eso vacío
-    browsers: [],
+    browserDisconnectTolerance: 3,
+    browserNoActivityTimeout: 120000,
+    captureTimeout: 120000,
 
+    // Si ejecutas con Puppeteer (CI) usamos Headless; si no, conexión manual desde tu Chrome
+    browsers: useHeadless ? ['ChromeHeadlessNoSandbox'] : [],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
