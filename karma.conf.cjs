@@ -76,17 +76,8 @@ preprocessors: {
     },
 
     // Navegador headless vía Puppeteer
-    browsers: ['ChromeHeadlessNoSandbox'],
-    customLaunchers: {
-      ChromeHeadlessNoSandbox: {
-        base: 'ChromeHeadless',
-        flags: [
-          '--no-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage'
-        ]
-      }
-    },
+    browsers: [],
+    customLaunchers: {},
 
     // Modo presentación en vivo
     autoWatch: true,
