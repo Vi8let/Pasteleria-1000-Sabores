@@ -6,15 +6,15 @@ module.exports = function (config) {
 
     // Archivos de prueba y assets estáticos
     files: [
-      // Tests
+      // Todos los tests (src/ y test/)
       { pattern: 'src/**/*.spec.js', watched: true },
       { pattern: 'test/**/*.spec.js', watched: true },
 
-      // Servir assets (no se inyectan en el runner)
+      // Servir assets (no inyectar en el runner)
       { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true, nocache: true }
     ],
 
-    // Mapear /assets/img/... a lo que sirve Karma
+    // Mapear /assets/img/... a lo que sirve Karma (evita 404 de favicon/logo)
     proxies: {
       '/assets/img/': '/base/public/assets/img/'
     },
@@ -67,8 +67,9 @@ module.exports = function (config) {
       }
     },
 
-    // Reportes
-    reporters: ['progress', 'kjhtml', 'coverage'],
+    // Reportes (UI en navegador + cobertura + progreso)
+    reporters: ['kjhtml', 'progress', 'coverage'],
+
     coverageReporter: {
       dir: 'coverage',
       reporters: [
@@ -88,15 +89,20 @@ module.exports = function (config) {
       clearContext: false // mantiene visible la UI después de correr
     },
 
+    // Modo presentación en vivo
+    autoWatch: true,
+    singleRun: false,
+
     // Más tolerante a latencias y recargas
     browserDisconnectTolerance: 3,
     browserNoActivityTimeout: 120000,
     captureTimeout: 120000,
+    transports: ['websocket', 'polling'],
 
-    // OPCIÓN A) Conexión manual desde tu navegador (deja vacío)
+    // 👇 IMPORTANTE: no lanzar browsers en la EC2; te conectarás desde tu Chrome
     browsers: [],
 
-    // OPCIÓN B) Lanzar Chrome Headless en la EC2 (útil con CHROME_BIN)
+    // Si en algún momento quieres headless en la EC2, habilita este launcher
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
