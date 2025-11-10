@@ -9,29 +9,20 @@ export default function(config){
       { pattern: 'src/**/*.spec.js', watched: false }
     ],
     preprocessors: {
-      'src/**/*.spec.js': ['babel'],
-      'src/**/*.js': ['babel'],
-      'src/**/*.jsx': ['babel']
+      'src/**/*.spec.js': ['esbuild']
     },
-    babelPreprocessor: {
-      options: {
-        sourceMaps: 'inline',
-        presets: [
-          ['@babel/preset-env', { targets: { chrome: '100' } }],
-          ['@babel/preset-react', { runtime: 'automatic' }]
-        ],
-        plugins: [
-          ['babel-plugin-istanbul', { exclude: ['**/*.spec.js'] }]
-        ]
+    esbuild: {
+      format: 'esm',
+      target: 'es2020',
+      sourcemap: true,
+      jsx: 'automatic',
+      jsxImportSource: 'react',
+      loader: {
+        '.js': 'jsx',
+        '.jsx': 'jsx'
       }
     },
-    reporters: ['progress', 'coverage'],
-    coverageReporter: {
-      reporters: [
-        { type: 'html', dir: 'coverage/', subdir: '.' },
-        { type: 'text-summary' }
-      ]
-    },
+    reporters: ['progress'],
     browsers: ['ChromeHeadlessNoSandbox'],
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
