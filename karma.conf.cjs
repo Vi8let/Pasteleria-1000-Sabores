@@ -1,16 +1,31 @@
 // Karma + Jasmine + webpack + babel-istanbul (CommonJS) con cobertura
-module.exports = function(config){
+module.exports = function (config) {
   config.set({
+    // Frameworks
     frameworks: ['jasmine', 'webpack'],
 
+    // Archivos de prueba y assets estáticos
     files: [
-      { pattern: 'test/all.spec.js', watched: true }
+      // Todos tus tests
+      { pattern: 'src/**/*.spec.js', watched: true },
+      { pattern: 'test/**/*.spec.js', watched: true },
+
+      // Servir assets (no se inyectan en el runner)
+      { pattern: 'public/assets/img/**/*', watched: false, included: false, served: true, nocache: true }
     ],
 
-    preprocessors: {
-      'test/all.spec.js': ['webpack']
+    // Mapear /assets/img/... a lo que sirve Karma
+    proxies: {
+      '/assets/img/': '/base/public/assets/img/'
     },
 
+    // Preprocesar tests con webpack
+    preprocessors: {
+      'src/**/*.spec.js': ['webpack'],
+      'test/**/*.spec.js': ['webpack']
+    },
+
+    // Build de test con webpack + babel
     webpack: {
       mode: 'development',
       devtool: 'inline-source-map',
@@ -47,10 +62,12 @@ module.exports = function(config){
       },
       resolve: {
         extensions: ['.js', '.jsx'],
-        fallback: { "path": false } // Necesario para import.meta.glob
+        // Evita polyfills innecesarios en webpack 5
+        fallback: { path: false }
       }
     },
 
+    // Reportes
     reporters: ['progress', 'kjhtml', 'coverage'],
 
     coverageReporter: {
@@ -62,19 +79,34 @@ module.exports = function(config){
       ]
     },
 
+    // Acceso externo desde tu PC
     hostname: '0.0.0.0',
     listenAddress: '0.0.0.0',
     port: 9876,
+
     client: {
       jasmine: { random: false },
-      clearContext: false
+      clearContext: false // mantiene visible la UI después de correr
     },
 
-    // 🚀 Presentación en directo: el navegador se conecta desde tu PC
-    browsers: [],
-    customLaunchers: {},
-
+    // Modo presentación en vivo
     autoWatch: true,
-    singleRun: false
-  })
-}
+    singleRun: false,
+
+    // Más tolerante a latencias y recargas
+    browserDisconnectTolerance: 3,
+    browserNoActivityTimeout: 120000,
+    captureTimeout: 120000,
+
+    // OPCIÓN A) Conexión manual desde tu navegador (deja vacío)
+    browsers: [],
+
+    // OPCIÓN B) Lanzar Chrome Headless en la EC2 (actívalo si usas el script con CHROME_BIN)
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
+      }
+    }
+  });
+};
