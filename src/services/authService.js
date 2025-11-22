@@ -52,7 +52,13 @@ export async function getProfile(){
       email: response.email,
       rol: response.role?.toLowerCase() || 'usuario',
       role: response.role,
-      nombre: response.fullName
+      nombre: response.fullName,
+      run: response.run || '',
+      fechaNacimiento: response.fechaNacimiento || '',
+      region: response.region || '',
+      comuna: response.comuna || '',
+      direccion: response.direccion || '',
+      codigoDescuento: response.codigoDescuento || null
     }
   } catch (error) {
     console.error('Error al obtener perfil:', error)
@@ -105,47 +111,42 @@ export async function register(userData){
     const registerData = {
       email: userData.correo || userData.email,
       password: userData.contrasena || userData.password,
-      fullName: userData.nombre || userData.fullName
+      fullName: userData.nombre || userData.fullName,
+      run: userData.run || null,
+      fechaNacimiento: userData.fechaNacimiento || null,
+      region: userData.region || null,
+      comuna: userData.comuna || null,
+      direccion: userData.direccion || null,
+      codigoPromocion: userData.codigoPromocion || null
     }
     
     const response = await apiClient.post('/auth/register', registerData, false)
     
     if (response.ok && response.token) {
+      // Obtener perfil completo para tener todos los datos
+      let profile = null
+      try {
+        localStorage.setItem('authToken', response.token)
+        profile = await getProfile()
+      } catch (e) {
+        console.warn('No se pudo obtener perfil:', e)
+      }
+      
       const user = {
         correo: response.email,
         email: response.email,
         rol: response.role === 'ADMIN' ? 'admin' : 'usuario',
         role: response.role,
         token: response.token,
-        nombre: registerData.fullName,
-        // Guardar datos adicionales del registro
-        run: userData.run || '',
-        fechaNacimiento: userData.fechaNacimiento || '',
-        region: userData.region || '',
-        comuna: userData.comuna || '',
-        direccion: userData.direccion || '',
-        codigoDescuento: userData.codigoPromocion || null
+        nombre: profile?.nombre || registerData.fullName,
+        run: profile?.run || userData.run || '',
+        fechaNacimiento: profile?.fechaNacimiento || userData.fechaNacimiento || '',
+        region: profile?.region || userData.region || '',
+        comuna: profile?.comuna || userData.comuna || '',
+        direccion: profile?.direccion || userData.direccion || '',
+        codigoDescuento: profile?.codigoDescuento || userData.codigoPromocion || null
       }
       setSessionUser(user)
-      // También guardar en localStorage para compatibilidad con userService
-      if (userData.codigoPromocion) {
-        const { addUser } = await import('./userService.js')
-        try {
-          addUser({
-            correo: user.correo,
-            nombre: user.nombre,
-            run: user.run,
-            fechaNacimiento: user.fechaNacimiento,
-            region: user.region,
-            comuna: user.comuna,
-            direccion: user.direccion,
-            codigoDescuento: user.codigoDescuento,
-            rol: user.rol
-          })
-        } catch (e) {
-          console.warn('No se pudo guardar usuario local:', e)
-        }
-      }
       return { success: true, user }
     }
     

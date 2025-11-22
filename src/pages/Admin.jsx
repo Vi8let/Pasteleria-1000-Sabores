@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getSessionUser } from '../services/authService.js'
 import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.js'
-import { getUsers, deleteUserByEmail, updateUserByEmail } from '../services/userService.js'
+import { getAllUsers, deleteUser, updatePromotionCode } from '../services/userServiceBackend.js'
 
 export default function Admin(){
   const nav = useNavigate()
@@ -47,31 +47,33 @@ export default function Admin(){
     }
   }, [user])
 
-  function loadUsuarios() {
-    const users = getUsers()
-    setUsuarios(users)
+  async function loadUsuarios() {
+    try {
+      const users = await getAllUsers()
+      setUsuarios(users)
+    } catch (error) {
+      console.error('Error al cargar usuarios:', error)
+      setUsuarios([])
+    }
   }
 
-  function eliminarUsuario(correo) {
-    if (!confirm(`¿Eliminar usuario ${correo}?`)) return
+  async function eliminarUsuario(userId) {
+    if (!confirm(`¿Eliminar este usuario?`)) return
     try {
-      deleteUserByEmail(correo)
-      loadUsuarios()
+      await deleteUser(userId)
+      await loadUsuarios()
       alert('Usuario eliminado')
     } catch (error) {
       alert('Error al eliminar usuario: ' + (error.message || 'Error desconocido'))
     }
   }
 
-  function activarFelices50(correo) {
-    if (!confirm(`¿Activar código FELICES50 para ${correo}?`)) return
+  async function activarFelices50(userId) {
+    if (!confirm(`¿Activar código FELICES50 para este usuario?`)) return
     try {
-      const usuario = usuarios.find(u => u.correo === correo)
-      if (usuario) {
-        updateUserByEmail(correo, { ...usuario, codigoDescuento: 'FELICES50' })
-        loadUsuarios()
-        alert('Código FELICES50 activado')
-      }
+      await updatePromotionCode(userId, 'FELICES50')
+      await loadUsuarios()
+      alert('Código FELICES50 activado')
     } catch (error) {
       alert('Error al activar código: ' + (error.message || 'Error desconocido'))
     }
@@ -301,11 +303,11 @@ export default function Admin(){
                   </thead>
                   <tbody>
                     {usuarios.map(u => (
-                      <tr key={u.correo}>
+                      <tr key={u.id || u.correo}>
                         <td>{u.nombre || '-'}</td>
                         <td>{u.correo}</td>
                         <td>
-                          <span className={`badge ${u.rol === 'admin' ? 'bg-danger' : 'bg-primary'}`}>
+                          <span className={`badge ${u.rol === 'admin' || u.role === 'ADMIN' ? 'bg-danger' : 'bg-primary'}`}>
                             {u.rol || 'usuario'}
                           </span>
                         </td>
@@ -318,18 +320,18 @@ export default function Admin(){
                         </td>
                         <td>
                           <div className="d-flex gap-2">
-                            {u.rol !== 'admin' && !u.codigoDescuento && (
+                            {u.rol !== 'admin' && u.role !== 'ADMIN' && !u.codigoDescuento && (
                               <button 
                                 className="btn btn-sm btn-outline-success"
-                                onClick={() => activarFelices50(u.correo)}
+                                onClick={() => activarFelices50(u.id || u.correo)}
                                 title="Activar FELICES50">
                                 🎉 Activar FELICES50
                               </button>
                             )}
-                            {u.rol !== 'admin' && (
+                            {u.rol !== 'admin' && u.role !== 'ADMIN' && (
                               <button 
                                 className="btn btn-sm btn-danger"
-                                onClick={() => eliminarUsuario(u.correo)}
+                                onClick={() => eliminarUsuario(u.id || u.correo)}
                                 title="Eliminar usuario">
                                 🗑️ Eliminar
                               </button>
