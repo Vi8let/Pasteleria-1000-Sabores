@@ -42,6 +42,25 @@ export function logout(){
 }
 
 /**
+ * Obtiene el perfil del usuario autenticado
+ */
+export async function getProfile(){
+  try {
+    const response = await apiClient.get('/auth/me', true)
+    return {
+      correo: response.email,
+      email: response.email,
+      rol: response.role?.toLowerCase() || 'usuario',
+      role: response.role,
+      nombre: response.fullName
+    }
+  } catch (error) {
+    console.error('Error al obtener perfil:', error)
+    return null
+  }
+}
+
+/**
  * Inicia sesión en el backend
  */
 export async function login(email, password){
@@ -53,7 +72,6 @@ export async function login(email, password){
       let profile = null
       try {
         // Guardar token temporalmente para obtener perfil
-        const tempUser = { token: response.token, email: response.email, role: response.role }
         localStorage.setItem('authToken', response.token)
         profile = await getProfile()
       } catch (e) {
