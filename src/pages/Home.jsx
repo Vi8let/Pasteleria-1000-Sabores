@@ -1,17 +1,44 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getProducts } from '../services/productService.js'
 import { addToCart } from '../services/cartService.js'
 import { getSessionUser } from '../services/authService.js'
 
 export default function Home(){
-  const productos = getProducts().slice(0,3)
+  const [productos, setProductos] = useState([])
+  const [loading, setLoading] = useState(true)
   const session = getSessionUser()
   const isAdmin = (session?.rol === 'admin')
   const isLogged = !!session
 
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const products = await getProducts()
+        setProductos(products.slice(0, 3))
+      } catch (error) {
+        console.error('Error al cargar productos:', error)
+        setProductos([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadProducts()
+  }, [])
+
   function onAgregar(p){
     addToCart(p, 1)
     alert(`¡${p.nombre} agregado al carrito!`)
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -39,8 +66,14 @@ export default function Home(){
       <section className="py-5">
         <div className="container">
           <h2 className="text-center mb-4" style={{color:'#5D4037'}}>Nuestros Productos Destacados</h2>
-          <div className="row">
-            {productos.map(p => (
+          {productos.length === 0 ? (
+            <div className="text-center">
+              <p>No hay productos disponibles en este momento.</p>
+              <Link to="/productos" className="btn btn-primary">Ver todos los productos</Link>
+            </div>
+          ) : (
+            <div className="row">
+              {productos.map(p => (
               <div className="col-md-4 mb-4" key={p.id}>
                 <div className="card h-100">
                   <img src={p.imagen} className="card-img-top" alt={p.nombre} style={{height:250, objectFit:'cover'}} />
@@ -55,8 +88,9 @@ export default function Home(){
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
           <div className="text-center mt-3">
             <Link to="/productos" className="btn btn-primary">Ver todos los productos</Link>
           </div>
