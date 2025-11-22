@@ -7,6 +7,7 @@ import Carrito from './pages/Carrito.jsx'
 import Perfil from './pages/Perfil.jsx'
 import Login from './pages/Login.jsx'
 import Admin from './pages/Admin.jsx'
+import Pedidos from './pages/Pedidos.jsx'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/producto/:id" element={<ProductoDetalle />} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/pedidos" element={<Pedidos />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>

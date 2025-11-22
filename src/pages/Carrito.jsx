@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getCart, updateQuantity, removeItem, clearCart } from '../services/cartService.js'
 import { getSessionUser } from '../services/authService.js'
 import { calcularDescuentos } from '../services/discountService.js'
@@ -6,6 +7,7 @@ import { saveOrder, generateOrderNumber } from '../services/orderService.js'
 import Modal from 'bootstrap/js/dist/modal'
 
 export default function Carrito(){
+  const navigate = useNavigate()
   const [cart, setCart] = useState([])
 
   useEffect(()=>{ setCart(getCart()) }, [])
@@ -100,7 +102,8 @@ export default function Carrito(){
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn" style="background-color:#8B4513;color:#fff;" data-bs-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn" style="background-color:#8B4513;color:#fff;" id="btnVerPedidos">Ver Mis Pedidos</button>
             </div>
           </div>
         </div>
@@ -110,6 +113,16 @@ export default function Carrito(){
     document.body.appendChild(holder)
     const modalEl = document.getElementById('boletaModal')
     const modal = new Modal(modalEl)
+    
+    // Agregar evento al botón "Ver Mis Pedidos"
+    const btnVerPedidos = document.getElementById('btnVerPedidos')
+    if (btnVerPedidos) {
+      btnVerPedidos.addEventListener('click', () => {
+        modal.hide()
+        navigate('/pedidos')
+      })
+    }
+    
     modal.show()
     modalEl.addEventListener('hidden.bs.modal', ()=> holder.remove())
   }

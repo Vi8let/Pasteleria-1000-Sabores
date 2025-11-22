@@ -39,6 +39,7 @@ export default function Navbar() {
         <div className="ms-auto d-flex gap-3 align-items-center">
           <Link className="nav-link" to="/productos">Productos</Link>
           {!isAdmin && <Link className="nav-link" to="/perfil">Mi Perfil</Link>}
+          {!isAdmin && <Link className="nav-link" to="/pedidos">📦 Mis Pedidos</Link>}
           {!isAdmin && (
             <Link className="nav-link" to="/carrito">{cartCount>0? `🛒 Carrito (${cartCount})` : '🛒 Carrito'}</Link>
           )}
