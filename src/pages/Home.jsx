@@ -57,7 +57,8 @@ export default function Home(){
               <h1 className="display-5 fw-bold mb-3" style={{color:'#5D4037'}}>Bienvenidos a Pastelería 1000 Sabores</h1>
               <p className="lead mb-4" style={{color:'#8B4513'}}>Dulces momentos, sabores únicos. Descubre nuestra exquisita selección de tortas y postres artesanales.</p>
               <div className="d-flex gap-3 justify-content-center">
-                <Link to="/productos" className="btn btn-primary btn-lg">Ver Productos</Link>
+                {!isAdmin && <Link to="/productos" className="btn btn-primary btn-lg">Ver Productos</Link>}
+                {isAdmin && <Link to="/admin" className="btn btn-primary btn-lg">Panel de Administración</Link>}
                 {!isLogged && <Link to="/login" className="btn btn-outline-primary btn-lg">Registrarse</Link>}
               </div>
             </div>
@@ -89,7 +90,9 @@ export default function Home(){
                       <p className="card-text">{p.descripcion}</p>
                       <p className="card-text"><strong>Precio:</strong> ${p.precio.toLocaleString('es-CL')}</p>
                       <div className="mt-auto d-flex gap-2">
-                        <button className="btn btn-sm" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={()=>onAgregar(p)}>🛒 Agregar</button>
+                        {!isAdmin && (
+                          <button className="btn btn-sm" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={()=>onAgregar(p)}>🛒 Agregar</button>
+                        )}
                         <Link to={`/producto/${p.id}`} className="btn btn-sm" style={{backgroundColor:'#FFC0CB', color:'#5D4037'}}>Ver detalle</Link>
                       </div>
                     </div>
@@ -97,9 +100,16 @@ export default function Home(){
                 </div>
                 ))}
               </div>
-              <div className="text-center mt-3">
-                <Link to="/productos" className="btn btn-primary">Ver todos los productos</Link>
-              </div>
+              {!isAdmin && (
+                <div className="text-center mt-3">
+                  <Link to="/productos" className="btn btn-primary">Ver todos los productos</Link>
+                </div>
+              )}
+              {isAdmin && (
+                <div className="text-center mt-3">
+                  <Link to="/admin" className="btn btn-primary">Ir al Panel de Administración</Link>
+                </div>
+              )}
             </>
           )}
         </div>
