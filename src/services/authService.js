@@ -129,22 +129,3 @@ export async function register(userData){
     return { success: false, message: error.message || 'Error al registrar usuario' }
   }
 }
-
-/**
- * Obtiene el perfil del usuario autenticado
- */
-export async function getProfile(){
-  try {
-    const response = await apiClient.get('/auth/me', true)
-    return {
-      correo: response.email,
-      email: response.email,
-      rol: response.role?.toLowerCase() || 'usuario',
-      role: response.role,
-      nombre: response.fullName
-    }
-  } catch (error) {
-    console.error('Error al obtener perfil:', error)
-    return null
-  }
-}
