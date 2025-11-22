@@ -37,7 +37,7 @@ export default function Navbar() {
           Pastelería 1000 Sabores
         </Link>
         <div className="ms-auto d-flex gap-3 align-items-center">
-          <Link className="nav-link" to="/productos">Productos</Link>
+          {!isAdmin && <Link className="nav-link" to="/productos">Productos</Link>}
           {!isAdmin && <Link className="nav-link" to="/perfil">Mi Perfil</Link>}
           {!isAdmin && <Link className="nav-link" to="/pedidos">📦 Mis Pedidos</Link>}
           {!isAdmin && (
