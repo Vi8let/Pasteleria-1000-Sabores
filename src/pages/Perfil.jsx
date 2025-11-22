@@ -44,18 +44,6 @@ export default function Perfil(){
     alert('Datos guardados')
   }
 
-  function activarFelices(){
-    if (!user?.correo){
-      alert('No encontramos una sesión activa. Inicia sesión nuevamente.')
-      navigate('/login', { replace: true })
-      return
-    }
-    const actualizado = { ...user, codigoDescuento: 'FELICES50' }
-    setUser(actualizado)
-    updateUserByEmail(actualizado.correo, actualizado)
-    setSessionUser(actualizado)
-    alert('Código FELICES50 activado')
-  }
 
   if (!user){
     return null
@@ -107,14 +95,14 @@ export default function Perfil(){
             <input className="form-control" name="direccion" value={user.direccion||''} onChange={onChange} />
           </div>
 
-          <div className="mb-3">
-            <h6>Descuentos disponibles</h6>
-            {user.codigoDescuento === 'FELICES50' ? (
-              <div className="alert alert-success mb-2"><small>🎉 FELICES50 activo: 10% de descuento</small></div>
-            ) : (
-              <button className="btn btn-outline-primary btn-sm" onClick={activarFelices}>Activar FELICES50</button>
-            )}
-          </div>
+          {user.codigoDescuento && (
+            <div className="mb-3">
+              <h6>Descuentos activos</h6>
+              <div className="alert alert-success mb-2">
+                <small>🎉 Código promocional activo: {user.codigoDescuento}</small>
+              </div>
+            </div>
+          )}
 
           <div className="text-end">
             <button className="btn" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={guardar}>Guardar Cambios</button>

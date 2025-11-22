@@ -117,9 +117,35 @@ export async function register(userData){
         rol: response.role === 'ADMIN' ? 'admin' : 'usuario',
         role: response.role,
         token: response.token,
-        nombre: registerData.fullName
+        nombre: registerData.fullName,
+        // Guardar datos adicionales del registro
+        run: userData.run || '',
+        fechaNacimiento: userData.fechaNacimiento || '',
+        region: userData.region || '',
+        comuna: userData.comuna || '',
+        direccion: userData.direccion || '',
+        codigoDescuento: userData.codigoPromocion || null
       }
       setSessionUser(user)
+      // También guardar en localStorage para compatibilidad con userService
+      if (userData.codigoPromocion) {
+        const { addUser } = await import('./userService.js')
+        try {
+          addUser({
+            correo: user.correo,
+            nombre: user.nombre,
+            run: user.run,
+            fechaNacimiento: user.fechaNacimiento,
+            region: user.region,
+            comuna: user.comuna,
+            direccion: user.direccion,
+            codigoDescuento: user.codigoDescuento,
+            rol: user.rol
+          })
+        } catch (e) {
+          console.warn('No se pudo guardar usuario local:', e)
+        }
+      }
       return { success: true, user }
     }
     

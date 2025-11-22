@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getSessionUser } from '../services/authService.js'
 import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.js'
+import { getUsers, deleteUserByEmail, updateUserByEmail } from '../services/userService.js'
 
 export default function Admin(){
   const nav = useNavigate()
@@ -24,6 +25,8 @@ export default function Admin(){
     imagen: '',
     categoria: 'General'
   })
+  const [usuarios, setUsuarios] = useState([])
+  const [tab, setTab] = useState('productos')
   
   const categoriasDisponibles = ['General', 'Tortas Cuadradas', 'Tortas Circulares', 'Tortas Especiales', 'Postres Individuales', 'Sin Gluten', 'Sin Azúcar', 'Veganos', 'Tradicionales']
 
@@ -40,8 +43,39 @@ export default function Admin(){
     }
     if (user?.rol === 'admin' || user?.role === 'ADMIN') {
       loadProducts()
+      loadUsuarios()
     }
   }, [user])
+
+  function loadUsuarios() {
+    const users = getUsers()
+    setUsuarios(users)
+  }
+
+  function eliminarUsuario(correo) {
+    if (!confirm(`¿Eliminar usuario ${correo}?`)) return
+    try {
+      deleteUserByEmail(correo)
+      loadUsuarios()
+      alert('Usuario eliminado')
+    } catch (error) {
+      alert('Error al eliminar usuario: ' + (error.message || 'Error desconocido'))
+    }
+  }
+
+  function activarFelices50(correo) {
+    if (!confirm(`¿Activar código FELICES50 para ${correo}?`)) return
+    try {
+      const usuario = usuarios.find(u => u.correo === correo)
+      if (usuario) {
+        updateUserByEmail(correo, { ...usuario, codigoDescuento: 'FELICES50' })
+        loadUsuarios()
+        alert('Código FELICES50 activado')
+      }
+    } catch (error) {
+      alert('Error al activar código: ' + (error.message || 'Error desconocido'))
+    }
+  }
   
   const categorias = useMemo(()=> Array.from(new Set(productos.map(p=>p.categoria))), [productos])
 
@@ -129,7 +163,28 @@ export default function Admin(){
     <div>
       <h1 className="mb-4">Panel de Administración</h1>
 
+      {/* Tabs */}
+      <div className="card mb-3">
+        <div className="card-body">
+          <div className="d-flex gap-2">
+            <button 
+              className={`btn ${tab === 'productos' ? '' : 'btn-outline-primary'}`}
+              style={tab === 'productos' ? {backgroundColor:'#8B4513', color:'#fff'} : {}}
+              onClick={() => setTab('productos')}>
+              Productos
+            </button>
+            <button 
+              className={`btn ${tab === 'usuarios' ? '' : 'btn-outline-primary'}`}
+              style={tab === 'usuarios' ? {backgroundColor:'#8B4513', color:'#fff'} : {}}
+              onClick={() => setTab('usuarios')}>
+              Usuarios
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Productos */}
+      {tab === 'productos' && (
       <section className="mb-5">
         <div className="card">
           <div className="card-header d-flex justify-content-between align-items-center">
@@ -220,6 +275,77 @@ export default function Admin(){
           </div>
         </div>
       </section>
+      )}
+
+      {/* Usuarios */}
+      {tab === 'usuarios' && (
+      <section className="mb-5">
+        <div className="card">
+          <div className="card-header">
+            <h5 className="mb-0">Gestión de Usuarios</h5>
+          </div>
+          <div className="card-body">
+            {usuarios.length === 0 ? (
+              <div className="alert alert-info">No hay usuarios registrados</div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-hover">
+                  <thead style={{backgroundColor:'#FFF5E1'}}>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Correo</th>
+                      <th>Rol</th>
+                      <th>Código Promocional</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {usuarios.map(u => (
+                      <tr key={u.correo}>
+                        <td>{u.nombre || '-'}</td>
+                        <td>{u.correo}</td>
+                        <td>
+                          <span className={`badge ${u.rol === 'admin' ? 'bg-danger' : 'bg-primary'}`}>
+                            {u.rol || 'usuario'}
+                          </span>
+                        </td>
+                        <td>
+                          {u.codigoDescuento ? (
+                            <span className="badge bg-success">{u.codigoDescuento}</span>
+                          ) : (
+                            <span className="text-muted">-</span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="d-flex gap-2">
+                            {u.rol !== 'admin' && !u.codigoDescuento && (
+                              <button 
+                                className="btn btn-sm btn-outline-success"
+                                onClick={() => activarFelices50(u.correo)}
+                                title="Activar FELICES50">
+                                🎉 Activar FELICES50
+                              </button>
+                            )}
+                            {u.rol !== 'admin' && (
+                              <button 
+                                className="btn btn-sm btn-danger"
+                                onClick={() => eliminarUsuario(u.correo)}
+                                title="Eliminar usuario">
+                                🗑️ Eliminar
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+      )}
     </div>
   )
 }

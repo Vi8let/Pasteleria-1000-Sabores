@@ -11,7 +11,7 @@ export default function Login(){
   const [error, setError] = useState('')
 
   // Registro
-  const [reg, setReg] = useState({ nombre:'', correo:'', contrasena:'', run:'', fechaNacimiento:'', region:'', comuna:'', direccion:'', rol:'usuario' })
+  const [reg, setReg] = useState({ nombre:'', correo:'', contrasena:'', run:'', fechaNacimiento:'', region:'', comuna:'', direccion:'', codigoPromocion:'', rol:'usuario' })
   const [regiones, setRegiones] = useState([])
   const [comunas, setComunas] = useState([])
 
@@ -130,6 +130,11 @@ export default function Login(){
                       {comunas.map(c=> <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Código de Promoción (opcional)</label>
+                  <input type="text" className="form-control" name="codigoPromocion" value={reg.codigoPromocion} onChange={onChangeReg} placeholder="Ej: FELICES50" />
+                  <small className="text-muted">Ingresa un código promocional si tienes uno</small>
                 </div>
                 <div className="text-end">
                   <button className="btn" style={{backgroundColor:'#8B4513', color:'#fff'}} type="submit">Registrarme</button>
