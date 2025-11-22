@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { login, setSessionUser } from '../services/authService.js'
-import { seedUsers, addUser } from '../services/userService.js'
+import { login, register } from '../services/authService.js'
 import { getAllRegiones, getComunasByRegion } from '../data/regiones-comunas.js'
 
 export default function Login(){
@@ -16,18 +15,22 @@ export default function Login(){
   const [regiones, setRegiones] = useState([])
   const [comunas, setComunas] = useState([])
 
-  useEffect(()=>{ seedUsers(); setRegiones(getAllRegiones()) }, [])
+  useEffect(()=>{ setRegiones(getAllRegiones()) }, [])
   useEffect(()=>{ setComunas(getComunasByRegion(reg.region)) }, [reg.region])
 
-  function onSubmitLogin(e){
+  async function onSubmitLogin(e){
     e.preventDefault()
     setError('')
-    const res = login(email.trim(), password)
-    if (res.success){
-      alert('Inicio de sesión exitoso')
-      navigate('/')
-    } else {
-      setError(res.message)
+    try {
+      const res = await login(email.trim(), password)
+      if (res.success){
+        alert('Inicio de sesión exitoso')
+        navigate('/')
+      } else {
+        setError(res.message)
+      }
+    } catch (err) {
+      setError(err.message || 'Error al iniciar sesión')
     }
   }
 
@@ -36,14 +39,17 @@ export default function Login(){
     setReg(prev => ({ ...prev, [name]: value }))
   }
 
-  function onSubmitRegister(e){
+  async function onSubmitRegister(e){
     e.preventDefault()
     setError('')
     try {
-      addUser(reg)
-      setSessionUser(reg)
-      alert('Registro exitoso')
-      navigate('/')
+      const res = await register(reg)
+      if (res.success){
+        alert('Registro exitoso')
+        navigate('/')
+      } else {
+        setError(res.message)
+      }
     } catch(err){
       setError(err.message || 'Error al registrar')
     }

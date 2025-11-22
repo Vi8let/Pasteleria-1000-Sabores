@@ -1,19 +1,46 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getProducts } from '../services/productService.js'
 import { addToCart } from '../services/cartService.js'
 import { getSessionUser } from '../services/authService.js'
 
 export default function Productos(){
-  const productos = getProducts()
+  const [productos, setProductos] = useState([])
+  const [loading, setLoading] = useState(true)
+  
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const products = await getProducts()
+        setProductos(products)
+      } catch (error) {
+        console.error('Error al cargar productos:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadProducts()
+  }, [])
+  
   const categorias = useMemo(()=> ['Todas', ...Array.from(new Set(productos.map(p=>p.categoria)))], [productos])
   const [categoria, setCategoria] = useState('Todas')
   const visibles = useMemo(()=> categoria==='Todas' ? productos : productos.filter(p=>p.categoria===categoria), [productos, categoria])
-  const isAdmin = (getSessionUser()?.rol === 'admin')
+  const isAdmin = (getSessionUser()?.rol === 'admin' || getSessionUser()?.role === 'ADMIN')
 
   function onAgregar(p){
     addToCart(p, 1)
     alert(`¡${p.nombre} agregado al carrito!`)
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center">
+        <h1 className="mb-4">Productos</h1>
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    )
   }
 
   return (

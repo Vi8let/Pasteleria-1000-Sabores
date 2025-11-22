@@ -1,56 +1,86 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getSessionUser } from '../services/authService.js'
-import { getProducts, upsertProductOverride, setProductDeleted, getDeletedProducts } from '../services/productService.js'
-import { getUsers, deleteUserByEmail, updateUserByEmail } from '../services/userService.js'
+import { getProducts, updateProduct, deleteProduct } from '../services/productService.js'
 
 export default function Admin(){
   const nav = useNavigate()
   const user = getSessionUser()
 
   useEffect(()=>{
-    if (user?.rol !== 'admin'){
+    if (user?.rol !== 'admin' && user?.role !== 'ADMIN'){
       nav('/', { replace: true })
     }
   }, [user, nav])
 
-  const [productos, setProductos] = useState(getProducts())
-  const [desactivados, setDesactivados] = useState(getDeletedProducts())
-  const [usuarios, setUsuarios] = useState(getUsers())
-  const categorias = useMemo(()=> Array.from(new Set(getProducts().map(p=>p.categoria))), [])
+  const [productos, setProductos] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  function guardarProd(id, precio, stock){
-    upsertProductOverride(id, { precio: Number(precio)||0, stock: Number(stock)||0 })
-    setProductos(getProducts())
-    alert('Cambios guardados')
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const products = await getProducts()
+        setProductos(products)
+      } catch (error) {
+        console.error('Error al cargar productos:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    if (user?.rol === 'admin' || user?.role === 'ADMIN') {
+      loadProducts()
+    }
+  }, [user])
+  
+  const categorias = useMemo(()=> Array.from(new Set(productos.map(p=>p.categoria))), [productos])
+
+  async function guardarProd(id, precio, stock){
+    try {
+      const producto = productos.find(p => p.id === id)
+      if (!producto) return
+      
+      await updateProduct(id, { 
+        ...producto, 
+        precio: Number(precio)||0, 
+        stock: Number(stock)||0 
+      })
+      
+      // Recargar productos
+      const products = await getProducts()
+      setProductos(products)
+      alert('Cambios guardados')
+    } catch (error) {
+      alert('Error al guardar: ' + (error.message || 'Error desconocido'))
+      console.error('Error al guardar producto:', error)
+    }
   }
 
-  function eliminarProd(id){
-    if (!confirm('¿Ocultar este producto del catálogo?')) return
-    setProductDeleted(id, true)
-    setProductos(getProducts())
-    setDesactivados(getDeletedProducts())
+  async function eliminarProd(id){
+    if (!confirm('¿Eliminar este producto del catálogo?')) return
+    try {
+      await deleteProduct(id)
+      const products = await getProducts()
+      setProductos(products)
+      alert('Producto eliminado')
+    } catch (error) {
+      alert('Error al eliminar: ' + (error.message || 'Error desconocido'))
+      console.error('Error al eliminar producto:', error)
+    }
   }
 
-  function reactivarProd(id){
-    setProductDeleted(id, false)
-    setProductos(getProducts())
-    setDesactivados(getDeletedProducts())
-  }
-
-  function eliminarUsuario(correo){
-    if (!confirm('¿Eliminar usuario?')) return
-    deleteUserByEmail(correo)
-    setUsuarios(getUsers())
-  }
-
-  function cambiarRol(correo, nuevoRol){
-    updateUserByEmail(correo, { rol: nuevoRol })
-    setUsuarios(getUsers())
-  }
-
-  if (user?.rol !== 'admin') {
+  if (user?.rol !== 'admin' && user?.role !== 'ADMIN') {
     return null
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center">
+        <h1 className="mb-4">Panel de Administración</h1>
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -91,54 +121,6 @@ export default function Admin(){
               ))}
             </div>
 
-            <h6 className="mt-4">Productos desactivados</h6>
-            {desactivados.length===0 ? (
-              <div className="text-muted">No hay productos desactivados.</div>
-            ) : (
-              <table className="table table-sm">
-                <thead><tr><th>Código</th><th>Nombre</th><th></th></tr></thead>
-                <tbody>
-                  {desactivados.map(p=> (
-                    <tr key={p.id}>
-                      <td>{p.codigo||p.id}</td>
-                      <td>{p.nombre||p.id}</td>
-                      <td className="text-end"><button className="btn btn-primary btn-sm" onClick={()=>reactivarProd(p.id)}>Reactivar</button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Usuarios */}
-      <section>
-        <div className="card">
-          <div className="card-header"><h5 className="mb-0">Usuarios Registrados</h5></div>
-          <div className="card-body">
-            {usuarios.length===0 ? <div className="text-muted">Sin usuarios registrados.</div> : (
-              <table className="table">
-                <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th></th></tr></thead>
-                <tbody>
-                  {usuarios.map(u => (
-                    <tr key={u.correo}>
-                      <td>{u.nombre}</td>
-                      <td>{u.correo}</td>
-                      <td>
-                        <select className="form-select form-select-sm" defaultValue={u.rol||'usuario'} onChange={e=>cambiarRol(u.correo, e.target.value)}>
-                          <option value="usuario">usuario</option>
-                          <option value="admin">admin</option>
-                        </select>
-                      </td>
-                      <td className="text-end">
-                        <button className="btn btn-danger btn-sm" onClick={()=>eliminarUsuario(u.correo)}>Eliminar</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
           </div>
         </div>
       </section>

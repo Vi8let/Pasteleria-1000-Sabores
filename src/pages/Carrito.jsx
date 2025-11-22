@@ -39,26 +39,32 @@ export default function Carrito(){
     )
   }
 
-  function finalizarCompra(){
+  async function finalizarCompra(){
     if (!cart.length){ alert('El carrito está vacío.'); return }
     const usuario = getSessionUser()
     if (!usuario){ alert('Debes iniciar sesión para comprar.'); return }
-    const numeroPedido = generateOrderNumber()
-    const fecha = new Date().toISOString()
-    const orden = {
-      numeroPedido,
-      fecha,
-      usuario: { nombre: usuario?.nombre, correo: usuario?.correo, direccion: usuario?.direccion, comuna: usuario?.comuna, region: usuario?.region },
-      productos: cart,
-      subtotal,
-      descuento: mejor?.monto || 0,
-      descuentoInfo: mejor,
-      total
+    
+    try {
+      const fecha = new Date().toISOString()
+      const orden = {
+        numeroPedido: generateOrderNumber(),
+        fecha,
+        usuario: { nombre: usuario?.nombre, correo: usuario?.correo, direccion: usuario?.direccion, comuna: usuario?.comuna, region: usuario?.region },
+        productos: cart,
+        subtotal,
+        descuento: mejor?.monto || 0,
+        descuentoInfo: mejor,
+        total
+      }
+      
+      const savedOrder = await saveOrder(orden)
+      mostrarBoleta(savedOrder || orden)
+      setCart([])
+      clearCart()
+    } catch (error) {
+      alert('Error al procesar la orden: ' + (error.message || 'Error desconocido'))
+      console.error('Error al finalizar compra:', error)
     }
-    saveOrder(orden)
-    mostrarBoleta(orden)
-    setCart([])
-    clearCart()
   }
 
   function mostrarBoleta({ numeroPedido, subtotal, total, descuento, descuentoInfo }){

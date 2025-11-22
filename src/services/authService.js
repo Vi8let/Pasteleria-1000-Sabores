@@ -1,28 +1,132 @@
-const SESSION_KEY = 'sessionUser'
-import { getUsers } from './userService.js'
+import { apiClient } from './apiClient.js'
 
+const SESSION_KEY = 'sessionUser'
+const TOKEN_KEY = 'authToken'
+
+/**
+ * Obtiene el usuario de la sesión actual
+ */
 export function getSessionUser(){
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null') } catch { return null }
+  try { 
+    return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null') 
+  } catch { 
+    return null 
+  }
 }
 
+/**
+ * Guarda el usuario en la sesión
+ */
 export function setSessionUser(user){
   localStorage.setItem(SESSION_KEY, JSON.stringify(user))
+  if (user?.token) {
+    localStorage.setItem(TOKEN_KEY, user.token)
+  }
   window.dispatchEvent(new CustomEvent('session:changed', { detail: user }))
 }
 
+/**
+ * Obtiene el token JWT
+ */
+export function getToken(){
+  return localStorage.getItem(TOKEN_KEY) || getSessionUser()?.token
+}
+
+/**
+ * Cierra la sesión del usuario
+ */
 export function logout(){
   localStorage.removeItem(SESSION_KEY)
+  localStorage.removeItem(TOKEN_KEY)
   window.dispatchEvent(new CustomEvent('session:changed', { detail: null }))
 }
 
-export function login(email, password){
-  const users = getUsers()
-  const user = users.find(u => u.correo === email && u.contrasena === password)
-  if (user){
-    setSessionUser(user)
-    return { success:true, user }
+/**
+ * Inicia sesión en el backend
+ */
+export async function login(email, password){
+  try {
+    const response = await apiClient.post('/auth/login', { email, password }, false)
+    
+    if (response.ok && response.token) {
+      // Obtener perfil completo para tener el nombre
+      let profile = null
+      try {
+        // Guardar token temporalmente para obtener perfil
+        const tempUser = { token: response.token, email: response.email, role: response.role }
+        localStorage.setItem('authToken', response.token)
+        profile = await getProfile()
+      } catch (e) {
+        console.warn('No se pudo obtener perfil:', e)
+      }
+      
+      const user = {
+        correo: response.email,
+        email: response.email,
+        rol: response.role === 'ADMIN' ? 'admin' : 'usuario',
+        role: response.role,
+        token: response.token,
+        nombre: profile?.nombre || response.email.split('@')[0]
+      }
+      setSessionUser(user)
+      return { success: true, user }
+    }
+    
+    return { success: false, message: 'Credenciales incorrectas' }
+  } catch (error) {
+    console.error('Error en login:', error)
+    return { success: false, message: error.message || 'Error al iniciar sesión' }
   }
-  return { success:false, message:'Credenciales incorrectas' }
 }
 
+/**
+ * Registra un nuevo usuario
+ */
+export async function register(userData){
+  try {
+    const registerData = {
+      email: userData.correo || userData.email,
+      password: userData.contrasena || userData.password,
+      fullName: userData.nombre || userData.fullName
+    }
+    
+    const response = await apiClient.post('/auth/register', registerData, false)
+    
+    if (response.ok && response.token) {
+      const user = {
+        correo: response.email,
+        email: response.email,
+        rol: response.role === 'ADMIN' ? 'admin' : 'usuario',
+        role: response.role,
+        token: response.token,
+        nombre: registerData.fullName
+      }
+      setSessionUser(user)
+      return { success: true, user }
+    }
+    
+    return { success: false, message: 'Error al registrar usuario' }
+  } catch (error) {
+    console.error('Error en register:', error)
+    return { success: false, message: error.message || 'Error al registrar usuario' }
+  }
+}
 
+/**
+ * Obtiene el perfil del usuario autenticado
+ */
+export async function getProfile(){
+  try {
+    const response = await apiClient.get('/auth/me', true)
+    return {
+      correo: response.email,
+      email: response.email,
+      rol: response.role?.toLowerCase() || 'usuario',
+      role: response.role,
+      nombre: response.fullName
+    }
+  } catch (error) {
+    console.error('Error al obtener perfil:', error)
+    return null
+  }
+}
