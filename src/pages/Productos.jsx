@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getProducts } from '../services/productService.js'
 import { addToCart } from '../services/cartService.js'
 import { getSessionUser } from '../services/authService.js'
 
 export default function Productos(){
+  const navigate = useNavigate()
   const [productos, setProductos] = useState([])
   const [loading, setLoading] = useState(true)
   
@@ -25,9 +26,16 @@ export default function Productos(){
   const categorias = useMemo(()=> ['Todas', ...Array.from(new Set(productos.map(p=>p.categoria)))], [productos])
   const [categoria, setCategoria] = useState('Todas')
   const visibles = useMemo(()=> categoria==='Todas' ? productos : productos.filter(p=>p.categoria===categoria), [productos, categoria])
-  const isAdmin = (getSessionUser()?.rol === 'admin' || getSessionUser()?.role === 'ADMIN')
+  const session = getSessionUser()
+  const isAdmin = (session?.rol === 'admin' || session?.role === 'ADMIN')
+  const isLogged = !!session
 
   function onAgregar(p){
+    if (!isLogged) {
+      alert('Debes estar logeado para comprar')
+      navigate('/login')
+      return
+    }
     addToCart(p, 1)
     alert(`¡${p.nombre} agregado al carrito!`)
   }
@@ -78,7 +86,7 @@ export default function Productos(){
                 <p className="card-text">{p.descripcion}</p>
                 <p className="card-text"><strong>Precio:</strong> ${p.precio.toLocaleString('es-CL')}</p>
                 <div className="mt-auto d-flex gap-2">
-                  {!isAdmin && <button className="btn btn-sm" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={()=>onAgregar(p)}>🛒 Agregar</button>}
+                  <button className="btn btn-sm" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={()=>onAgregar(p)}>🛒 Agregar</button>
                   <Link to={`/producto/${p.id}`} className="btn btn-sm" style={{backgroundColor:'#FFC0CB', color:'#5D4037'}}>Ver detalle</Link>
                 </div>
               </div>

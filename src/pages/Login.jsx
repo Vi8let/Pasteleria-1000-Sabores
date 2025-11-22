@@ -45,8 +45,10 @@ export default function Login(){
     try {
       const res = await register(reg)
       if (res.success){
-        alert('Registro exitoso')
-        navigate('/')
+        alert('Cuenta creada exitosamente')
+        setTab('login')
+        setEmail(reg.correo)
+        setPassword('')
       } else {
         setError(res.message)
       }

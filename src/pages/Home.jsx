@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getProducts } from '../services/productService.js'
 import { addToCart } from '../services/cartService.js'
 import { getSessionUser } from '../services/authService.js'
 
 export default function Home(){
+  const navigate = useNavigate()
   const [productos, setProductos] = useState([])
   const [loading, setLoading] = useState(true)
   const session = getSessionUser()
@@ -27,6 +28,11 @@ export default function Home(){
   }, [])
 
   function onAgregar(p){
+    if (!isLogged) {
+      alert('Debes estar logeado para comprar')
+      navigate('/login')
+      return
+    }
     addToCart(p, 1)
     alert(`¡${p.nombre} agregado al carrito!`)
   }
@@ -83,7 +89,7 @@ export default function Home(){
                       <p className="card-text">{p.descripcion}</p>
                       <p className="card-text"><strong>Precio:</strong> ${p.precio.toLocaleString('es-CL')}</p>
                       <div className="mt-auto d-flex gap-2">
-                        {!isAdmin && <button className="btn btn-sm" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={()=>onAgregar(p)}>🛒 Agregar</button>}
+                        <button className="btn btn-sm" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={()=>onAgregar(p)}>🛒 Agregar</button>
                         <Link to={`/producto/${p.id}`} className="btn btn-sm" style={{backgroundColor:'#FFC0CB', color:'#5D4037'}}>Ver detalle</Link>
                       </div>
                     </div>

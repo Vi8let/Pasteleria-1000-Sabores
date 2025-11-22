@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getCart } from '../services/cartService.js'
 import { getSessionUser, logout } from '../services/authService.js'
 
 export default function Navbar() {
+  const navigate = useNavigate()
   const [cartCount, setCartCount] = useState(0)
   const [user, setUser] = useState(getSessionUser())
 
@@ -22,6 +23,12 @@ export default function Navbar() {
 
   const isAdmin = user?.rol === 'admin'
 
+  function handleLogout(){
+    logout()
+    alert('Cerraste sesión')
+    navigate('/login')
+  }
+
   return (
     <nav className="navbar navbar-expand-lg">
       <div className="container">
@@ -37,7 +44,7 @@ export default function Navbar() {
           )}
           {isAdmin && <Link className="nav-link" to="/admin">Admin</Link>}
           {user ? (
-            <button className="btn btn-link nav-link" onClick={logout}>Cerrar Sesión</button>
+            <button className="btn btn-link nav-link" onClick={handleLogout}>Cerrar Sesión</button>
           ) : (
             <Link className="nav-link" to="/login">Iniciar Sesión</Link>
           )}
