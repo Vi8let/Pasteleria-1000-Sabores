@@ -21,8 +21,11 @@ export default function Admin(){
     descripcion: '',
     precio: '',
     stock: '',
-    imagen: ''
+    imagen: '',
+    categoria: 'General'
   })
+  
+  const categoriasDisponibles = ['General', 'Tortas Cuadradas', 'Tortas Circulares', 'Tortas Especiales', 'Postres Individuales', 'Sin Gluten', 'Sin Azúcar', 'Veganos', 'Tradicionales']
 
   useEffect(() => {
     async function loadProducts() {
@@ -79,7 +82,7 @@ export default function Admin(){
   async function crearProducto(e){
     e.preventDefault()
     try {
-      if (!nuevoProducto.nombre || !nuevoProducto.descripcion || !nuevoProducto.precio || !nuevoProducto.stock || !nuevoProducto.imagen) {
+      if (!nuevoProducto.nombre || !nuevoProducto.descripcion || !nuevoProducto.precio || !nuevoProducto.stock || !nuevoProducto.imagen || !nuevoProducto.categoria) {
         alert('Por favor completa todos los campos')
         return
       }
@@ -89,7 +92,8 @@ export default function Admin(){
         descripcion: nuevoProducto.descripcion,
         precio: Number(nuevoProducto.precio),
         stock: Number(nuevoProducto.stock),
-        imagen: nuevoProducto.imagen
+        imagen: nuevoProducto.imagen,
+        categoria: nuevoProducto.categoria
       })
       
       // Recargar productos
@@ -97,7 +101,7 @@ export default function Admin(){
       setProductos(products)
       
       // Limpiar formulario
-      setNuevoProducto({ nombre: '', descripcion: '', precio: '', stock: '', imagen: '' })
+      setNuevoProducto({ nombre: '', descripcion: '', precio: '', stock: '', imagen: '', categoria: 'General' })
       setShowForm(false)
       alert('Producto creado exitosamente')
     } catch (error) {
@@ -146,6 +150,15 @@ export default function Admin(){
                         <label className="form-label">Nombre del Producto</label>
                         <input type="text" className="form-control" value={nuevoProducto.nombre} 
                           onChange={e => setNuevoProducto({...nuevoProducto, nombre: e.target.value})} required />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Categoría</label>
+                        <select className="form-select" value={nuevoProducto.categoria} 
+                          onChange={e => setNuevoProducto({...nuevoProducto, categoria: e.target.value})} required>
+                          {categoriasDisponibles.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
                       </div>
                       <div className="col-md-6">
                         <label className="form-label">URL de Imagen (ej: /assets/img/logo.png)</label>

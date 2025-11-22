@@ -21,6 +21,7 @@ function mapProductToBackend(product) {
     description: product.descripcion || '',
     price: product.precio,
     imageUrl: product.imagen,
+    category: product.categoria || 'General',
     stock: product.stock
   }
 }
