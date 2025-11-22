@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getSessionUser } from '../services/authService.js'
-import { getProducts, updateProduct, deleteProduct } from '../services/productService.js'
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/productService.js'
 
 export default function Admin(){
   const nav = useNavigate()
@@ -15,6 +15,14 @@ export default function Admin(){
 
   const [productos, setProductos] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [nuevoProducto, setNuevoProducto] = useState({
+    nombre: '',
+    descripcion: '',
+    precio: '',
+    stock: '',
+    imagen: ''
+  })
 
   useEffect(() => {
     async function loadProducts() {
@@ -68,6 +76,36 @@ export default function Admin(){
     }
   }
 
+  async function crearProducto(e){
+    e.preventDefault()
+    try {
+      if (!nuevoProducto.nombre || !nuevoProducto.descripcion || !nuevoProducto.precio || !nuevoProducto.stock || !nuevoProducto.imagen) {
+        alert('Por favor completa todos los campos')
+        return
+      }
+      
+      await createProduct({
+        nombre: nuevoProducto.nombre,
+        descripcion: nuevoProducto.descripcion,
+        precio: Number(nuevoProducto.precio),
+        stock: Number(nuevoProducto.stock),
+        imagen: nuevoProducto.imagen
+      })
+      
+      // Recargar productos
+      const products = await getProducts()
+      setProductos(products)
+      
+      // Limpiar formulario
+      setNuevoProducto({ nombre: '', descripcion: '', precio: '', stock: '', imagen: '' })
+      setShowForm(false)
+      alert('Producto creado exitosamente')
+    } catch (error) {
+      alert('Error al crear producto: ' + (error.message || 'Error desconocido'))
+      console.error('Error al crear producto:', error)
+    }
+  }
+
   if (user?.rol !== 'admin' && user?.role !== 'ADMIN') {
     return null
   }
@@ -90,8 +128,53 @@ export default function Admin(){
       {/* Productos */}
       <section className="mb-5">
         <div className="card">
-          <div className="card-header"><h5 className="mb-0">Catálogo de Productos</h5></div>
+          <div className="card-header d-flex justify-content-between align-items-center">
+            <h5 className="mb-0">Catálogo de Productos</h5>
+            <button className="btn btn-sm" style={{backgroundColor:'#8B4513', color:'#fff'}} onClick={() => setShowForm(!showForm)}>
+              {showForm ? 'Cancelar' : '+ Agregar Producto'}
+            </button>
+          </div>
           <div className="card-body">
+            {/* Formulario para crear producto */}
+            {showForm && (
+              <div className="card mb-4" style={{backgroundColor:'#FFF5E1'}}>
+                <div className="card-body">
+                  <h6 className="mb-3">Nuevo Producto</h6>
+                  <form onSubmit={crearProducto}>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label className="form-label">Nombre del Producto</label>
+                        <input type="text" className="form-control" value={nuevoProducto.nombre} 
+                          onChange={e => setNuevoProducto({...nuevoProducto, nombre: e.target.value})} required />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">URL de Imagen (ej: /assets/img/logo.png)</label>
+                        <input type="text" className="form-control" value={nuevoProducto.imagen} 
+                          onChange={e => setNuevoProducto({...nuevoProducto, imagen: e.target.value})} required />
+                      </div>
+                      <div className="col-12">
+                        <label className="form-label">Descripción</label>
+                        <textarea className="form-control" rows="2" value={nuevoProducto.descripcion} 
+                          onChange={e => setNuevoProducto({...nuevoProducto, descripcion: e.target.value})} required />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Precio</label>
+                        <input type="number" className="form-control" min="0" step="0.01" value={nuevoProducto.precio} 
+                          onChange={e => setNuevoProducto({...nuevoProducto, precio: e.target.value})} required />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label">Stock</label>
+                        <input type="number" className="form-control" min="0" value={nuevoProducto.stock} 
+                          onChange={e => setNuevoProducto({...nuevoProducto, stock: e.target.value})} required />
+                      </div>
+                      <div className="col-12">
+                        <button type="submit" className="btn" style={{backgroundColor:'#8B4513', color:'#fff'}}>Crear Producto</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
             <div className="row">
               {productos.map(p => (
                 <div className="col-md-4 mb-4" key={p.id}>

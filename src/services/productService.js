@@ -67,6 +67,9 @@ export async function createProduct(product) {
   }
 }
 
+// Alias para compatibilidad
+export const upsertProduct = createProduct
+
 /**
  * Actualiza un producto (solo ADMIN)
  */
