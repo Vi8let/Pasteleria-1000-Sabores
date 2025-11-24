@@ -19,19 +19,31 @@ export default function Pedidos(){
       try {
         const orders = await getMyOrders()
         // Mapear las órdenes del backend al formato del frontend
-        const mappedOrders = orders.map(order => ({
-          id: order.id,
-          numeroPedido: `PED-${order.id}`,
-          fecha: order.createdAt || order.date,
-          status: order.status || 'PENDIENTE',
-          total: order.total || 0,
-          items: (order.items || []).map(item => ({
-            productId: item.productId,
-            productName: item.productName || `Producto ${item.productId}`,
-            quantity: item.quantity || item.quantity,
-            unitPrice: item.unitPrice || 0
-          }))
-        }))
+        const mappedOrders = orders.map(order => {
+          // Calcular subtotal sumando los items
+          const subtotal = (order.items || []).reduce((sum, item) => 
+            sum + (item.unitPrice || 0) * (item.quantity || 0), 0)
+          
+          return {
+            id: order.id,
+            numeroPedido: `PED-${order.id}`,
+            fecha: order.createdAt || order.date,
+            status: order.status || 'PENDIENTE',
+            subtotal: subtotal,
+            descuento: order.discountAmount || 0,
+            descuentoInfo: {
+              porcentaje: order.discountPercentage || 0,
+              descripcion: order.discountDescription || ''
+            },
+            total: order.total || 0,
+            items: (order.items || []).map(item => ({
+              productId: item.productId,
+              productName: item.productName || `Producto ${item.productId}`,
+              quantity: item.quantity || item.quantity,
+              unitPrice: item.unitPrice || 0
+            }))
+          }
+        })
         setPedidos(mappedOrders)
       } catch (error) {
         console.error('Error al cargar pedidos:', error)
@@ -101,6 +113,17 @@ export default function Pedidos(){
                 </div>
                 <div className="card-body">
                   <p className="card-text"><strong>Fecha:</strong> {formatDate(pedido.fecha)}</p>
+                  {pedido.subtotal && (
+                    <p className="card-text"><strong>Subtotal:</strong> ${pedido.subtotal.toLocaleString('es-CL')}</p>
+                  )}
+                  {pedido.descuento > 0 && (
+                    <p className="card-text text-success">
+                      <strong>Descuento ({pedido.descuentoInfo?.porcentaje || 0}%):</strong> -${pedido.descuento.toLocaleString('es-CL')}
+                      {pedido.descuentoInfo?.descripcion && (
+                        <small className="d-block text-muted">{pedido.descuentoInfo.descripcion}</small>
+                      )}
+                    </p>
+                  )}
                   <p className="card-text"><strong>Total:</strong> <span className="h5" style={{color:'#8B4513'}}>${pedido.total.toLocaleString('es-CL')}</span></p>
                   
                   {pedido.items && pedido.items.length > 0 && (

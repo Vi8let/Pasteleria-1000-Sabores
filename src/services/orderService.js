@@ -38,7 +38,10 @@ export async function saveOrder(orderData) {
     })) || []
 
     const orderRequest = {
-      items: items
+      items: items,
+      discountAmount: orderData.descuento || 0,
+      discountPercentage: orderData.descuentoInfo?.porcentaje || 0,
+      discountDescription: orderData.descuentoInfo?.descripcion || null
     }
 
     const createdOrder = await apiClient.post('/orders', orderRequest, true)
@@ -49,7 +52,12 @@ export async function saveOrder(orderData) {
       id: createdOrder.id,
       numeroPedido: `PED-${createdOrder.id}`,
       fecha: createdOrder.createdAt || new Date().toISOString(),
-      status: createdOrder.status || 'PENDIENTE'
+      status: createdOrder.status || 'PENDIENTE',
+      descuento: createdOrder.discountAmount || 0,
+      descuentoInfo: {
+        porcentaje: createdOrder.discountPercentage || 0,
+        descripcion: createdOrder.discountDescription || ''
+      }
     }
   } catch (error) {
     console.error('Error al crear orden:', error)
