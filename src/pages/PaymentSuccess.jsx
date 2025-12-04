@@ -28,7 +28,11 @@ export default function PaymentSuccess() {
                     <p className="mb-0"><strong>Fecha:</strong> {new Date(order.fecha).toLocaleString('es-CL')}</p>
                 </div>
 
-                <p className="text-muted mt-3">Hemos enviado un correo de confirmación a {order.usuario?.correo}</p>
+                <p className="text-muted mt-3">
+                    Hemos enviado la boleta y el número de seguimiento a <strong>{order.usuario?.correo}</strong>.
+                    <br />
+                    Recibirás un correo con todos los detalles de tu compra.
+                </p>
 
                 <div className="d-grid gap-2 d-md-block mt-4">
                     <Link to="/pedidos" className="btn btn-primary me-md-2" style={{ backgroundColor: '#8B4513', borderColor: '#8B4513' }}>Ver Mis Pedidos</Link>

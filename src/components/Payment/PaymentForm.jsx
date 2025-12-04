@@ -14,30 +14,15 @@ export default function PaymentForm({ onSubmit, isProcessing }) {
     }
 
     const handleSubmit = (e) => {
-        e.preventDefault()
-        onSubmit(formData)
-    }
-
-    return (
-        <div className="card">
-            <div className="card-header bg-primary text-white">
-                <h5 className="mb-0">Datos de Pago</h5>
-            </div>
-            <div className="card-body">
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label htmlFor="cardName" className="form-label">Nombre en la tarjeta</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="cardName"
-                            name="cardName"
-                            value={formData.cardName}
-                            onChange={handleChange}
-                            required
-                            placeholder="Juan Pérez"
-                        />
-                    </div>
+        className = "form-control"
+        id = "cardName"
+        name = "cardName"
+        value = { formData.cardName }
+        onChange = { handleChange }
+        required
+        placeholder = "Juan Pérez"
+            />
+                    </div >
                     <div className="mb-3">
                         <label htmlFor="cardNumber" className="form-label">Número de tarjeta</label>
                         <input
@@ -87,8 +72,8 @@ export default function PaymentForm({ onSubmit, isProcessing }) {
                             {isProcessing ? 'Procesando...' : 'Pagar Ahora'}
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
+                </form >
+            </div >
+        </div >
     )
 }
