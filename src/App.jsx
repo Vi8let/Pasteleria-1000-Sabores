@@ -8,6 +8,9 @@ import Perfil from './pages/Perfil.jsx'
 import Login from './pages/Login.jsx'
 import Admin from './pages/Admin.jsx'
 import Pedidos from './pages/Pedidos.jsx'
+import Checkout from './pages/Checkout.jsx'
+import PaymentSuccess from './pages/PaymentSuccess.jsx'
+import PaymentFailure from './pages/PaymentFailure.jsx'
 
 export default function App() {
   return (
@@ -21,6 +24,9 @@ export default function App() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/pedidos" element={<Pedidos />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/success" element={<PaymentSuccess />} />
+          <Route path="/checkout/failure" element={<PaymentFailure />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
